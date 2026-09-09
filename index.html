@@ -22,10 +22,11 @@ img,svg,video,canvas{max-width:100%;height:auto}
 .top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-width:0}
 .pill{border:1px solid var(--line);background:rgba(255,255,255,.72);border-radius:999px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center;font-weight:800;box-shadow:var(--shadow)}
 .status-dot{width:10px;height:10px;border-radius:50%;background:var(--green)}
-button{border:0;border-radius:15px;padding:11px 14px;font-weight:900;cursor:pointer;background:var(--pink);color:white;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 30%,transparent)}
-button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}button.ghost{background:transparent;color:var(--pink);box-shadow:none;padding:7px 8px}button.danger{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+button{border:0;border-radius:15px;padding:11px 14px;font-weight:900;cursor:pointer;background:var(--pink);color:white;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 30%,transparent);transition:.15s ease}
+button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}button.ghost{background:transparent;color:var(--pink);box-shadow:none;padding:7px 8px}button.danger{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
 .setup,.notice{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;margin:14px 0}.setup{background:#fff3cd;border-color:#ffd36b;color:#5e4300;font-weight:800}
-.notice{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;min-width:0}.notice>div{min-width:0}.notice b{color:var(--pink)}.rules{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.chip{font-size:13px;padding:8px 10px;border-radius:999px;background:var(--pink2);color:color-mix(in srgb,var(--pink) 65%,#4b1a2b);font-weight:800}
+.notice{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center;min-width:0}.notice>div{min-width:0}.notice b{color:var(--pink)}.rules{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}.chip{font-size:13px;padding:8px 10px;border-radius:999px;background:var(--pink2);color:color-mix(in srgb,var(--pink) 65%,#14304a);font-weight:800}
 .live-marquee{background:var(--dark);color:#fff;border-radius:18px;padding:12px 0;overflow:hidden;margin:14px 0;box-shadow:var(--shadow);max-width:100%}
 .marquee-track{display:flex;width:max-content;will-change:transform;animation:marqueeScroll 26s linear infinite}
 .marquee-track span{display:inline-block;white-space:nowrap;font-weight:950;padding-right:56px}
@@ -33,14 +34,22 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
 .live-board{background:linear-gradient(135deg,#fff,var(--pink2));border:1px solid var(--line);box-shadow:var(--shadow);border-radius:28px;padding:20px;min-height:190px;margin:14px 0 18px;overflow:hidden}
 .live-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.live-tag{background:var(--dark);color:#fff;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:950;letter-spacing:.06em}.dots{display:flex;gap:6px}.dot{width:8px;height:8px;border-radius:50%;background:var(--line)}.dot.active{background:var(--pink)}
 .slide{display:none;animation:fadeSlide .45s ease}.slide.active{display:block}.slide-title{font-size:clamp(26px,6vw,48px);font-weight:950;margin:4px 0}.slide-desc{font-size:17px;color:var(--muted);font-weight:800}.big-number{font-size:clamp(44px,10vw,80px);font-weight:950;color:var(--pink);line-height:1;margin:8px 0}
-.people{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.person{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 12px;font-weight:900}.empty{background:#fff8fa;border:1px dashed var(--line);color:var(--muted)}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:18px;min-width:0}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;min-width:0}
-.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:.18s;min-width:0}.card:hover{transform:translateY(-2px)}.card.full:after{content:"เต็มแล้ว";position:absolute;right:-34px;top:18px;background:var(--red);color:#fff;transform:rotate(35deg);padding:6px 42px;font-size:12px;font-weight:950}.role-title{display:flex;justify-content:space-between;gap:10px;align-items:start;min-width:0}.role-title h3{margin:0;font-size:20px;min-width:0;overflow-wrap:anywhere}.count{font-size:13px;color:var(--muted);font-weight:900;flex:0 0 auto}.slots{margin:13px 0;display:grid;gap:8px;min-width:0}.slot{background:#fff8fa;border:1px dashed var(--line);border-radius:14px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0}.slot>div{min-width:0}.slot.taken{background:#f7fff9;border-style:solid;border-color:#bfeccf}.name{font-weight:950;overflow-wrap:anywhere;word-break:break-word}.small{font-size:12px;color:var(--muted);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
-.side{display:grid;gap:14px;min-width:0}.panel{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0}.panel h2{margin:0 0 12px}.stat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}.stat div{background:#fff6f8;border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.stat b{font-size:26px}.field{display:grid;gap:6px;margin:10px 0;min-width:0}.field label{font-size:13px;color:var(--muted);font-weight:900}input,select{width:100%;max-width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--ink);min-width:0}
-.admin-box{display:none;min-width:0}.admin-on .admin-box{display:block}.admin-on #adminLogin{display:none}.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;min-width:340px;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #f3d4dc;padding:8px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.table th{color:var(--muted)}.table td .admin-actions{flex-wrap:wrap}.table td .ghost{padding:6px 7px;font-size:12px}
+.people{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.person{background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 12px;font-weight:900}.empty{background:#eef7fd;border:1px dashed var(--line);color:var(--muted)}
+.dept-block{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;margin-bottom:16px;min-width:0}.dept-block:last-child{margin-bottom:0}
+.dept-heading{font-size:15px;font-weight:900;color:var(--ink);padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.dept-heading .dept-count{margin-left:auto;font-size:12px;font-weight:800;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:18px;min-width:0}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;min-width:0}
+.dept-block .card{box-shadow:none;background:var(--bg)}
+.dept-block .card:hover{box-shadow:0 14px 30px rgba(23,79,120,.12)}
+.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:.2s ease;min-width:0}.card:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(23,79,120,.16)}.card.full:after{content:"เต็มแล้ว";position:absolute;right:-34px;top:18px;background:var(--red);color:#fff;transform:rotate(35deg);padding:6px 42px;font-size:12px;font-weight:950}.role-title{display:flex;justify-content:space-between;gap:10px;align-items:start;min-width:0}.role-title h3{margin:0;font-size:20px;min-width:0;overflow-wrap:anywhere}.count{font-size:13px;color:var(--muted);font-weight:900;flex:0 0 auto}.slots{margin:13px 0;display:grid;gap:8px;min-width:0}.slot{background:#eef7fd;border:1px dashed var(--line);border-radius:14px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0}.slot>div{min-width:0}.slot.taken{background:#f7fff9;border-style:solid;border-color:#bfeccf}.name{font-weight:950;overflow-wrap:anywhere;word-break:break-word}.small{font-size:12px;color:var(--muted);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
+.side{display:grid;gap:14px;min-width:0}.panel{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0}.panel h2{margin:0 0 12px}.stat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}.stat div{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.stat b{font-size:26px}.field{display:grid;gap:6px;margin:10px 0;min-width:0}.field label{font-size:13px;color:var(--muted);font-weight:900}input,select{width:100%;max-width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--ink);min-width:0}
+.admin-box{display:none;min-width:0}.admin-on .admin-box{display:block}.admin-on #adminLogin{display:none}
+.panel.admin-box{max-height:440px;overflow-y:auto}
+#adminLogin{padding:12px}#adminLogin h2{font-size:15px;margin-bottom:4px}#adminLogin p{margin:0 0 8px}#adminLogin .field{margin:7px 0}
+.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;min-width:340px;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #cfe6f7;padding:8px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.table th{color:var(--muted)}.table td .admin-actions{flex-wrap:wrap}.table td .ghost{padding:6px 7px;font-size:12px}
 .modal{position:fixed;inset:0;background:rgba(40,18,28,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.modal-card{max-width:500px;width:100%;background:#fff;border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.22);max-height:90vh;overflow:auto}.modal-card h2{margin:0 0 10px}.code{font-size:38px;letter-spacing:.08em;font-weight:950;background:var(--dark);color:#fff;border-radius:18px;text-align:center;padding:18px;margin:12px 0}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#20141a;color:#fff;padding:12px 16px;border-radius:999px;display:none;font-weight:900;z-index:50}.toast.show{display:block;animation:pop .2s ease}
-.schedule-status{background:#fff6f8;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:12px}.countdown{font-size:22px;font-weight:950;color:var(--pink);margin-top:4px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.time-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.progressbar{height:12px;background:#ffe7ee;border-radius:999px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#ff9bb8);border-radius:999px;width:0%}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fff8fa;border:1px solid var(--line);border-radius:14px;padding:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--pink2);display:inline-grid;place-items:center;font-weight:950;color:color-mix(in srgb,var(--pink) 70%,#222)}.call-card{border:1px solid var(--line);background:#fff8fa;border-radius:16px;padding:12px;margin:8px 0}.muted-btn{font-size:13px;padding:8px 10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#15304a;color:#fff;padding:12px 16px;border-radius:999px;display:none;font-weight:900;z-index:50}.toast.show{display:block;animation:pop .2s ease}
+.schedule-status{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:12px}.countdown{font-size:22px;font-weight:950;color:var(--pink);margin-top:4px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.time-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.progressbar{height:12px;background:#dcedf9;border-radius:999px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#9cc9ec);border-radius:999px;width:0%}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#eef7fd;border:1px solid var(--line);border-radius:14px;padding:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--pink2);display:inline-grid;place-items:center;font-weight:950;color:color-mix(in srgb,var(--pink) 70%,#222)}.call-card{border:1px solid var(--line);background:#eef7fd;border-radius:16px;padding:12px;margin:8px 0}.muted-btn{font-size:13px;padding:8px 10px}
 @keyframes pop{from{transform:translateX(-50%) scale(.9);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}@keyframes fadeSlide{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.notice{grid-template-columns:1fr}.side{grid-row:1}.live-board{min-height:220px}}
 @media print{body{background:#fff}.top,.notice,.live-board,.live-marquee,.side,.cards,.modal:not(#callSheetModal){display:none!important}#callSheetModal{position:static;display:block;background:#fff}.modal-card{box-shadow:none;max-width:100%;border-radius:0}}
@@ -51,7 +60,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   min-height:unset;
   background:
     radial-gradient(circle at 15% 20%, color-mix(in srgb,var(--pink) 23%, transparent), transparent 32%),
-    linear-gradient(135deg,#fff,var(--pink2) 58%,#fff7fa);
+    linear-gradient(135deg,#fff,var(--pink2) 58%,#f4faff);
   border-radius:32px;
   padding:22px;
   min-width:0;
@@ -99,7 +108,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   border:1px solid var(--line);
   border-radius:26px;
   padding:20px;
-  box-shadow:0 10px 28px rgba(82,31,50,.08);
+  box-shadow:0 10px 28px rgba(23,79,120,.08);
   min-width:0;
 }
 .live-progress-main{
@@ -115,7 +124,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   width:150px;
   height:150px;
   border-radius:50%;
-  background:conic-gradient(var(--pink) calc(var(--p)*1%),#ffe1ea 0);
+  background:conic-gradient(var(--pink) calc(var(--p)*1%),#dcedf9 0);
   display:grid;
   place-items:center;
   flex:0 0 auto;
@@ -220,7 +229,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   font-weight:950;
   white-space:nowrap;
 }
-.live-badge.full{background:#ffe4e8;color:var(--red)}
+.live-badge.full{background:#ffe1e1;color:var(--red)}
 .live-badge.open{background:#eafff2;color:var(--green)}
 .live-badge.wait{background:#fff5d8;color:#a66a00}
 .live-announcement{
@@ -238,7 +247,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   max-width:100%;
 }
 .live-announcement b{
-  color:#ffd7e3;
+  color:#bfe0ff;
   white-space:nowrap;
   flex:0 0 auto;
 }
@@ -270,7 +279,6 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
 
   <div class="setup" id="setupWarn" style="display:none">⚠️ ยังไม่ได้ใส่ Firebase Config ในไฟล์ index.html</div>
 
-  <div class="live-marquee"><div class="marquee-track" id="marqueeTrack"><span id="marqueeText">กำลังโหลดข้อมูล...</span><span id="marqueeText2" aria-hidden="true">กำลังโหลดข้อมูล...</span></div></div>
   <section class="live-board">
     <div class="live-head"><div class="live-tag">LIVE INFO BOARD</div><div class="dots" id="liveDots"></div></div>
     <div id="liveSlides"></div>
@@ -349,6 +357,15 @@ const roles=[
   {id:'art',emoji:'🎨',name:'Art Director',max:1},
   {id:'artprop',emoji:'🪑',name:'Art/Prop',max:2},
   {id:'makeup',emoji:'💄',name:'Makeup & Costume',max:2},
+];
+// จัดกลุ่มตำแหน่งเป็นหมวดหมู่แผนก สำหรับแสดงผลเป็นส่วนๆ
+const DEPARTMENTS=[
+  {name:'กำกับ / โปรดักชั่น',ids:['director','producer','script','runner']},
+  {name:'ฝ่ายกล้อง',ids:['dop','camoperator','focuspuller','camop']},
+  {name:'ไฟ / ไฟฟ้า',ids:['gaffer','bestboy']},
+  {name:'เสียง',ids:['sound']},
+  {name:'ศิลป์',ids:['art','artprop']},
+  {name:'แต่งหน้า / คอสตูม',ids:['makeup']},
 ];
 // รายชื่อทีม 18 คน — ใช้รหัสนักศึกษาเป็นตัวอ้างอิงไม่ซ้ำ (กันคนเดียวลงหลายตำแหน่ง)
 const ROSTER=[
@@ -462,7 +479,22 @@ function renderLiveBanner(){
   if(track)track.style.animationDuration=Math.max(18,marqueeMsg.length*0.16)+'s';
 }
 function renderCards(){
-  document.getElementById('roleCards').innerHTML=roles.map(r=>{const max=roleMax(r.id),entries=state.entries.filter(e=>e.role===r.id),full=entries.length>=max;return`<article class="card ${full?'full':''}"><div class="role-title"><h3>${r.emoji} ${r.name}</h3><span class="count">${entries.length}/${max}</span></div><div class="slots">${Array.from({length:max}).map((_,i)=>{const e=entries[i];return`<div class="slot ${e?'taken':''}"><div><div class="name">${e?e.name:'ว่าง'}</div><div class="small">${e?'เลือกเวลา '+(e.time||'-'):'รอคนกดเลือก'}</div></div>${e?'✅':'🟢'}</div>`}).join('')}</div><button ${full||!effectiveOpen()||!isConfigured()?'disabled':''} onclick="openSignup('${r.id}')">ลงตำแหน่งนี้</button></article>`}).join('');
+  const deptIcon={'กำกับ / โปรดักชั่น':'🎬','ฝ่ายกล้อง':'📷','ไฟ / ไฟฟ้า':'💡','เสียง':'🎤','ศิลป์':'🎨','แต่งหน้า / คอสตูม':'💄'};
+  const cardHTML=r=>{
+    const max=roleMax(r.id),entries=state.entries.filter(e=>e.role===r.id),full=entries.length>=max;
+    const slotsHTML=max===1
+      ? (entries[0]?`<div class="slot taken"><div><div class="name">${entries[0].name}</div><div class="small">เลือกเวลา ${entries[0].time||'-'}</div></div>✅</div>`
+                    :`<div class="slot"><div><div class="name">ว่าง</div><div class="small">รอคนกดเลือก</div></div>🟢</div>`)
+      : Array.from({length:max}).map((_,i)=>{const e=entries[i];return`<div class="slot ${e?'taken':''}"><div><div class="name">${e?e.name:'ว่าง'}</div><div class="small">${e?'เลือกเวลา '+(e.time||'-'):'รอคนกดเลือก'}</div></div>${e?'✅':'🟢'}</div>`}).join('');
+    return`<article class="card ${full?'full':''}"><div class="role-title"><h3>${r.emoji} ${r.name}</h3><span class="count">${entries.length}/${max}</span></div><div class="slots">${slotsHTML}</div><button ${full||!effectiveOpen()||!isConfigured()?'disabled':''} onclick="openSignup('${r.id}')">ลงตำแหน่งนี้</button></article>`;
+  };
+  document.getElementById('roleCards').innerHTML=DEPARTMENTS.map(dept=>{
+    const deptRoles=dept.ids.map(id=>roles.find(r=>r.id===id)).filter(Boolean);
+    if(!deptRoles.length)return '';
+    const filled=deptRoles.reduce((s,r)=>s+state.entries.filter(e=>e.role===r.id).length,0);
+    const total=deptRoles.reduce((s,r)=>s+roleMax(r.id),0);
+    return `<div class="dept-block"><div class="dept-heading">${deptIcon[dept.name]||'🎬'} ${dept.name}<span class="dept-count">${filled}/${total} คน</span></div><div class="cards">${deptRoles.map(cardHTML).join('')}</div></div>`;
+  }).join('');
   const roleOptions=roles.map(r=>`<option value="${r.id}" ${roleFree(r.id)<=0?'disabled':''}>${r.name} ${roleFree(r.id)>0?'ว่าง '+roleFree(r.id):'เต็ม'}</option>`).join('');
   document.getElementById('editRole').innerHTML=roleOptions;
   const adminEditRole=document.getElementById('adminEditRole');if(adminEditRole)adminEditRole.innerHTML=roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
