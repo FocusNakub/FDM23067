@@ -383,8 +383,9 @@
     font-weight: 800;
     box-shadow: none;
   }
-  .q-status.pending{ background: #fff3cd; color: #8a6400; }
-  .q-status.received{ background: #e5f9ee; color: var(--ok); }
+  .q-status.pending{ background: #ffe8ea; color: var(--danger); }
+  .q-status.received{ background: #fff3cd; color: #8a6400; }
+  .q-status.asked{ background: #e5f9ee; color: var(--ok); }
   .q-status:disabled{
     opacity: 1;
     cursor: default;
@@ -684,12 +685,13 @@
     await batch.commit();
   });
 
-  // สลับสถานะ "รับเรื่องแล้ว / ยังไม่รับเรื่อง" ทำได้เฉพาะตอนล็อกอิน Admin
+  // กดที่ป้ายสถานะแล้ววนไปสถานะถัดไปทีละขั้น (ยังไม่เห็น → รับเรื่องแล้ว → ถามอาจารย์เรียบร้อยแล้ว → วนกลับ) ทำได้เฉพาะตอนล็อกอิน Admin
   questionList.addEventListener('click', (e) => {
     const btn = e.target.closest('.q-status');
     if (!btn || !isAdmin) return;
     const id = btn.dataset.id;
-    const newStatus = btn.dataset.status === 'received' ? 'pending' : 'received';
+    const currentIndex = STATUS_ORDER.indexOf(btn.dataset.status);
+    const newStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
     questionsRef.doc(id).update({ status: newStatus });
   });
 
@@ -735,8 +737,16 @@
     }
   });
 
-  // ป้ายสถานะที่อ่านแล้วเข้าใจง่ายขึ้น
-  const STATUS_LABEL = { pending: 'รอคิว', received: 'ถามอาจารย์แล้ว' };
+  // 3 สถานะ เรียงตามลำดับที่กดวนได้: ยังไม่เห็น → รับเรื่องแล้ว → ถามอาจารย์เรียบร้อยแล้ว
+  const STATUS_ORDER = ['pending', 'received', 'asked'];
+  const STATUS_LABEL = {
+    pending: 'ยังไม่เห็น',
+    received: 'รับเรื่องแล้ว',
+    asked: 'ถามอาจารย์เรียบร้อยแล้ว'
+  };
+  function normalizeStatus(s) {
+    return STATUS_ORDER.includes(s) ? s : 'pending';
+  }
 
   // สร้าง HTML ของลิสต์คำถามจากข้อมูลล่าสุด (เรียกใหม่ตอน login/logout ด้วย เพื่อสลับมุมมอง admin/ทั่วไป)
   function renderQuestionList(items) {
@@ -749,27 +759,27 @@
 
     // คนทั่วไป (ไม่ได้ล็อกอิน Admin) เห็นแค่ภาพรวมจำนวน ไม่เห็นเนื้อหาคำถามของคนอื่น
     if (!isAdmin) {
-      const receivedCount = items.filter(({ data }) => data.status === 'received').length;
-      const pendingCount = items.length - receivedCount;
+      const askedCount = items.filter(({ data }) => normalizeStatus(data.status) === 'asked').length;
+      const inProgressCount = items.length - askedCount;
       questionList.innerHTML = `
         <div class="qsummary">
           <div class="qsummary-item"><b>${items.length}</b><span>คำถามทั้งหมด</span></div>
-          <div class="qsummary-item"><b>${receivedCount}</b><span>ถามอาจารย์แล้ว</span></div>
-          <div class="qsummary-item"><b>${pendingCount}</b><span>รอคิว</span></div>
+          <div class="qsummary-item"><b>${askedCount}</b><span>ถามอาจารย์แล้ว</span></div>
+          <div class="qsummary-item"><b>${inProgressCount}</b><span>กำลังดำเนินการ</span></div>
         </div>
         <div class="qsummary-note">เนื้อหาคำถามเห็นได้เฉพาะแอดมิน เพื่อความเป็นส่วนตัวของทุกคน</div>
       `;
       return;
     }
 
-    // มุมมอง Admin เห็นรายละเอียดครบ + สลับสถานะได้
+    // มุมมอง Admin เห็นรายละเอียดครบ + กดวนสถานะได้
     let html = '';
     items.forEach(({ id, data }) => {
       const time = data.createdAt
         ? data.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
         : 'กำลังบันทึก...';
       const initial = (data.realName || '?').trim().slice(0, 1).toUpperCase();
-      const status = data.status === 'received' ? 'received' : 'pending';
+      const status = normalizeStatus(data.status);
       html += `
         <div class="q-item">
           <div class="q-avatar">${escapeHtml(initial)}</div>
