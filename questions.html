@@ -305,6 +305,41 @@
     margin-bottom: 16px;
     font-size: 13px;
   }
+  .modal-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(23,48,73,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 30;
+  }
+  .modal-overlay.show{ display: flex; }
+  .modal-box{
+    position: relative;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 26px 22px 22px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: 0 30px 80px rgba(0,0,0,.25);
+  }
+  .modal-box h2{ font-size:16px; margin: 0 0 16px; }
+  .modal-close{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--text-soft);
+    box-shadow: none;
+    font-size: 18px;
+    line-height: 1;
+  }
   .admin-card{ display:none; }
   .admin-card h2{ font-size:15px; }
   .admin-actions{
@@ -362,14 +397,6 @@
   <div class="trial-banner" id="trialBanner" style="display:none">โหมดทดลอง — คำถามที่ส่งตอนนี้จะถูกล้างทิ้งก่อนใช้งานจริง</div>
   <div class="closed-banner" id="closedBanner" style="display:none">ตอนนี้ปิดรับคำถามชั่วคราว รอเปิดอีกครั้งนะ</div>
 
-  <!-- เข้าสู่ระบบ Admin -->
-  <div class="card admin-card" id="adminLoginCard">
-    <h2>เข้าสู่ระบบ Admin</h2>
-    <input id="adminKeyInput" type="password" placeholder="รหัส Admin">
-    <button type="button" id="adminLoginBtn">เข้าสู่ระบบ</button>
-    <div class="status-msg" id="adminLoginMsg"></div>
-  </div>
-
   <!-- แผงควบคุม Admin -->
   <div class="card admin-card" id="adminPanelCard">
     <h2>แผงควบคุม Admin</h2>
@@ -420,6 +447,17 @@
   <footer>
     ทำโดย Focus Nakub
   </footer>
+</div>
+
+<!-- แผงลอยเข้าสู่ระบบ Admin -->
+<div class="modal-overlay" id="adminLoginModal">
+  <div class="modal-box">
+    <button type="button" class="modal-close" id="adminLoginCloseBtn">×</button>
+    <h2>เข้าสู่ระบบ Admin</h2>
+    <input id="adminKeyInput" type="password" placeholder="รหัส Admin">
+    <button type="button" id="adminLoginBtn">เข้าสู่ระบบ</button>
+    <div class="status-msg" id="adminLoginMsg"></div>
+  </div>
 </div>
 
 <script>
@@ -479,7 +517,8 @@
   const trialBanner = document.getElementById('trialBanner');
   const closedBanner = document.getElementById('closedBanner');
   const adminToggleBtn = document.getElementById('adminToggleBtn');
-  const adminLoginCard = document.getElementById('adminLoginCard');
+  const adminLoginModal = document.getElementById('adminLoginModal');
+  const adminLoginCloseBtn = document.getElementById('adminLoginCloseBtn');
   const adminPanelCard = document.getElementById('adminPanelCard');
   const adminKeyInput = document.getElementById('adminKeyInput');
   const adminLoginBtn = document.getElementById('adminLoginBtn');
@@ -513,9 +552,20 @@
     toggleTrialBtn.textContent = currentTrial ? 'ปิดโหมดทดลอง' : 'เปิดโหมดทดลอง';
   }
 
+  function openAdminModal() {
+    adminLoginModal.classList.add('show');
+    adminLoginMsg.textContent = '';
+    adminKeyInput.value = '';
+    // เด้งไปโฟกัสช่องกรอกรหัสทันที กด Enter แล้วเข้าได้เลย
+    setTimeout(() => adminKeyInput.focus(), 50);
+  }
+
+  function closeAdminModal() {
+    adminLoginModal.classList.remove('show');
+  }
+
   function renderAdminUI() {
     adminToggleBtn.textContent = isAdmin ? 'ปิดแผง Admin' : 'จัดการ';
-    adminLoginCard.style.display = (!isAdmin && adminLoginCard.dataset.open === '1') ? 'block' : 'none';
     adminPanelCard.style.display = isAdmin ? 'block' : 'none';
   }
 
@@ -534,10 +584,25 @@
       // ออกจากระบบเมื่อกดปุ่มซ้ำตอนแผงเปิดอยู่
       isAdmin = false;
       sessionStorage.removeItem('fdm23067QAdmin');
+      renderAdminUI();
+      renderQuestionList(latestQuestions);
     } else {
-      adminLoginCard.dataset.open = adminLoginCard.dataset.open === '1' ? '0' : '1';
+      openAdminModal();
     }
-    renderAdminUI();
+  });
+
+  adminLoginCloseBtn.addEventListener('click', closeAdminModal);
+  // คลิกพื้นหลังมืดๆ นอกกล่อง ก็ปิดแผงลอยได้เหมือนกัน
+  adminLoginModal.addEventListener('click', (e) => {
+    if (e.target === adminLoginModal) closeAdminModal();
+  });
+
+  // กด Enter ในช่องรหัส Admin แล้วเข้าสู่ระบบได้ทันที ไม่ต้องกดปุ่ม
+  adminKeyInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      adminLoginBtn.click();
+    }
   });
 
   adminLoginBtn.addEventListener('click', () => {
@@ -546,7 +611,7 @@
       sessionStorage.setItem('fdm23067QAdmin', '1');
       adminKeyInput.value = '';
       adminLoginMsg.textContent = '';
-      adminLoginCard.dataset.open = '0';
+      closeAdminModal();
       renderAdminUI();
       renderQuestionList(latestQuestions);
     } else {
