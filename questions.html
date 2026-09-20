@@ -362,22 +362,63 @@
   }
   button.danger{ background: var(--danger); }
 
-  .q-status{
-    margin-top: 8px;
-    width: auto;
-    padding: 5px 12px;
-    border-radius: 999px;
+  .q-status-row{
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .q-status-row .q-status-label{
     font-size: 11px;
+    color: var(--text-soft);
+    font-weight: 700;
+  }
+  .q-status{
+    width: auto;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 12px;
     font-weight: 800;
     box-shadow: none;
   }
-  .q-status.pending{ background: #ffe8ea; color: var(--danger); }
+  .q-status.pending{ background: #fff3cd; color: #8a6400; }
   .q-status.received{ background: #e5f9ee; color: var(--ok); }
   .q-status:disabled{
     opacity: 1;
     cursor: default;
   }
   .q-status:not(:disabled):hover{ filter: brightness(0.95); transform:none; }
+
+  .qsummary{
+    display: flex;
+    gap: 10px;
+    text-align: center;
+  }
+  .qsummary-item{
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 8px;
+  }
+  .qsummary-item b{
+    display: block;
+    font-size: 24px;
+    color: var(--primary-dark);
+  }
+  .qsummary-item span{
+    font-size: 12px;
+    color: var(--text-soft);
+    font-weight: 700;
+  }
+  .qsummary-note{
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 12px;
+    margin-top: 14px;
+  }
 </style>
 </head>
 <body>
@@ -694,7 +735,10 @@
     }
   });
 
-  // สร้าง HTML ของลิสต์คำถามจากข้อมูลล่าสุด (เรียกใหม่ตอน login/logout ด้วย เพื่อโชว์/ซ่อนปุ่มสถานะ)
+  // ป้ายสถานะที่อ่านแล้วเข้าใจง่ายขึ้น
+  const STATUS_LABEL = { pending: 'รอคิว', received: 'ถามอาจารย์แล้ว' };
+
+  // สร้าง HTML ของลิสต์คำถามจากข้อมูลล่าสุด (เรียกใหม่ตอน login/logout ด้วย เพื่อสลับมุมมอง admin/ทั่วไป)
   function renderQuestionList(items) {
     if (items.length === 0) {
       questionList.innerHTML = '<div class="empty">ยังไม่มีใครถามเลย เป็นคนแรกก็ได้นะ</div>';
@@ -702,6 +746,23 @@
       return;
     }
     countPill.textContent = items.length;
+
+    // คนทั่วไป (ไม่ได้ล็อกอิน Admin) เห็นแค่ภาพรวมจำนวน ไม่เห็นเนื้อหาคำถามของคนอื่น
+    if (!isAdmin) {
+      const receivedCount = items.filter(({ data }) => data.status === 'received').length;
+      const pendingCount = items.length - receivedCount;
+      questionList.innerHTML = `
+        <div class="qsummary">
+          <div class="qsummary-item"><b>${items.length}</b><span>คำถามทั้งหมด</span></div>
+          <div class="qsummary-item"><b>${receivedCount}</b><span>ถามอาจารย์แล้ว</span></div>
+          <div class="qsummary-item"><b>${pendingCount}</b><span>รอคิว</span></div>
+        </div>
+        <div class="qsummary-note">เนื้อหาคำถามเห็นได้เฉพาะแอดมิน เพื่อความเป็นส่วนตัวของทุกคน</div>
+      `;
+      return;
+    }
+
+    // มุมมอง Admin เห็นรายละเอียดครบ + สลับสถานะได้
     let html = '';
     items.forEach(({ id, data }) => {
       const time = data.createdAt
@@ -709,7 +770,6 @@
         : 'กำลังบันทึก...';
       const initial = (data.realName || '?').trim().slice(0, 1).toUpperCase();
       const status = data.status === 'received' ? 'received' : 'pending';
-      const statusLabel = status === 'received' ? 'รับเรื่องแล้ว' : 'ยังไม่รับเรื่อง';
       html += `
         <div class="q-item">
           <div class="q-avatar">${escapeHtml(initial)}</div>
@@ -723,7 +783,10 @@
               <span class="q-time">${time}</span>
             </div>
             <div class="q-text">${escapeHtml(data.question)}</div>
-            <button type="button" class="q-status ${status}" data-id="${id}" data-status="${status}" ${isAdmin ? '' : 'disabled'}>${statusLabel}</button>
+            <div class="q-status-row">
+              <span class="q-status-label">สถานะ</span>
+              <button type="button" class="q-status ${status}" data-id="${id}" data-status="${status}">${STATUS_LABEL[status]}</button>
+            </div>
           </div>
         </div>
       `;
