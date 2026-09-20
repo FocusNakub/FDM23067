@@ -520,7 +520,7 @@
   }
 
   metaRef.onSnapshot(snap => {
-    const d = snap.exists() ? snap.data() : {};
+    const d = snap.exists ? snap.data() : {};
     currentOpen = d.open !== false;
     currentTrial = !!d.trialMode;
     renderStatus();
