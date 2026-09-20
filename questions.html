@@ -437,10 +437,12 @@
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
-  // เก็บคำถามไว้คนละ collection กับข้อมูลตำแหน่ง ไม่ปนกัน
-  const questionsRef = db.collection("fdm23067Questions");
-  // เก็บสถานะเปิด/ปิดรับคำถาม + โหมดทดลอง ไว้คนละที่กับตัวคำถามเอง
-  const metaRef = db.doc("fdm23067QuestionsMeta/settings");
+  // เก็บคำถามไว้ใต้ path เดียวกับเว็บ Position System (fdm23067/settings/...)
+  // เพราะกฎความปลอดภัยของ Firestore โปรเจกต์นี้อนุญาตเฉพาะ path ใต้ fdm23067 เท่านั้น
+  // (ถ้าใช้ collection ชื่ออื่นนอกโครงสร้างนี้ จะถูกบล็อกแบบไม่มี error โชว์ ทำให้หน้าเว็บค้างที่ "กำลังโหลด...")
+  const questionsRef = db.collection("fdm23067").doc("settings").collection("questions");
+  // เก็บสถานะเปิด/ปิดรับคำถาม + โหมดทดลอง ไว้คนละเอกสารกับตัวคำถามเอง แต่ยังอยู่ใต้ path เดิม
+  const metaRef = db.collection("fdm23067").doc("settings").collection("questionsMeta").doc("main");
 
   // เปลี่ยนรหัสนี้ได้ตามต้องการ — ใช้เข้าแผงควบคุม Admin
   const ADMIN_KEY = "Focus3256";
@@ -522,6 +524,9 @@
     currentOpen = d.open !== false;
     currentTrial = !!d.trialMode;
     renderStatus();
+  }, err => {
+    console.error(err);
+    statusText.textContent = 'โหลดสถานะไม่สำเร็จ (เช็ค Firestore Rules)';
   });
 
   adminToggleBtn.addEventListener('click', () => {
