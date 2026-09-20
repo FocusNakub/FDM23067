@@ -15,22 +15,26 @@
 
 <style>
   :root{
-    --bg: #f5f3ff;
+    --bg: #f0f7fd;
+    --bg2: #e3f1fb;
     --card: #ffffff;
-    --primary: #6d5ce7;
-    --primary-dark: #5a4bd6;
-    --text: #2b2740;
-    --text-soft: #6b6580;
-    --border: #e6e2f7;
-    --danger: #e5484d;
+    --primary: #6fa8dc;
+    --primary-dark: #4f8fc7;
+    --ink: #173049;
+    --text-soft: #6b859c;
+    --border: #cfe6f7;
+    --danger: #ff4d5f;
+    --ok: #25b86a;
+    --shadow: 0 16px 40px rgba(23,79,120,.10);
+    --radius: 20px;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     font-family:'Noto Sans Thai', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding: 24px 16px 60px;
+    background: radial-gradient(circle at top left, var(--bg2), transparent 40%), var(--bg);
+    color: var(--ink);
+    padding: 28px 16px 60px;
   }
   .wrap{
     max-width: 640px;
@@ -38,110 +42,188 @@
   }
   header{
     text-align:center;
-    margin-bottom: 24px;
+    margin-bottom: 26px;
+    padding: 0 8px;
   }
-  header h1{
-    font-size: 22px;
-    margin: 0 0 6px;
+  .header-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 12px;
+  }
+  .header-badge .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--ok);
   }
   header p{
     color: var(--text-soft);
     font-size: 14px;
-    margin: 0;
+    margin: 0 auto;
+    line-height: 1.6;
+    max-width: 440px;
   }
   .card{
     background: var(--card);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 14px rgba(109,92,231,0.08);
-    margin-bottom: 20px;
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
     border: 1px solid var(--border);
   }
   .card h2{
     font-size: 16px;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
   label{
     display:block;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 6px;
     color: var(--text-soft);
   }
   input, textarea, select{
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
     border: 1px solid var(--border);
     font-family: inherit;
     font-size: 14px;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     resize: vertical;
-    background: #fff;
+    background: var(--bg);
+    color: var(--ink);
+    transition: border-color .15s, box-shadow .15s;
   }
   textarea{ min-height: 90px; }
+  .row-fields{
+    display: flex;
+    gap: 10px;
+  }
+  .row-fields .field-name{
+    flex: 1.6;
+    min-width: 0;
+  }
+  .row-fields .field-position{
+    flex: 1;
+    min-width: 0;
+  }
+  .row-fields select{
+    font-size: 13px;
+    padding: 12px 8px;
+  }
+  @media (max-width: 420px){
+    .row-fields{ flex-direction: column; }
+  }
   input:focus, textarea:focus, select:focus{
     outline: none;
     border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+    background: #fff;
   }
   button{
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px;
     background: var(--primary);
     color: #fff;
     font-family: inherit;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 800;
     cursor: pointer;
-    transition: background .15s;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--primary) 35%, transparent);
+    transition: filter .15s, transform .15s;
   }
-  button:hover{ background: var(--primary-dark); }
+  button:hover:not(:disabled){ filter: brightness(1.06); transform: translateY(-1px); }
   button:disabled{
-    background: #c9c3e8;
+    background: #c9d8e3;
+    box-shadow:none;
     cursor: not-allowed;
   }
   .status-msg{
     text-align:center;
     font-size: 13px;
-    margin-top: 10px;
+    font-weight: 700;
+    margin-top: 12px;
     min-height: 16px;
   }
-  .status-msg.ok{ color: #16a34a; }
+  .status-msg.ok{ color: var(--ok); }
   .status-msg.err{ color: var(--danger); }
 
   .list-head{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom: 6px;
+    margin-bottom: 14px;
   }
   .list-head h2{ margin:0; }
   .count-pill{
-    background: var(--bg);
-    color: var(--primary);
+    background: var(--bg2);
+    color: var(--primary-dark);
     font-size: 12px;
-    font-weight: 700;
-    padding: 4px 10px;
+    font-weight: 800;
+    padding: 5px 12px;
     border-radius: 999px;
   }
 
   .q-item{
+    display:flex;
+    gap: 12px;
     padding: 14px 0;
     border-bottom: 1px solid var(--border);
   }
-  .q-item:last-child{ border-bottom: none; }
+  .q-item:last-child{ border-bottom: none; padding-bottom: 2px; }
+  .q-item:first-child{ padding-top: 2px; }
+  .q-avatar{
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg2);
+    color: var(--primary-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  .q-body{ min-width:0; flex:1; }
   .q-top{
     display:flex;
     justify-content:space-between;
     align-items:baseline;
     gap: 10px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+  }
+  .q-who{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    flex-wrap: wrap;
   }
   .q-name{
-    font-weight: 700;
+    font-weight: 800;
     font-size: 14px;
+  }
+  .q-role{
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    background: var(--bg2);
+    padding: 2px 8px;
+    border-radius: 999px;
   }
   .q-time{
     font-size: 11px;
@@ -150,8 +232,8 @@
   }
   .q-text{
     font-size: 14px;
-    line-height: 1.5;
-    color: var(--text);
+    line-height: 1.55;
+    color: var(--ink);
     white-space: pre-wrap;
     word-break: break-word;
   }
@@ -159,34 +241,162 @@
     text-align:center;
     color: var(--text-soft);
     font-size: 14px;
-    padding: 20px 0;
+    padding: 26px 0;
   }
   footer{
     text-align:center;
     font-size: 11px;
     color: var(--text-soft);
     margin-top: 30px;
+    font-weight: 600;
   }
+
+  .status-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .status-pill .dot{ width:9px; height:9px; border-radius:50%; background: var(--ok); }
+  .status-pill.closed .dot{ background: var(--danger); }
+  .admin-btn{
+    width:auto;
+    background: #fff;
+    color: var(--primary-dark);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-radius: 999px;
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+  .trial-banner{
+    background: #fff3cd;
+    border: 1px solid #ffd36b;
+    color: #5e4300;
+    font-weight: 800;
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .closed-banner{
+    background: #ffe8ea;
+    border: 1px solid #ffb9c0;
+    color: #a3202c;
+    font-weight: 800;
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .admin-card{ display:none; }
+  .admin-card h2{ font-size:15px; }
+  .admin-actions{
+    display:flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .admin-actions button{ width:auto; flex:1; min-width:130px; }
+  button.secondary{
+    background:#fff;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  button.ghost{
+    background: transparent;
+    color: var(--danger);
+    box-shadow: none;
+    border: 1px solid var(--border);
+  }
+  button.danger{ background: var(--danger); }
+
+  .q-status{
+    margin-top: 8px;
+    width: auto;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: none;
+  }
+  .q-status.pending{ background: #ffe8ea; color: var(--danger); }
+  .q-status.received{ background: #e5f9ee; color: var(--ok); }
+  .q-status:disabled{
+    opacity: 1;
+    cursor: default;
+  }
+  .q-status:not(:disabled):hover{ filter: brightness(0.95); transform:none; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
+    <div class="header-badge"><span class="dot"></span>FDM23067</div>
     <p>ใครมีคำถามหรือข้อสงสัยเกี่ยวกับงาน FDM23067 พิมพ์ทิ้งไว้ตรงนี้ได้เลย เดี๋ยวรวบรวมไปถามอาจารย์ให้</p>
   </header>
+
+  <!-- แถบสถานะเปิด/ปิดรับคำถาม + ปุ่มเข้าระบบ Admin -->
+  <div class="status-bar">
+    <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">กำลังโหลด...</span></span>
+    <button type="button" class="admin-btn" id="adminToggleBtn">จัดการ</button>
+  </div>
+
+  <div class="trial-banner" id="trialBanner" style="display:none">โหมดทดลอง — คำถามที่ส่งตอนนี้จะถูกล้างทิ้งก่อนใช้งานจริง</div>
+  <div class="closed-banner" id="closedBanner" style="display:none">ตอนนี้ปิดรับคำถามชั่วคราว รอเปิดอีกครั้งนะ</div>
+
+  <!-- เข้าสู่ระบบ Admin -->
+  <div class="card admin-card" id="adminLoginCard">
+    <h2>เข้าสู่ระบบ Admin</h2>
+    <input id="adminKeyInput" type="password" placeholder="รหัส Admin">
+    <button type="button" id="adminLoginBtn">เข้าสู่ระบบ</button>
+    <div class="status-msg" id="adminLoginMsg"></div>
+  </div>
+
+  <!-- แผงควบคุม Admin -->
+  <div class="card admin-card" id="adminPanelCard">
+    <h2>แผงควบคุม Admin</h2>
+    <div class="admin-actions">
+      <button type="button" class="secondary" id="toggleOpenBtn">เปิด/ปิดรับคำถาม</button>
+      <button type="button" class="secondary" id="toggleTrialBtn">เปิด/ปิดโหมดทดลอง</button>
+      <button type="button" class="danger" id="clearTrialBtn">ล้างคำถามทดลอง</button>
+      <button type="button" class="ghost" id="adminLogoutBtn">ออกจากระบบ</button>
+    </div>
+  </div>
 
   <!-- ฟอร์มส่งคำถาม -->
   <div class="card">
     <h2>ฝากคำถาม</h2>
     <form id="questionForm">
-      <label for="realNameInput">ชื่อจริง</label>
-      <input id="realNameInput" type="text" placeholder="เช่น หิรัญ ดิษฐสกุล" maxlength="60" required>
-
-      <label for="positionInput">ตำแหน่ง</label>
-      <select id="positionInput" required>
-        <option value="" disabled selected>เลือกตำแหน่งของคุณ</option>
-      </select>
+      <div class="row-fields">
+        <div class="field-name">
+          <label for="realNameInput">ชื่อจริง</label>
+          <input id="realNameInput" type="text" placeholder="พิมพ์ ชื่อ นามสกุล" maxlength="60" required>
+        </div>
+        <div class="field-position">
+          <label for="positionInput">ตำแหน่ง</label>
+          <select id="positionInput" required>
+            <option value="" disabled selected>เลือกตำแหน่ง</option>
+          </select>
+        </div>
+      </div>
 
       <label for="questionInput">คำถาม</label>
       <textarea id="questionInput" placeholder="พิมพ์คำถามที่อยากให้ถามอาจารย์" maxlength="500" required></textarea>
@@ -229,6 +439,11 @@
   const db = firebase.firestore();
   // เก็บคำถามไว้คนละ collection กับข้อมูลตำแหน่ง ไม่ปนกัน
   const questionsRef = db.collection("fdm23067Questions");
+  // เก็บสถานะเปิด/ปิดรับคำถาม + โหมดทดลอง ไว้คนละที่กับตัวคำถามเอง
+  const metaRef = db.doc("fdm23067QuestionsMeta/settings");
+
+  // เปลี่ยนรหัสนี้ได้ตามต้องการ — ใช้เข้าแผงควบคุม Admin
+  const ADMIN_KEY = "Focus3256";
 
   // รายชื่อตำแหน่งเดียวกับเว็บ Position System เป๊ะๆ (เรียงตามแผนก)
   const ROLES = [
@@ -257,6 +472,21 @@
   const questionList = document.getElementById('questionList');
   const countPill = document.getElementById('countPill');
 
+  const statusPill = document.getElementById('statusPill');
+  const statusText = document.getElementById('statusText');
+  const trialBanner = document.getElementById('trialBanner');
+  const closedBanner = document.getElementById('closedBanner');
+  const adminToggleBtn = document.getElementById('adminToggleBtn');
+  const adminLoginCard = document.getElementById('adminLoginCard');
+  const adminPanelCard = document.getElementById('adminPanelCard');
+  const adminKeyInput = document.getElementById('adminKeyInput');
+  const adminLoginBtn = document.getElementById('adminLoginBtn');
+  const adminLoginMsg = document.getElementById('adminLoginMsg');
+  const adminLogoutBtn = document.getElementById('adminLogoutBtn');
+  const toggleOpenBtn = document.getElementById('toggleOpenBtn');
+  const toggleTrialBtn = document.getElementById('toggleTrialBtn');
+  const clearTrialBtn = document.getElementById('clearTrialBtn');
+
   // เติมตัวเลือกตำแหน่งในฟอร์ม
   ROLES.forEach(r => {
     const opt = document.createElement('option');
@@ -265,9 +495,99 @@
     positionInput.appendChild(opt);
   });
 
+  // ===== ระบบ Admin: เปิด/ปิดรับคำถาม, โหมดทดลอง =====
+  let isAdmin = sessionStorage.getItem('fdm23067QAdmin') === '1';
+  let currentOpen = true;
+  let currentTrial = false;
+  let latestQuestions = [];
+
+  function renderStatus() {
+    statusPill.classList.toggle('closed', !currentOpen);
+    statusText.textContent = currentOpen ? 'เปิดรับคำถาม' : 'ปิดรับคำถามชั่วคราว';
+    trialBanner.style.display = currentTrial ? 'block' : 'none';
+    closedBanner.style.display = currentOpen ? 'none' : 'block';
+    submitBtn.disabled = !currentOpen;
+    toggleOpenBtn.textContent = currentOpen ? 'ปิดรับคำถาม' : 'เปิดรับคำถาม';
+    toggleTrialBtn.textContent = currentTrial ? 'ปิดโหมดทดลอง' : 'เปิดโหมดทดลอง';
+  }
+
+  function renderAdminUI() {
+    adminToggleBtn.textContent = isAdmin ? 'ปิดแผง Admin' : 'จัดการ';
+    adminLoginCard.style.display = (!isAdmin && adminLoginCard.dataset.open === '1') ? 'block' : 'none';
+    adminPanelCard.style.display = isAdmin ? 'block' : 'none';
+  }
+
+  metaRef.onSnapshot(snap => {
+    const d = snap.exists() ? snap.data() : {};
+    currentOpen = d.open !== false;
+    currentTrial = !!d.trialMode;
+    renderStatus();
+  });
+
+  adminToggleBtn.addEventListener('click', () => {
+    if (isAdmin) {
+      // ออกจากระบบเมื่อกดปุ่มซ้ำตอนแผงเปิดอยู่
+      isAdmin = false;
+      sessionStorage.removeItem('fdm23067QAdmin');
+    } else {
+      adminLoginCard.dataset.open = adminLoginCard.dataset.open === '1' ? '0' : '1';
+    }
+    renderAdminUI();
+  });
+
+  adminLoginBtn.addEventListener('click', () => {
+    if (adminKeyInput.value === ADMIN_KEY) {
+      isAdmin = true;
+      sessionStorage.setItem('fdm23067QAdmin', '1');
+      adminKeyInput.value = '';
+      adminLoginMsg.textContent = '';
+      adminLoginCard.dataset.open = '0';
+      renderAdminUI();
+      renderQuestionList(latestQuestions);
+    } else {
+      adminLoginMsg.textContent = 'รหัสไม่ถูกต้อง';
+      adminLoginMsg.className = 'status-msg err';
+    }
+  });
+
+  adminLogoutBtn.addEventListener('click', () => {
+    isAdmin = false;
+    sessionStorage.removeItem('fdm23067QAdmin');
+    renderAdminUI();
+    renderQuestionList(latestQuestions);
+  });
+
+  toggleOpenBtn.addEventListener('click', () => {
+    metaRef.set({ open: !currentOpen }, { merge: true });
+  });
+
+  toggleTrialBtn.addEventListener('click', () => {
+    metaRef.set({ trialMode: !currentTrial }, { merge: true });
+  });
+
+  clearTrialBtn.addEventListener('click', async () => {
+    const trialDocs = latestQuestions.filter(q => q.data.trial);
+    if (trialDocs.length === 0) return;
+    const batch = db.batch();
+    trialDocs.forEach(q => batch.delete(questionsRef.doc(q.id)));
+    await batch.commit();
+  });
+
+  // สลับสถานะ "รับเรื่องแล้ว / ยังไม่รับเรื่อง" ทำได้เฉพาะตอนล็อกอิน Admin
+  questionList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.q-status');
+    if (!btn || !isAdmin) return;
+    const id = btn.dataset.id;
+    const newStatus = btn.dataset.status === 'received' ? 'pending' : 'received';
+    questionsRef.doc(id).update({ status: newStatus });
+  });
+
+  renderAdminUI();
+
   // ส่งคำถามใหม่ขึ้น Firestore
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (!currentOpen) return;
     const realName = realNameInput.value.trim();
     const positionId = positionInput.value;
     const positionName = ROLES.find(r => r.id === positionId)?.name || positionId;
@@ -285,6 +605,8 @@
         positionId: positionId,
         position: positionName,
         question: question,
+        status: 'pending',
+        trial: currentTrial,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       realNameInput.value = '';
@@ -297,37 +619,52 @@
       statusMsg.textContent = 'ส่งไม่สำเร็จ ลองอีกทีนะ';
       statusMsg.className = 'status-msg err';
     } finally {
-      submitBtn.disabled = false;
+      submitBtn.disabled = currentOpen ? false : true;
       submitBtn.textContent = 'ส่ง';
     }
   });
 
-  // ฟังคำถามแบบ real-time เรียงใหม่สุดขึ้นก่อน
-  questionsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
-    if (snapshot.empty) {
+  // สร้าง HTML ของลิสต์คำถามจากข้อมูลล่าสุด (เรียกใหม่ตอน login/logout ด้วย เพื่อโชว์/ซ่อนปุ่มสถานะ)
+  function renderQuestionList(items) {
+    if (items.length === 0) {
       questionList.innerHTML = '<div class="empty">ยังไม่มีใครถามเลย เป็นคนแรกก็ได้นะ</div>';
       countPill.textContent = '0';
       return;
     }
-
-    countPill.textContent = snapshot.size;
+    countPill.textContent = items.length;
     let html = '';
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    items.forEach(({ id, data }) => {
       const time = data.createdAt
         ? data.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
         : 'กำลังบันทึก...';
+      const initial = (data.realName || '?').trim().slice(0, 1).toUpperCase();
+      const status = data.status === 'received' ? 'received' : 'pending';
+      const statusLabel = status === 'received' ? 'รับเรื่องแล้ว' : 'ยังไม่รับเรื่อง';
       html += `
         <div class="q-item">
-          <div class="q-top">
-            <span class="q-name">${escapeHtml(data.realName)}${data.position ? ' · ' + escapeHtml(data.position) : ''}</span>
-            <span class="q-time">${time}</span>
+          <div class="q-avatar">${escapeHtml(initial)}</div>
+          <div class="q-body">
+            <div class="q-top">
+              <span class="q-who">
+                <span class="q-name">${escapeHtml(data.realName)}</span>
+                ${data.position ? '<span class="q-role">' + escapeHtml(data.position) + '</span>' : ''}
+                ${data.trial ? '<span class="q-role">ทดลอง</span>' : ''}
+              </span>
+              <span class="q-time">${time}</span>
+            </div>
+            <div class="q-text">${escapeHtml(data.question)}</div>
+            <button type="button" class="q-status ${status}" data-id="${id}" data-status="${status}" ${isAdmin ? '' : 'disabled'}>${statusLabel}</button>
           </div>
-          <div class="q-text">${escapeHtml(data.question)}</div>
         </div>
       `;
     });
     questionList.innerHTML = html;
+  }
+
+  // ฟังคำถามแบบ real-time เรียงใหม่สุดขึ้นก่อน
+  questionsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    latestQuestions = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+    renderQuestionList(latestQuestions);
   }, (err) => {
     console.error(err);
     questionList.innerHTML = '<div class="empty">โหลดข้อมูลไม่สำเร็จ ตรวจสอบการตั้งค่า Firebase</div>';
