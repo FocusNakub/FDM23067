@@ -392,33 +392,86 @@
   }
   .q-status:not(:disabled):hover{ filter: brightness(0.95); transform:none; }
 
-  .qsummary{
-    display: flex;
-    gap: 10px;
+  .qsummary-hero{
     text-align: center;
+    padding: 6px 0 20px;
   }
-  .qsummary-item{
-    flex: 1;
+  .qsummary-hero b{
+    display: block;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+  .qsummary-hero span{
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+  }
+  .qsummary-bar{
+    height: 10px;
+    background: var(--bg2);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 16px 0 4px;
+  }
+  .qsummary-bar-fill{
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--ok), #7bd9a6);
+    transition: width .4s ease;
+  }
+  .qsummary-bar-label{
+    text-align: right;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-soft);
+    margin-bottom: 14px;
+  }
+  .qsummary-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .qsummary-stat{
+    display: flex;
+    align-items: center;
+    gap: 10px;
     background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 16px 8px;
+    padding: 12px 14px;
   }
-  .qsummary-item b{
+  .qsummary-stat .qs-icon{
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .qsummary-stat.asked .qs-icon{ background: #e5f9ee; color: var(--ok); }
+  .qsummary-stat.progress .qs-icon{ background: #fff3cd; color: #8a6400; }
+  .qsummary-stat b{
     display: block;
-    font-size: 24px;
-    color: var(--primary-dark);
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1.1;
   }
-  .qsummary-item span{
-    font-size: 12px;
-    color: var(--text-soft);
+  .qsummary-stat span{
+    font-size: 11px;
     font-weight: 700;
+    color: var(--text-soft);
   }
   .qsummary-note{
     text-align: center;
     color: var(--text-soft);
     font-size: 12px;
-    margin-top: 14px;
+    margin-top: 18px;
   }
 </style>
 </head>
@@ -761,11 +814,23 @@
     if (!isAdmin) {
       const askedCount = items.filter(({ data }) => normalizeStatus(data.status) === 'asked').length;
       const inProgressCount = items.length - askedCount;
+      const pct = items.length ? Math.round((askedCount / items.length) * 100) : 0;
       questionList.innerHTML = `
-        <div class="qsummary">
-          <div class="qsummary-item"><b>${items.length}</b><span>คำถามทั้งหมด</span></div>
-          <div class="qsummary-item"><b>${askedCount}</b><span>ถามอาจารย์แล้ว</span></div>
-          <div class="qsummary-item"><b>${inProgressCount}</b><span>กำลังดำเนินการ</span></div>
+        <div class="qsummary-hero">
+          <b>${items.length}</b>
+          <span>คำถามทั้งหมดที่ส่งมา</span>
+        </div>
+        <div class="qsummary-bar"><div class="qsummary-bar-fill" style="width:${pct}%"></div></div>
+        <div class="qsummary-bar-label">ถามอาจารย์แล้ว ${pct}%</div>
+        <div class="qsummary-grid">
+          <div class="qsummary-stat asked">
+            <div class="qs-icon">✓</div>
+            <div><b>${askedCount}</b><span>ถามอาจารย์แล้ว</span></div>
+          </div>
+          <div class="qsummary-stat progress">
+            <div class="qs-icon">…</div>
+            <div><b>${inProgressCount}</b><span>กำลังดำเนินการ</span></div>
+          </div>
         </div>
         <div class="qsummary-note">เนื้อหาคำถามเห็นได้เฉพาะแอดมิน เพื่อความเป็นส่วนตัวของทุกคน</div>
       `;
