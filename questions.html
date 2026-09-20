@@ -29,12 +29,14 @@
     --radius: 20px;
   }
   *{box-sizing:border-box;}
+  html{ overscroll-behavior-y: contain; }
   body{
     margin:0;
     font-family:'Noto Sans Thai', sans-serif;
     background: radial-gradient(circle at top left, var(--bg2), transparent 40%), var(--bg);
     color: var(--ink);
     padding: 28px 16px 60px;
+    overscroll-behavior-y: contain;
   }
   .wrap{
     max-width: 640px;
@@ -176,6 +178,24 @@
     padding: 5px 12px;
     border-radius: 999px;
   }
+  .list-head-right{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .refresh-btn{
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 50%;
+    background: var(--bg2);
+    color: var(--primary-dark);
+    box-shadow: none;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .refresh-btn.spinning{ animation: spin .7s linear; }
+  @keyframes spin{ from{ transform: rotate(0deg); } to{ transform: rotate(360deg); } }
 
   .q-item{
     display:flex;
@@ -327,6 +347,31 @@
     margin-bottom: 16px;
     font-size: 13px;
   }
+  .ptr-indicator{
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -60px);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    box-shadow: var(--shadow);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .ptr-indicator.dragging{ transition: none; }
+  .ptr-indicator.snap{ transition: transform .2s ease; }
+  .ptr-icon{ display: inline-block; transition: transform .2s ease; }
+  .ptr-indicator.ready .ptr-icon{ transform: rotate(180deg); }
+  .ptr-indicator.loading .ptr-icon{ animation: spin .7s linear infinite; }
+
   .modal-overlay{
     position: fixed;
     inset: 0;
@@ -413,6 +458,18 @@
     cursor: default;
   }
   .q-status:not(:disabled):hover{ filter: brightness(0.95); transform:none; }
+  .q-status-badge{
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .q-status-badge.pending{ background: #ffe8ea; color: var(--danger); }
+  .q-status-badge.received{ background: #fff3cd; color: #8a6400; }
+  .q-status-badge.asked{ background: #e5f9ee; color: var(--ok); }
 
   .qsummary-hero{
     text-align: center;
@@ -499,6 +556,9 @@
 </head>
 <body>
 
+<!-- ดึงหน้าจอลงจากด้านบนสุดของเว็บ เพื่อรีเฟรชข้อมูลใหม่ -->
+<div class="ptr-indicator" id="ptrIndicator"><span class="ptr-icon">↻</span><span id="ptrText">ดึงลงเพื่อรีเฟรช</span></div>
+
 <div class="wrap">
   <header>
     <div class="header-badge"><span class="dot"></span>FDM23067</div>
@@ -554,7 +614,10 @@
   <div class="card">
     <div class="list-head">
       <h2>คำถามที่ส่งมาแล้ว</h2>
-      <span class="count-pill" id="countPill">0</span>
+      <div class="list-head-right">
+        <span class="count-pill" id="countPill">0</span>
+        <button type="button" class="refresh-btn" id="refreshBtn" title="รีเฟรช">↻</button>
+      </div>
     </div>
     <div id="questionList">
       <div class="empty">ยังไม่มีใครถามเลย เป็นคนแรกก็ได้นะ</div>
@@ -628,6 +691,7 @@
   const statusMsg = document.getElementById('statusMsg');
   const questionList = document.getElementById('questionList');
   const countPill = document.getElementById('countPill');
+  const refreshBtn = document.getElementById('refreshBtn');
 
   const statusPill = document.getElementById('statusPill');
   const statusText = document.getElementById('statusText');
@@ -824,27 +888,88 @@
   }
 
   // จัดคำถามเข้าหมวดหมู่สั้นๆ (เช่น "ศิลป์/พร็อพ", "ตารางงาน") ให้คนทั่วไปเห็นคร่าวๆ
-  // ว่าคำถามเกี่ยวกับอะไร โดยไม่ต้องเห็นเนื้อคำถามเต็ม — ใช้วิธีจับคำสำคัญในประโยค (ไม่ใช่ AI จริงๆ
-  // เพราะหน้านี้เป็นเว็บสถิตที่รันในเบราว์เซอร์ล้วน ไม่มีฝั่งเซิร์ฟเวอร์ให้เก็บ API key อย่างปลอดภัย)
+  // ว่าคำถามเกี่ยวกับอะไร โดยไม่ต้องเห็นเนื้อคำถามเต็ม — ใช้วิธีจับคำสำคัญในประโยค ทั้งไทยและอังกฤษ
+  // (ไม่ใช่ AI จริงๆ เพราะหน้านี้เป็นเว็บสถิตที่รันในเบราว์เซอร์ล้วน ไม่มีฝั่งเซิร์ฟเวอร์ให้เก็บ API key อย่างปลอดภัย)
   const TOPIC_CATEGORIES = [
-    { id: 'schedule', label: 'ตารางงาน/เดดไลน์', icon: '🗓️', keywords: ['เดดไลน์', 'deadline', 'กำหนดส่ง', 'ตาราง', 'นัด', 'วันถ่าย', 'เวลาถ่าย', 'call time', 'เลื่อน'] },
-    { id: 'script', label: 'บท/สคริปต์', icon: '📝', keywords: ['บท', 'สคริปต์', 'สตอรี่บอร์ด', 'ซีน', 'พล็อต', 'บทพูด', 'ไดอะล็อก'] },
-    { id: 'camera', label: 'กล้อง/ถ่ายภาพ', icon: '🎥', keywords: ['กล้อง', 'เลนส์', 'มุมกล้อง', 'shot', 'เฟรม', 'โฟกัส'] },
-    { id: 'light', label: 'ไฟ/แสง', icon: '💡', keywords: ['ไฟ', 'แสง', 'ไฟส่อง', 'gaffer'] },
-    { id: 'sound', label: 'เสียง', icon: '🎤', keywords: ['เสียง', 'ไมค์', 'บูม', 'เพลงประกอบ'] },
-    { id: 'art', label: 'ศิลป์/พร็อพ', icon: '🎨', keywords: ['พร็อพ', 'ศิลป์', 'ฉาก', 'ของประกอบฉาก', 'อาร์ต', 'prop', 'art'] },
-    { id: 'costume', label: 'แต่งหน้า/คอสตูม', icon: '💄', keywords: ['แต่งหน้า', 'คอสตูม', 'เสื้อผ้า', 'ทรงผม'] },
-    { id: 'location', label: 'สถานที่ถ่ายทำ', icon: '📍', keywords: ['สถานที่', 'โลเคชั่น', 'สถานที่ถ่าย', 'ขออนุญาตสถานที่'] },
-    { id: 'budget', label: 'งบประมาณ', icon: '💰', keywords: ['งบ', 'เงิน', 'ค่าใช้จ่าย', 'จ่าย', 'ค่าเช่า'] },
-    { id: 'role', label: 'ตำแหน่ง/ทีมงาน', icon: '👥', keywords: ['ตำแหน่ง', 'ทีม', 'หน้าที่', 'แบ่งงาน', 'แบ่งฝ่าย'] },
-    { id: 'submit', label: 'การส่งงาน', icon: '📤', keywords: ['ส่งงาน', 'ไฟล์', 'อัปโหลด', 'ฟอร์แมต', 'export', 'เรนเดอร์'] },
-    { id: 'grade', label: 'เกณฑ์/คะแนน', icon: '📊', keywords: ['คะแนน', 'เกณฑ์', 'เกรด', 'ประเมิน'] },
+    { id: 'schedule', label: 'ตารางงาน/เดดไลน์', icon: '🗓️', keywords: [
+      'เดดไลน์', 'กำหนดส่ง', 'ตาราง', 'นัด', 'วันถ่าย', 'เวลาถ่าย', 'เลื่อน', 'สคาวต์โลเคชั่น', 'สแกนโลเคชั่น', 'คิวถ่าย', 'ลำดับคิว', 'วันนัดหมาย', 'เลิกกอง', 'พักเที่ยง', 'เวลาเริ่มกอง', 'เวลาเลิกงาน', 'เตรียมงาน', 'วันเตรียมกอง',
+      'deadline', 'due date', 'due', 'schedule', 'timeline', 'postpone', 'reschedule', 'shooting schedule', 'wrap time', 'wrap', 'shoot day', 'prep day', 'scout', 'location scout', 'production timeline', 'lunch break', 'turnaround', 'strike', 'overtime', 'production calendar'
+    ] },
+    { id: 'script', label: 'บท/สคริปต์', icon: '📝', keywords: [
+      'บท', 'สคริปต์', 'สตอรี่บอร์ด', 'ซีน', 'พล็อต', 'บทพูด', 'ไดอะล็อก', 'บทภาพยนตร์', 'เรื่องย่อ', 'ตัวละคร', 'พล็อตเรื่อง', 'มุมมองเรื่อง', 'บทสนทนา', 'ลิสต์ช็อต', 'จำนวนซีน', 'คิวบท',
+      'script', 'screenplay', 'storyboard', 'scene', 'plot', 'dialogue', 'synopsis', 'character', 'treatment', 'logline', 'shot list', 'narrative', 'story arc', 'draft'
+    ] },
+    { id: 'camera', label: 'กล้อง/ถ่ายภาพ', icon: '🎥', keywords: [
+      'กล้อง', 'เลนส์', 'มุมกล้อง', 'เฟรม', 'โฟกัส', 'ระยะภาพ', 'โคลสอัพ', 'ไวด์ช็อต', 'มิดช็อต', 'มุมสูง', 'มุมต่ำ', 'แพนกล้อง', 'ทิลท์กล้อง', 'ซูม', 'องค์ประกอบภาพ', 'ถือกล้อง', 'ขาตั้งกล้อง', 'สโลโมชัน', 'ไทม์แลปส์', 'โดรน', 'รูรับแสง', 'ความไว', 'สมดุลแสงขาว',
+      'camera', 'lens', 'shot', 'frame', 'focus', 'angle', 'composition', 'close-up', 'close up', 'closeup', 'wide shot', 'medium shot', 'long shot', 'establishing shot', 'insert shot', 'low angle', 'high angle', 'eye level', 'dutch angle', 'pan', 'tilt', 'dolly', 'zoom', 'tracking shot', 'crane shot', 'drone shot', 'handheld', 'steadicam', 'gimbal', 'slow motion', 'time lapse', 'rack focus', 'over the shoulder', 'pov', 'depth of field', 'aperture', 'iso', 'shutter speed', 'white balance', 'tripod', 'b-roll', 'a-roll'
+    ] },
+    { id: 'light', label: 'ไฟ/แสง', icon: '💡', keywords: [
+      'ไฟ', 'แสง', 'ไฟส่อง', 'ผังไฟ', 'ไฟหลัก', 'ไฟเสริม', 'ไฟย้อน', 'จัดไฟ', 'อุณหภูมิสี', 'สะท้อนแสง', 'กระจายแสง', 'ตั้งไฟ',
+      'light', 'lighting', 'gaffer', 'lighting layout', 'lighting plan', 'lighting design', 'key light', 'fill light', 'backlight', 'back light', 'rim light', 'practical light', 'three-point lighting', 'three point lighting', 'softbox', 'diffuser', 'reflector', 'bounce', 'flag', 'color temperature', 'kelvin', 'exposure'
+    ] },
+    { id: 'sound', label: 'เสียง', icon: '🎤', keywords: [
+      'เสียง', 'ไมค์', 'บูม', 'เพลงประกอบ', 'เสียงประกอบ', 'พากย์', 'อัดเสียง', 'มิกซ์เสียง', 'ลดเสียงรบกวน', 'เสียงรบกวน', 'เก็บเสียง', 'ซาวด์เช็ค',
+      'sound', 'audio', 'mic', 'microphone', 'boom', 'music', 'score', 'sound effect', 'sfx', 'foley', 'mixing', 'mastering', 'voice over', 'dubbing', 'ambient sound', 'room tone', 'adr', 'sync sound', 'sound design', 'noise', 'lavalier', 'lav mic'
+    ] },
+    { id: 'art', label: 'ศิลป์/พร็อพ', icon: '🎨', keywords: [
+      'พร็อพ', 'ศิลป์', 'ฉาก', 'ของประกอบฉาก', 'อาร์ต', 'จัดฉาก', 'ตกแต่งฉาก', 'ฉากหลัง', 'อุปกรณ์ประกอบฉาก', 'ความต่อเนื่องของฉาก', 'คอนตินิวอิตี้',
+      'prop', 'props', 'art', 'set design', 'production design', 'set dressing', 'backdrop', 'decoration', 'continuity', 'texture', 'mood board'
+    ] },
+    { id: 'costume', label: 'แต่งหน้า/คอสตูม', icon: '💄', keywords: [
+      'แต่งหน้า', 'คอสตูม', 'เสื้อผ้า', 'ทรงผม', 'ชุดนักแสดง', 'แต่งตัว', 'สไตล์ลิ่ง', 'แผลปลอม', 'เลือดปลอม',
+      'costume', 'makeup', 'wardrobe', 'hair', 'styling', 'outfit', 'hairstyle', 'sfx makeup', 'special effects makeup', 'prosthetics'
+    ] },
+    { id: 'location', label: 'สถานที่ถ่ายทำ', icon: '📍', keywords: [
+      'สถานที่', 'โลเคชั่น', 'สถานที่ถ่าย', 'ขออนุญาตสถานที่', 'สถานที่ถ่ายทำ', 'เส้นทาง', 'จุดนัดพบ', 'ที่จอดรถ', 'ทางเข้า',
+      'location', 'venue', 'permit', 'permission', 'site', 'shooting location', 'meeting point', 'address', 'parking', 'access'
+    ] },
+    { id: 'budget', label: 'งบประมาณ', icon: '💰', keywords: [
+      'งบ', 'เงิน', 'ค่าใช้จ่าย', 'จ่าย', 'ค่าเช่า', 'เบิกเงิน', 'ค่ารถ', 'ค่าอุปกรณ์', 'เก็บเงิน', 'หารเงิน', 'ใบเสร็จ', 'ค่าเดินทาง', 'ค่าอาหาร',
+      'budget', 'money', 'cost', 'expense', 'payment', 'rent', 'reimburse', 'fund', 'split cost', 'transportation fee', 'receipt', 'invoice'
+    ] },
+    { id: 'role', label: 'ตำแหน่ง/ทีมงาน', icon: '👥', keywords: [
+      'ตำแหน่ง', 'ทีม', 'หน้าที่', 'แบ่งงาน', 'แบ่งฝ่าย', 'สมาชิกทีม', 'หัวหน้าทีม', 'ผู้รับผิดชอบ', 'ขาดคน', 'ผู้กำกับ', 'ผู้ช่วยผู้กำกับ', 'ผู้อำนวยการสร้าง', 'ตากล้อง', 'ผู้ช่วยตากล้อง',
+      'role', 'position', 'team', 'assign', 'department', 'crew', 'responsibility', 'leader', 'member', 'staff', 'producer', 'director', 'assistant director', 'production manager', 'dop', 'director of photography', 'focus puller', 'script supervisor', 'slate'
+    ] },
+    { id: 'edit', label: 'ตัดต่อ/โพสต์โปรดักชัน', icon: '🎬', keywords: [
+      'ตัดต่อ', 'ตัดเสียง', 'เกรดสี', 'ปรับสี', 'ใส่เอฟเฟกต์', 'ทำซับ', 'ใส่ซับไตเติล', 'ทำเอฟเฟกต์', 'คัตซีน', 'ลำดับภาพ', 'จังหวะตัดต่อ', 'ซ้อนภาพ', 'ใส่ตัวอักษร', 'ทำไตเติล', 'เครดิตท้ายเรื่อง', 'ตัดจบ', 'ต่อฉาก', 'ไฟล์ตัดต่อ', 'โปรเจกต์ตัดต่อ',
+      'edit', 'editing', 'cut', 'cutting', 'rough cut', 'fine cut', 'final cut', 'jump cut', 'match cut', 'montage', 'pacing', 'timeline', 'color grading', 'color correction', 'transition', 'vfx', 'visual effects', 'cgi', 'subtitle', 'caption', 'title card', 'credits', 'premiere pro', 'davinci resolve', 'after effects', 'final cut pro', 'capcut'
+    ] },
+    { id: 'submit', label: 'การส่งงาน', icon: '📤', keywords: [
+      'ส่งงาน', 'ไฟล์', 'อัปโหลด', 'ฟอร์แมต', 'ลิงก์ส่งงาน', 'นามสกุลไฟล์', 'ความละเอียด', 'ขนาดไฟล์',
+      'submit', 'file', 'upload', 'format', 'resolution', 'file size', 'google drive', 'youtube link', 'aspect ratio'
+    ] },
+    { id: 'document', label: 'เอกสาร', icon: '📄', keywords: [
+      'เอกสาร', 'แบบฟอร์ม', 'ใบคำร้อง', 'ใบขออนุญาต', 'หนังสือขออนุญาต', 'ใบยินยอม', 'สัญญา', 'ลายเซ็น', 'เซ็นเอกสาร', 'ขอหนังสือ', 'เอกสารกองถ่าย', 'เอกสารยืนยัน', 'หนังสือรับรอง', 'ใบสมัคร', 'ใบลา',
+      'คอลชีท', 'ใบคิวถ่าย', 'ตารางกอง', 'รายชื่อทีมงาน', 'รายชื่อนักแสดง', 'ใบบันทึกกอง', 'รายงานกอง', 'รายงานประจำวัน', 'ใบเบรกดาวน์บท', 'เบรกดาวน์บท', 'แผนผังกอง', 'ผังกอง', 'ใบติดต่อ', 'เบอร์ติดต่อกอง',
+      'ใบขออนุญาตสถานที่', 'หนังสือขอสถานที่', 'ใบยินยอมนักแสดง', 'สัญญานักแสดง', 'สัญญาสถานที่', 'ใบเบิกอุปกรณ์', 'ใบยืมอุปกรณ์', 'รายการอุปกรณ์', 'ใบประเมินความเสี่ยง', 'ใบรับรองประกันภัย', 'เอกสารประกันภัย',
+      'บทตัดต่อกล้อง', 'สคริปต์กองถ่าย', 'ใบขออนุญาตผู้ปกครอง', 'หนังสือรับรองนักศึกษา', 'ใบส่งตัว', 'บันทึกข้อตกลง', 'สัญญาว่าจ้าง', 'ใบเสร็จ', 'ใบสำคัญจ่าย', 'ไฟล์เอกสาร', 'เทมเพลตเอกสาร', 'ตัวอย่างเอกสาร',
+      'document', 'form', 'paperwork', 'permission letter', 'consent form', 'release form', 'contract', 'signature', 'sign', 'official letter', 'template', 'pdf',
+      'call sheet', 'call time', 'shot list', 'breakdown sheet', 'script breakdown', 'crew list', 'cast list', 'contact sheet', 'contact list', 'production report', 'daily production report', 'dpr', 'continuity report', 'continuity sheet',
+      'day out of days', 'dood', 'one liner schedule', 'one-liner', 'sides', 'lined script', 'deal memo', 'location agreement', 'location release', 'talent release', 'model release', 'insurance', 'certificate of insurance', 'coi',
+      'nda', 'non disclosure agreement', 'shooting permit', 'filming permit', 'risk assessment', 'health and safety form', 'equipment list', 'gear list', 'checklist', 'clearance form', 'appearance release', 'liability waiver', 'waiver'
+    ] },
+    { id: 'grade', label: 'เกณฑ์/คะแนน', icon: '📊', keywords: [
+      'คะแนน', 'เกณฑ์', 'เกรด', 'ประเมิน', 'คะแนนเก็บ', 'สอบ', 'เช็คชื่อ', 'เข้าเรียน',
+      'grade', 'score', 'rubric', 'criteria', 'evaluate', 'assessment', 'exam', 'attendance', 'point'
+    ] },
   ];
   const OTHER_TOPIC = { id: 'other', label: 'คำถามทั่วไป', icon: '💬' };
 
+  // คำอังกฤษ (a-z ล้วน) จับแบบขอบเขตคำ (word boundary) กันจับผิด เช่น "art" ไปแมตช์ในคำว่า "start"
+  // ส่วนคำไทยจับแบบ substring ตามปกติ เพราะภาษาไทยไม่มีช่องว่างคั่นคำ
+  function keywordMatches(text, keyword) {
+    const kw = keyword.toLowerCase();
+    if (/^[a-z0-9\s]+$/.test(kw)) {
+      const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return new RegExp('\\b' + escaped + '\\b').test(text);
+    }
+    return text.includes(kw);
+  }
+
   function getTopic(question) {
     const text = (question || '').toLowerCase();
-    const match = TOPIC_CATEGORIES.find(cat => cat.keywords.some(kw => text.includes(kw.toLowerCase())));
+    const match = TOPIC_CATEGORIES.find(cat => cat.keywords.some(kw => keywordMatches(text, kw)));
     return match || OTHER_TOPIC;
   }
 
@@ -886,6 +1011,7 @@
           ? data.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
           : 'กำลังบันทึก...';
         const initial = (data.realName || '?').trim().slice(0, 1).toUpperCase();
+        const status = normalizeStatus(data.status);
         publicList += `
           <div class="q-item">
             <div class="q-avatar">${escapeHtml(initial)}</div>
@@ -897,6 +1023,10 @@
                 <span class="q-time">${time}</span>
               </div>
               <div class="q-topic"><span class="q-topic-icon">${getTopic(data.question).icon}</span>${escapeHtml(getTopic(data.question).label)}</div>
+              <div class="q-status-row">
+                <span class="q-status-label">สถานะ</span>
+                <span class="q-status-badge ${status}">${STATUS_LABEL[status]}</span>
+              </div>
             </div>
           </div>
         `;
@@ -937,13 +1067,105 @@
     questionList.innerHTML = html;
   }
 
-  // ฟังคำถามแบบ real-time เรียงใหม่สุดขึ้นก่อน
-  questionsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+  // ฟังคำถามแบบ real-time เรียงใหม่สุดขึ้นก่อน (หน้าเว็บอัปเดตให้เองอยู่แล้วโดยไม่ต้องรีเฟรช
+  // แต่มีปุ่มรีเฟรชไว้ให้กดเช็คซ้ำเองได้ เผื่อเน็ตหลุดหรืออยากดึงข้อมูลล่าสุดชัวร์ๆ)
+  const questionsQuery = questionsRef.orderBy('createdAt', 'desc');
+  questionsQuery.onSnapshot((snapshot) => {
     latestQuestions = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
     renderQuestionList(latestQuestions);
   }, (err) => {
     console.error(err);
     questionList.innerHTML = '<div class="empty">โหลดข้อมูลไม่สำเร็จ ตรวจสอบการตั้งค่า Firebase</div>';
+  });
+
+  // ดึงข้อมูลล่าสุดจากเซิร์ฟเวอร์ตรงๆ ทั้งคำถามและสถานะเปิด/ปิด — ใช้ร่วมกันทั้งปุ่มรีเฟรชและท่าดึงลง
+  async function doRefresh() {
+    const [snapshot, metaSnap] = await Promise.all([
+      questionsQuery.get({ source: 'server' }),
+      metaRef.get({ source: 'server' })
+    ]);
+    latestQuestions = snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }));
+    renderQuestionList(latestQuestions);
+    const d = metaSnap.exists ? metaSnap.data() : {};
+    currentOpen = d.open !== false;
+    currentTrial = !!d.trialMode;
+    renderStatus();
+  }
+
+  // ปุ่มรีเฟรช
+  refreshBtn.addEventListener('click', async () => {
+    refreshBtn.disabled = true;
+    refreshBtn.classList.add('spinning');
+    try {
+      await doRefresh();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTimeout(() => {
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('spinning');
+      }, 500);
+    }
+  });
+
+  // ===== ดึงหน้าจอลงเพื่อรีเฟรช (pull-to-refresh) แบบแอปมือถือ =====
+  const ptrIndicator = document.getElementById('ptrIndicator');
+  const ptrText = document.getElementById('ptrText');
+  const PTR_THRESHOLD = 70;
+  const PTR_MAX = 110;
+  let ptrStartY = 0;
+  let ptrPulling = false;
+  let ptrReady = false;
+  let ptrLoading = false;
+
+  document.addEventListener('touchstart', (e) => {
+    if (window.scrollY <= 0 && !ptrLoading) {
+      ptrStartY = e.touches[0].clientY;
+      ptrPulling = true;
+      ptrIndicator.classList.add('dragging');
+      ptrIndicator.classList.remove('snap');
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!ptrPulling) return;
+    const dy = e.touches[0].clientY - ptrStartY;
+    if (dy <= 0) {
+      ptrIndicator.style.transform = 'translate(-50%, -60px)';
+      ptrReady = false;
+      ptrIndicator.classList.remove('ready');
+      return;
+    }
+    const dist = Math.min(dy * 0.5, PTR_MAX);
+    ptrIndicator.style.transform = `translate(-50%, ${-60 + dist}px)`;
+    ptrReady = dist >= PTR_THRESHOLD;
+    ptrIndicator.classList.toggle('ready', ptrReady);
+    ptrText.textContent = ptrReady ? 'ปล่อยเพื่อรีเฟรช' : 'ดึงลงเพื่อรีเฟรช';
+  }, { passive: true });
+
+  document.addEventListener('touchend', async () => {
+    if (!ptrPulling) return;
+    ptrPulling = false;
+    ptrIndicator.classList.add('snap');
+    ptrIndicator.classList.remove('dragging');
+
+    if (ptrReady) {
+      ptrLoading = true;
+      ptrIndicator.classList.add('loading');
+      ptrIndicator.classList.remove('ready');
+      ptrText.textContent = 'กำลังรีเฟรช...';
+      ptrIndicator.style.transform = 'translate(-50%, 14px)';
+      try {
+        await doRefresh();
+      } catch (err) {
+        console.error(err);
+      }
+      ptrLoading = false;
+      ptrIndicator.classList.remove('loading');
+    }
+    ptrText.textContent = 'ดึงลงเพื่อรีเฟรช';
+    ptrIndicator.style.transform = 'translate(-50%, -60px)';
+    ptrReady = false;
   });
 
   // กันโค้ด HTML แปลกปลอมจากข้อความที่พิมพ์
