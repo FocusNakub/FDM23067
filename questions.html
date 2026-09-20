@@ -237,6 +237,28 @@
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .qlist-divider{
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-soft);
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .q-topic{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-dark);
+    background: var(--bg2);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  .q-topic-icon{ font-size: 13px; }
   .empty{
     text-align:center;
     color: var(--text-soft);
@@ -801,6 +823,31 @@
     return STATUS_ORDER.includes(s) ? s : 'pending';
   }
 
+  // จัดคำถามเข้าหมวดหมู่สั้นๆ (เช่น "ศิลป์/พร็อพ", "ตารางงาน") ให้คนทั่วไปเห็นคร่าวๆ
+  // ว่าคำถามเกี่ยวกับอะไร โดยไม่ต้องเห็นเนื้อคำถามเต็ม — ใช้วิธีจับคำสำคัญในประโยค (ไม่ใช่ AI จริงๆ
+  // เพราะหน้านี้เป็นเว็บสถิตที่รันในเบราว์เซอร์ล้วน ไม่มีฝั่งเซิร์ฟเวอร์ให้เก็บ API key อย่างปลอดภัย)
+  const TOPIC_CATEGORIES = [
+    { id: 'schedule', label: 'ตารางงาน/เดดไลน์', icon: '🗓️', keywords: ['เดดไลน์', 'deadline', 'กำหนดส่ง', 'ตาราง', 'นัด', 'วันถ่าย', 'เวลาถ่าย', 'call time', 'เลื่อน'] },
+    { id: 'script', label: 'บท/สคริปต์', icon: '📝', keywords: ['บท', 'สคริปต์', 'สตอรี่บอร์ด', 'ซีน', 'พล็อต', 'บทพูด', 'ไดอะล็อก'] },
+    { id: 'camera', label: 'กล้อง/ถ่ายภาพ', icon: '🎥', keywords: ['กล้อง', 'เลนส์', 'มุมกล้อง', 'shot', 'เฟรม', 'โฟกัส'] },
+    { id: 'light', label: 'ไฟ/แสง', icon: '💡', keywords: ['ไฟ', 'แสง', 'ไฟส่อง', 'gaffer'] },
+    { id: 'sound', label: 'เสียง', icon: '🎤', keywords: ['เสียง', 'ไมค์', 'บูม', 'เพลงประกอบ'] },
+    { id: 'art', label: 'ศิลป์/พร็อพ', icon: '🎨', keywords: ['พร็อพ', 'ศิลป์', 'ฉาก', 'ของประกอบฉาก', 'อาร์ต', 'prop', 'art'] },
+    { id: 'costume', label: 'แต่งหน้า/คอสตูม', icon: '💄', keywords: ['แต่งหน้า', 'คอสตูม', 'เสื้อผ้า', 'ทรงผม'] },
+    { id: 'location', label: 'สถานที่ถ่ายทำ', icon: '📍', keywords: ['สถานที่', 'โลเคชั่น', 'สถานที่ถ่าย', 'ขออนุญาตสถานที่'] },
+    { id: 'budget', label: 'งบประมาณ', icon: '💰', keywords: ['งบ', 'เงิน', 'ค่าใช้จ่าย', 'จ่าย', 'ค่าเช่า'] },
+    { id: 'role', label: 'ตำแหน่ง/ทีมงาน', icon: '👥', keywords: ['ตำแหน่ง', 'ทีม', 'หน้าที่', 'แบ่งงาน', 'แบ่งฝ่าย'] },
+    { id: 'submit', label: 'การส่งงาน', icon: '📤', keywords: ['ส่งงาน', 'ไฟล์', 'อัปโหลด', 'ฟอร์แมต', 'export', 'เรนเดอร์'] },
+    { id: 'grade', label: 'เกณฑ์/คะแนน', icon: '📊', keywords: ['คะแนน', 'เกณฑ์', 'เกรด', 'ประเมิน'] },
+  ];
+  const OTHER_TOPIC = { id: 'other', label: 'คำถามทั่วไป', icon: '💬' };
+
+  function getTopic(question) {
+    const text = (question || '').toLowerCase();
+    const match = TOPIC_CATEGORIES.find(cat => cat.keywords.some(kw => text.includes(kw.toLowerCase())));
+    return match || OTHER_TOPIC;
+  }
+
   // สร้าง HTML ของลิสต์คำถามจากข้อมูลล่าสุด (เรียกใหม่ตอน login/logout ด้วย เพื่อสลับมุมมอง admin/ทั่วไป)
   function renderQuestionList(items) {
     if (items.length === 0) {
@@ -833,6 +880,28 @@
           </div>
         </div>
       `;
+      let publicList = '<div class="qlist-divider">รายชื่อผู้ส่งคำถาม</div>';
+      items.forEach(({ data }) => {
+        const time = data.createdAt
+          ? data.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
+          : 'กำลังบันทึก...';
+        const initial = (data.realName || '?').trim().slice(0, 1).toUpperCase();
+        publicList += `
+          <div class="q-item">
+            <div class="q-avatar">${escapeHtml(initial)}</div>
+            <div class="q-body">
+              <div class="q-top">
+                <span class="q-who">
+                  <span class="q-name">${escapeHtml(data.realName)}</span>
+                </span>
+                <span class="q-time">${time}</span>
+              </div>
+              <div class="q-topic"><span class="q-topic-icon">${getTopic(data.question).icon}</span>${escapeHtml(getTopic(data.question).label)}</div>
+            </div>
+          </div>
+        `;
+      });
+      questionList.innerHTML += publicList;
       return;
     }
 
