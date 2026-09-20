@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ถามอาจารย์หน่อย</title>
+
+<!-- ใช้ฟอนต์ไทยอ่านง่าย -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK (compat version ใช้ง่ายกับไฟล์เดี่ยว) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --bg: #f5f3ff;
+    --card: #ffffff;
+    --primary: #6d5ce7;
+    --primary-dark: #5a4bd6;
+    --text: #2b2740;
+    --text-soft: #6b6580;
+    --border: #e6e2f7;
+    --danger: #e5484d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Noto Sans Thai', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+  .wrap{
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  header{
+    text-align:center;
+    margin-bottom: 24px;
+  }
+  header h1{
+    font-size: 22px;
+    margin: 0 0 6px;
+  }
+  header p{
+    color: var(--text-soft);
+    font-size: 14px;
+    margin: 0;
+  }
+  .card{
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 14px rgba(109,92,231,0.08);
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .card h2{
+    font-size: 16px;
+    margin: 0 0 14px;
+  }
+  label{
+    display:block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-soft);
+  }
+  input, textarea, select{
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 14px;
+    resize: vertical;
+    background: #fff;
+  }
+  textarea{ min-height: 90px; }
+  input:focus, textarea:focus, select:focus{
+    outline: none;
+    border-color: var(--primary);
+  }
+  button{
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover{ background: var(--primary-dark); }
+  button:disabled{
+    background: #c9c3e8;
+    cursor: not-allowed;
+  }
+  .status-msg{
+    text-align:center;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 16px;
+  }
+  .status-msg.ok{ color: #16a34a; }
+  .status-msg.err{ color: var(--danger); }
+
+  .list-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 6px;
+  }
+  .list-head h2{ margin:0; }
+  .count-pill{
+    background: var(--bg);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  .q-item{
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .q-item:last-child{ border-bottom: none; }
+  .q-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .q-name{
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .q-time{
+    font-size: 11px;
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  .q-text{
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .empty{
+    text-align:center;
+    color: var(--text-soft);
+    font-size: 14px;
+    padding: 20px 0;
+  }
+  footer{
+    text-align:center;
+    font-size: 11px;
+    color: var(--text-soft);
+    margin-top: 30px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p>ใครมีคำถามหรือข้อสงสัยเกี่ยวกับงาน FDM23067 พิมพ์ทิ้งไว้ตรงนี้ได้เลย เดี๋ยวรวบรวมไปถามอาจารย์ให้</p>
+  </header>
+
+  <!-- ฟอร์มส่งคำถาม -->
+  <div class="card">
+    <h2>ฝากคำถาม</h2>
+    <form id="questionForm">
+      <label for="realNameInput">ชื่อจริง</label>
+      <input id="realNameInput" type="text" placeholder="เช่น หิรัญ ดิษฐสกุล" maxlength="60" required>
+
+      <label for="positionInput">ตำแหน่ง</label>
+      <select id="positionInput" required>
+        <option value="" disabled selected>เลือกตำแหน่งของคุณ</option>
+      </select>
+
+      <label for="questionInput">คำถาม</label>
+      <textarea id="questionInput" placeholder="พิมพ์คำถามที่อยากให้ถามอาจารย์" maxlength="500" required></textarea>
+
+      <button type="submit" id="submitBtn">ส่ง</button>
+      <div class="status-msg" id="statusMsg"></div>
+    </form>
+  </div>
+
+  <!-- ลิสต์คำถามทั้งหมด -->
+  <div class="card">
+    <div class="list-head">
+      <h2>คำถามที่ส่งมาแล้ว</h2>
+      <span class="count-pill" id="countPill">0</span>
+    </div>
+    <div id="questionList">
+      <div class="empty">ยังไม่มีใครถามเลย เป็นคนแรกก็ได้นะ</div>
+    </div>
+  </div>
+
+  <footer>
+    ทำโดย Focus Nakub
+  </footer>
+</div>
+
+<script>
+  // ===== ใช้ Firebase โปรเจกต์เดียวกับเว็บ Final Project Position System =====
+  // เพื่อให้ตำแหน่งในฟอร์มนี้ตรงกับตำแหน่งกองถ่ายจริง
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+    authDomain: "fdm13167.firebaseapp.com",
+    projectId: "fdm13167",
+    storageBucket: "fdm13167.firebasestorage.app",
+    messagingSenderId: "638048330365",
+    appId: "1:638048330365:web:961daeac412d5d6332c714",
+    measurementId: "G-08XDS71QRF"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  // เก็บคำถามไว้คนละ collection กับข้อมูลตำแหน่ง ไม่ปนกัน
+  const questionsRef = db.collection("fdm23067Questions");
+
+  // รายชื่อตำแหน่งเดียวกับเว็บ Position System เป๊ะๆ (เรียงตามแผนก)
+  const ROLES = [
+    { id: 'producer', name: 'Producer' },
+    { id: 'director', name: 'Director' },
+    { id: 'script', name: 'Script Supervisor' },
+    { id: 'runner', name: 'AD1' },
+    { id: 'dop', name: 'DOP' },
+    { id: 'camoperator', name: 'Camera Operator' },
+    { id: 'focuspuller', name: 'Focus Puller' },
+    { id: 'camop', name: 'Cam Assistant' },
+    { id: 'gaffer', name: 'Gaffer' },
+    { id: 'bestboy', name: 'Best Boy Electric' },
+    { id: 'sound', name: 'Sound' },
+    { id: 'art', name: 'Art Director' },
+    { id: 'artprop', name: 'Art/Prop' },
+    { id: 'makeup', name: 'Makeup & Costume' },
+  ];
+
+  const form = document.getElementById('questionForm');
+  const realNameInput = document.getElementById('realNameInput');
+  const positionInput = document.getElementById('positionInput');
+  const questionInput = document.getElementById('questionInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const statusMsg = document.getElementById('statusMsg');
+  const questionList = document.getElementById('questionList');
+  const countPill = document.getElementById('countPill');
+
+  // เติมตัวเลือกตำแหน่งในฟอร์ม
+  ROLES.forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = r.name;
+    positionInput.appendChild(opt);
+  });
+
+  // ส่งคำถามใหม่ขึ้น Firestore
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const realName = realNameInput.value.trim();
+    const positionId = positionInput.value;
+    const positionName = ROLES.find(r => r.id === positionId)?.name || positionId;
+    const question = questionInput.value.trim();
+    if (!realName || !positionId || !question) return;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'กำลังส่ง...';
+    statusMsg.textContent = '';
+    statusMsg.className = 'status-msg';
+
+    try {
+      await questionsRef.add({
+        realName: realName,
+        positionId: positionId,
+        position: positionName,
+        question: question,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      realNameInput.value = '';
+      positionInput.selectedIndex = 0;
+      questionInput.value = '';
+      statusMsg.textContent = 'ส่งแล้ว ขอบคุณนะ';
+      statusMsg.className = 'status-msg ok';
+    } catch (err) {
+      console.error(err);
+      statusMsg.textContent = 'ส่งไม่สำเร็จ ลองอีกทีนะ';
+      statusMsg.className = 'status-msg err';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'ส่ง';
+    }
+  });
+
+  // ฟังคำถามแบบ real-time เรียงใหม่สุดขึ้นก่อน
+  questionsRef.orderBy('createdAt', 'desc').onSnapshot((snapshot) => {
+    if (snapshot.empty) {
+      questionList.innerHTML = '<div class="empty">ยังไม่มีใครถามเลย เป็นคนแรกก็ได้นะ</div>';
+      countPill.textContent = '0';
+      return;
+    }
+
+    countPill.textContent = snapshot.size;
+    let html = '';
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const time = data.createdAt
+        ? data.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
+        : 'กำลังบันทึก...';
+      html += `
+        <div class="q-item">
+          <div class="q-top">
+            <span class="q-name">${escapeHtml(data.realName)}${data.position ? ' · ' + escapeHtml(data.position) : ''}</span>
+            <span class="q-time">${time}</span>
+          </div>
+          <div class="q-text">${escapeHtml(data.question)}</div>
+        </div>
+      `;
+    });
+    questionList.innerHTML = html;
+  }, (err) => {
+    console.error(err);
+    questionList.innerHTML = '<div class="empty">โหลดข้อมูลไม่สำเร็จ ตรวจสอบการตั้งค่า Firebase</div>';
+  });
+
+  // กันโค้ด HTML แปลกปลอมจากข้อความที่พิมพ์
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+
+</body>
+</html>
