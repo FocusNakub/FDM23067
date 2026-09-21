@@ -852,9 +852,7 @@
     await batch.commit();
   });
 
-  // รวมคำถามทั้งหมดเป็นไฟล์ข้อความ อ่านง่าย แยกตามสถานะ แล้วดาวน์โหลดให้อัตโนมัติ
-  const STATUS_DOT = { pending: '#ff4d5f', received: '#8a6400', asked: '#25b86a' };
-
+  // รวมคำถามทั้งหมดเป็นเอกสารรายงานทางการ เรียงเลขคำถามต่อเนื่อง แยกตามสถานะ แล้วเปิดในหน้าต่างใหม่
   exportBtn.addEventListener('click', () => {
     if (latestQuestions.length === 0) {
       alert('ยังไม่มีคำถามให้ส่งออก');
@@ -865,125 +863,122 @@
     const askedCount = items.filter(q => normalizeStatus(q.data.status) === 'asked').length;
 
     let groupsHtml = '';
+    let runningNo = 0;
     STATUS_ORDER.forEach(statusKey => {
       const group = items.filter(q => normalizeStatus(q.data.status) === statusKey);
       if (group.length === 0) return;
       groupsHtml += `
         <section class="group" data-status="${statusKey}">
-          <h2><span class="dot" style="background:${STATUS_DOT[statusKey]}"></span>${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">${group.length}</span></h2>
-          <div class="cards">
+          <h2>สถานะ: ${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">(${group.length} รายการ)</span></h2>
+          <ol class="q-list">
       `;
-      group.forEach((q, idx) => {
+      group.forEach((q) => {
+        runningNo += 1;
         const d = q.data;
         const time = d.createdAt
           ? d.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
           : 'ไม่ทราบเวลา';
         const topic = getTopic(d.question);
         groupsHtml += `
-          <article class="card">
-            <div class="card-top">
-              <div class="who">
-                <span class="name">${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</span>
-                ${d.position ? `<span class="role">${escapeHtml(d.position)}</span>` : ''}
-                ${d.trial ? `<span class="role trial">ทดลอง</span>` : ''}
-              </div>
-              <span class="time">${time}</span>
+          <li class="q-entry">
+            <div class="q-entry-head">
+              <span class="q-num">คำถามที่ ${runningNo}</span>
+              <span class="q-time">${time}</span>
             </div>
-            <div class="topic"><span class="topic-icon">${topic.icon}</span>${escapeHtml(topic.label)}</div>
-            <p class="question">${escapeHtml(d.question)}</p>
-          </article>
+            <div class="q-entry-meta">
+              <span>ผู้ถาม: <b>${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</b>${d.position ? ' (' + escapeHtml(d.position) + ')' : ''}</span>
+              <span>หมวด: <b>${escapeHtml(topic.label)}</b></span>
+              ${d.trial ? '<span class="q-trial-tag">ทดลอง</span>' : ''}
+            </div>
+            <p class="q-entry-text">${escapeHtml(d.question)}</p>
+          </li>
         `;
       });
-      groupsHtml += `</div></section>`;
+      groupsHtml += `</ol></section>`;
     });
 
     const html = `<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>สรุปคำถาม FDM23067</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>รายงานสรุปคำถาม FDM23067</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #f0f7fd; --bg2: #e3f1fb; --card: #ffffff;
-    --primary: #6fa8dc; --primary-dark: #4f8fc7; --ink: #173049;
-    --text-soft: #6b859c; --border: #cfe6f7; --shadow: 0 12px 30px rgba(23,79,120,.10); --radius: 18px;
+    --ink: #1a1a1a; --text-soft: #55606b; --border: #c9ccd1; --border-dark: #333;
+    --accent: #2c3e50;
   }
   *{ box-sizing: border-box; }
   body{
     margin:0; font-family:'Noto Sans Thai', sans-serif;
-    background: radial-gradient(circle at top left, var(--bg2), transparent 40%), var(--bg);
-    color: var(--ink); padding: 32px 20px 60px;
+    background: #e9eaec; color: var(--ink); padding: 40px 20px 60px;
   }
-  .wrap{ max-width: 780px; margin: 0 auto; }
-  .head{ text-align:center; margin-bottom: 28px; }
-  .head .badge{
-    display:inline-flex; align-items:center; gap:6px; background:#fff;
-    border:1px solid var(--border); box-shadow: var(--shadow); border-radius:999px;
-    padding:6px 14px; font-size:12px; font-weight:800; color: var(--primary-dark); margin-bottom:10px;
+  .wrap{ max-width: 760px; margin: 0 auto; }
+  #capture{ background:#fff; border:1px solid var(--border); padding: 44px 46px; }
+  .doc-head{ text-align:center; border-bottom: 3px double var(--border-dark); padding-bottom: 18px; margin-bottom: 20px; }
+  .doc-head .doc-title{ font-family:'Noto Serif Thai', serif; font-weight:700; font-size: 22px; letter-spacing:.3px; }
+  .doc-head .doc-sub{ font-size: 13px; color: var(--text-soft); margin-top: 4px; }
+  .doc-meta{ width:100%; border-collapse: collapse; font-size: 13px; margin-bottom: 26px; }
+  .doc-meta td{ border: 1px solid var(--border); padding: 8px 12px; }
+  .doc-meta td.label{ background:#f4f5f6; font-weight:700; width: 44%; }
+  .group{ margin-bottom: 24px; }
+  .group h2{
+    font-family:'Noto Serif Thai', serif; font-size: 15px; font-weight:700;
+    border-bottom: 1.5px solid var(--border-dark); padding-bottom: 6px; margin: 0 0 14px;
   }
-  .head h1{ margin: 6px 0; font-size: 22px; }
-  .head p{ color: var(--text-soft); font-size: 13px; margin: 4px 0; }
-  .stats{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap: wrap; }
-  .stat{ background:#fff; border:1px solid var(--border); border-radius: 14px; padding:10px 18px; box-shadow: var(--shadow); }
-  .stat b{ display:block; font-size:20px; }
-  .stat span{ font-size:11px; color: var(--text-soft); font-weight:700; }
-  .group{ margin-bottom: 26px; }
-  .group h2{ display:flex; align-items:center; gap:8px; font-size:15px; margin: 0 0 12px; }
-  .group h2 .dot{ width:9px; height:9px; border-radius:50%; }
-  .group h2 .count{ background: var(--bg2); color: var(--primary-dark); font-size:11px; font-weight:800; padding:2px 9px; border-radius:999px; }
-  .cards{ display:flex; flex-direction:column; gap:10px; }
-  .card{ background: var(--card); border:1px solid var(--border); border-radius: var(--radius); padding:16px 18px; box-shadow: var(--shadow); }
-  .card-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
-  .who{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
-  .name{ font-weight:800; font-size:14px; }
-  .role{ font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:2px 8px; border-radius:999px; }
-  .role.trial{ color:#8a6400; background:#fff3cd; }
-  .time{ font-size:11px; color: var(--text-soft); white-space:nowrap; }
-  .topic{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:3px 10px; border-radius:999px; margin-bottom:8px; }
-  .question{ font-size:14px; line-height:1.6; margin:0; white-space:pre-wrap; word-break:break-word; }
-  .foot{ text-align:center; font-size:11px; color: var(--text-soft); margin-top:30px; }
+  .group h2 .count{ font-family:'Noto Sans Thai', sans-serif; font-weight:600; color: var(--text-soft); font-size: 12px; }
+  .q-list{ list-style:none; margin:0; padding:0; }
+  .q-entry{ border-bottom: 1px solid var(--border); padding: 14px 0; }
+  .q-entry:first-child{ padding-top: 0; }
+  .q-entry:last-child{ border-bottom:none; padding-bottom: 0; }
+  .q-entry-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 6px; }
+  .q-num{ font-weight:800; font-size: 14px; }
+  .q-time{ font-size: 11.5px; color: var(--text-soft); white-space:nowrap; }
+  .q-entry-meta{ display:flex; gap: 16px; flex-wrap:wrap; font-size: 12px; color: var(--text-soft); margin-bottom: 8px; }
+  .q-entry-meta b{ color: var(--ink); font-weight:700; }
+  .q-trial-tag{ font-weight:700; color:#8a6400; background:#fff3cd; padding:1px 8px; border-radius:3px; font-size:11px; }
+  .q-entry-text{ font-size: 14px; line-height: 1.7; margin:0; white-space:pre-wrap; word-break:break-word; padding-left: 2px; border-left: 3px solid var(--border-dark); padding-left: 12px; }
+  .doc-foot{ text-align:center; font-size: 11px; color: var(--text-soft); margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--border); }
   .print-btn{
-    padding: 10px 22px; border:none; border-radius:14px;
-    background: var(--primary); color:#fff; font-family:inherit; font-size:14px; font-weight:800; cursor:pointer;
-    box-shadow: 0 8px 18px rgba(79,143,199,.35);
+    padding: 10px 22px; border: 1px solid var(--border-dark); border-radius:4px;
+    background: var(--accent); color:#fff; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer;
   }
-  .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
-  .save-img-btn{ background: #25b86a; box-shadow: 0 8px 18px rgba(37,184,106,.35); }
+  .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
+  .save-img-btn{ background: #3d6b52; }
   .save-img-btn:disabled{ opacity:.6; cursor: wait; }
 
   .filter-row{ display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
   .filter-chip{
-    padding: 7px 16px; border-radius: 999px; border: 1px solid var(--border);
-    background: #fff; color: var(--text-soft); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer;
+    padding: 7px 16px; border-radius: 4px; border: 1px solid var(--border-dark);
+    background: #fff; color: var(--accent); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer;
   }
-  .filter-chip.active{ background: var(--primary); border-color: var(--primary); color:#fff; }
+  .filter-chip.active{ background: var(--accent); border-color: var(--accent); color:#fff; }
 
   /* โหมดจัดหน้าเฉพาะตอนถ่ายรูป ให้กลุ่มสถานะเรียงเป็นคอลัมน์ ภาพจะออกมาสี่เหลี่ยมแทนที่จะยาวเป็นทาง */
-  #capture.capture-grid{ width: 1040px; padding: 6px; }
+  #capture.capture-grid{ width: 1040px; }
   #capture.capture-grid .groups-wrap{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
     align-items: start;
   }
   #capture.capture-grid .group{ margin-bottom: 0; }
-  #capture.capture-grid .card{ padding: 12px 14px; }
-  #capture.capture-grid .question{ font-size: 12.5px; }
-  #capture.capture-grid .name{ font-size: 13px; }
+  #capture.capture-grid .q-entry-text{ font-size: 12.5px; }
 
-  /* เลือกดูสถานะเดียว ให้การ์ดของกลุ่มนั้นจัดเป็นตาราง จะได้ไม่ไล่ยาวลงล่าง */
+  /* เลือกดูสถานะเดียว */
   .groups-wrap[data-filter="pending"] .group:not([data-status="pending"]),
   .groups-wrap[data-filter="received"] .group:not([data-status="received"]),
   .groups-wrap[data-filter="asked"] .group:not([data-status="asked"]){ display:none; }
-  .groups-wrap[data-filter="pending"] .group[data-status="pending"] .cards,
-  .groups-wrap[data-filter="received"] .group[data-status="received"] .cards,
-  .groups-wrap[data-filter="asked"] .group[data-status="asked"] .cards{
+
+  /* เลือกสถานะเดียว + ถ่ายรูป ให้กลุ่มที่เหลือกลุ่มเดียวขยายเต็มความกว้าง แล้วจัดคำถามเป็นตารางแทน */
+  #capture.capture-grid.filter-single .groups-wrap{ grid-template-columns: 1fr; }
+  #capture.capture-grid.filter-single .q-list{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
   }
-  @media print{ .btn-row, .filter-row{ display:none; } body{ background:#fff; padding:0; } .card, .stat{ box-shadow:none; } }
+  #capture.capture-grid.filter-single .q-entry{ border-bottom:none; border: 1px solid var(--border); padding: 12px 14px; }
+  @media print{ .btn-row, .filter-row{ display:none; } body{ background:#fff; padding:0; } .wrap{ max-width:none; } #capture{ border:none; padding:0; } }
 </style>
 </head>
 <body>
@@ -999,18 +994,18 @@
       <button class="print-btn save-img-btn" id="saveImgBtn">🖼️ บันทึกเป็นรูปภาพ</button>
     </div>
     <div id="capture">
-      <div class="head">
-        <div class="badge"><span>●</span> FDM23067</div>
-        <h1>สรุปคำถามจากทีมงาน</h1>
-        <p>ส่งออกเมื่อ ${escapeHtml(now)}</p>
-        <div class="stats">
-          <div class="stat"><b>${items.length}</b><span>คำถามทั้งหมด</span></div>
-          <div class="stat"><b>${askedCount}</b><span>ถามอาจารย์แล้ว</span></div>
-          <div class="stat"><b>${items.length - askedCount}</b><span>กำลังดำเนินการ</span></div>
-        </div>
+      <div class="doc-head">
+        <div class="doc-title">รายงานสรุปคำถามจากทีมงาน</div>
+        <div class="doc-sub">โครงการ FDM23067 — งานหนังสั้น 1 ซีน</div>
       </div>
+      <table class="doc-meta">
+        <tr><td class="label">วันที่จัดทำรายงาน</td><td>${escapeHtml(now)}</td></tr>
+        <tr><td class="label">จำนวนคำถามทั้งหมด</td><td>${items.length} รายการ</td></tr>
+        <tr><td class="label">ถามอาจารย์เรียบร้อยแล้ว</td><td>${askedCount} รายการ</td></tr>
+        <tr><td class="label">อยู่ระหว่างดำเนินการ</td><td>${items.length - askedCount} รายการ</td></tr>
+      </table>
       <div class="groups-wrap" id="groupsWrap" data-filter="all">${groupsHtml}</div>
-      <div class="foot">FDM23067 — ถามอาจารย์ · ทำโดย Focus Nakub</div>
+      <div class="doc-foot">จัดทำโดย Focus Nakub — FDM23067 ถามอาจารย์</div>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
@@ -1027,15 +1022,16 @@
       });
     });
 
-    // จับภาพส่วนสรุปคำถามทั้งหมด (หรือเฉพาะสถานะที่เลือก) แปลงเป็นไฟล์รูปภาพ PNG แล้วดาวน์โหลดให้อัตโนมัติ
+    // จับภาพส่วนรายงานทั้งหมด (หรือเฉพาะสถานะที่เลือก) แปลงเป็นไฟล์รูปภาพ PNG แล้วดาวน์โหลดให้อัตโนมัติ
     document.getElementById('saveImgBtn').addEventListener('click', async function () {
       const btn = this;
       btn.disabled = true;
       btn.textContent = 'กำลังสร้างรูปภาพ...';
       const target = document.getElementById('capture');
       target.classList.add('capture-grid');
+      target.classList.toggle('filter-single', currentFilter !== 'all');
       try {
-        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#f0f7fd', useCORS: true, windowWidth: 1080 });
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 1080 });
         const link = document.createElement('a');
         link.download = 'คำถาม-FDM23067-' + FILTER_LABEL[currentFilter] + '-' + new Date().toISOString().slice(0, 10) + '.png';
         link.href = canvas.toDataURL('image/png');
@@ -1043,7 +1039,7 @@
       } catch (err) {
         alert('สร้างรูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง');
       } finally {
-        target.classList.remove('capture-grid');
+        target.classList.remove('capture-grid', 'filter-single');
         btn.disabled = false;
         btn.textContent = '🖼️ บันทึกเป็นรูปภาพ';
       }
