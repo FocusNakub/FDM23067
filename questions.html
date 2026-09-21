@@ -120,6 +120,21 @@
     flex: 1.6;
     min-width: 0;
   }
+  .name-input-wrap{ position: relative; }
+  .name-input-wrap input.locked{
+    background: #eef2f5; color: var(--text-soft); cursor: not-allowed;
+    padding-right: 78px;
+  }
+  .unlock-name-btn{
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: auto; padding: 5px 10px; margin: 0; border-radius: 10px;
+    background: #fff; color: var(--primary-dark); border: 1px solid var(--border);
+    font-size: 11px; font-weight: 700; box-shadow: none; cursor: pointer;
+  }
+  .field-error{
+    font-size: 11.5px; color: var(--danger); font-weight: 700;
+    margin-top: -12px; margin-bottom: 12px; min-height: 14px;
+  }
   .row-fields .field-position{
     flex: 1;
     min-width: 0;
@@ -606,6 +621,7 @@
     <div class="admin-actions">
       <button type="button" class="secondary" id="toggleOpenBtn">เปิด/ปิดรับคำถาม</button>
       <button type="button" class="secondary" id="toggleTrialBtn">เปิด/ปิดโหมดทดลอง</button>
+      <button type="button" class="secondary" id="toggleNameCheckBtn">เปิด/ปิดตรวจชื่อกับรายชื่อทีม</button>
       <button type="button" class="secondary" id="exportBtn">📄 ส่งออกคำถามทั้งหมด</button>
       <button type="button" class="danger" id="clearTrialBtn">ล้างคำถามทดลอง</button>
       <button type="button" class="ghost" id="adminLogoutBtn">ออกจากระบบ</button>
@@ -619,7 +635,11 @@
       <div class="row-fields">
         <div class="field-name">
           <label for="realNameInput">ชื่อจริง</label>
-          <input id="realNameInput" type="text" placeholder="พิมพ์ ชื่อ นามสกุล" maxlength="60" required>
+          <div class="name-input-wrap">
+            <input id="realNameInput" type="text" placeholder="พิมพ์ ชื่อ นามสกุล" maxlength="60" required>
+            <button type="button" id="unlockNameBtn" class="unlock-name-btn" style="display:none;" title="เปลี่ยนชื่อ">เปลี่ยนชื่อ</button>
+          </div>
+          <div class="field-error" id="nameError"></div>
         </div>
         <div class="field-position">
           <label for="positionInput">ตำแหน่ง</label>
@@ -712,6 +732,8 @@
 
   const form = document.getElementById('questionForm');
   const realNameInput = document.getElementById('realNameInput');
+  const nameError = document.getElementById('nameError');
+  const unlockNameBtn = document.getElementById('unlockNameBtn');
   const positionInput = document.getElementById('positionInput');
   const questionInput = document.getElementById('questionInput');
   const submitBtn = document.getElementById('submitBtn');
@@ -734,6 +756,7 @@
   const adminLogoutBtn = document.getElementById('adminLogoutBtn');
   const toggleOpenBtn = document.getElementById('toggleOpenBtn');
   const toggleTrialBtn = document.getElementById('toggleTrialBtn');
+  const toggleNameCheckBtn = document.getElementById('toggleNameCheckBtn');
   const clearTrialBtn = document.getElementById('clearTrialBtn');
   const exportBtn = document.getElementById('exportBtn');
 
@@ -745,10 +768,74 @@
     positionInput.appendChild(opt);
   });
 
+  // ===== ตรวจชื่อ-นามสกุลกับรายชื่อทีมงานจริง 18 คน + ล็อคชื่อไว้ในเครื่องนี้จนกว่าจะออกจากหน้า =====
+  const NAME_STORAGE_KEY = 'fdm23067QLockedName';
+
+  // รายชื่อทีมงานตัวจริง (จากหน้า Crew) ใช้ตรวจว่าพิมพ์ชื่อ-นามสกุลถูกต้องหรือไม่
+  const TEAM_ROSTER = [
+    'หิรัญ ดิษฐสกุล',
+    'จันทิมา จันทร์ช่วง',
+    'ธัญพิสิษฐ์ พูนพานิช',
+    'ศิริวัฒน์ เดชอุดม',
+    'ทีปกร จิณเสน',
+    'ธนพัฒน์ พรมวิชัย',
+    'พิยดา ด่วนดี',
+    'วริชยา ไชยสงค์',
+    'พีชานิกา ทองประศรี',
+    'กัณญาพัฒน์ จันทร์เกษมสุข',
+    'วิโรจน์ สวนสระแก้ว',
+    'ภูริพัฒน์ อนุโชติ',
+    'กมลพร พูลแก้ว',
+    'ณัฐวุฒิ ทับทอง',
+    'ณรงค์เดช แสนสิทธิ์',
+    'ขันเงิน สาครธนะศักดิ์',
+    'วัชรพล ดำสมอ',
+    'รวีโรจน์ เชื้อแฉ่ง'
+  ];
+  const TEAM_ROSTER_NORMALIZED = TEAM_ROSTER.map(n => n.replace(/\s+/g, ''));
+
+  function validateName(raw) {
+    const cleaned = raw.trim().replace(/\s+/g, ' ');
+    if (!cleaned) {
+      return { ok: false, msg: 'กรุณาพิมพ์ชื่อ-นามสกุล' };
+    }
+    // เทียบแบบไม่สนใจช่องว่าง กันพิมพ์เว้นวรรคผิดที่
+    const idx = TEAM_ROSTER_NORMALIZED.indexOf(cleaned.replace(/\s+/g, ''));
+    if (idx === -1) {
+      return { ok: false, msg: 'ชื่อนี้ไม่ตรงกับรายชื่อทีมงาน 18 คน กรุณาพิมพ์ชื่อ-นามสกุลให้ตรงกับที่ลงทะเบียนไว้' };
+    }
+    return { ok: true, value: TEAM_ROSTER[idx] };
+  }
+
+  function lockName(name) {
+    realNameInput.value = name;
+    realNameInput.readOnly = true;
+    realNameInput.classList.add('locked');
+    unlockNameBtn.style.display = 'inline-block';
+    nameError.textContent = '';
+  }
+
+  function unlockName() {
+    sessionStorage.removeItem(NAME_STORAGE_KEY);
+    realNameInput.value = '';
+    realNameInput.readOnly = false;
+    realNameInput.classList.remove('locked');
+    unlockNameBtn.style.display = 'none';
+    realNameInput.focus();
+  }
+
+  unlockNameBtn.addEventListener('click', unlockName);
+  realNameInput.addEventListener('input', () => { nameError.textContent = ''; });
+
+  // ถ้าเคยพิมพ์ชื่อถูกต้องแล้วในหน้านี้ (แท็บ/เซสชันนี้) ให้ล็อคไว้เลยโดยไม่ต้องพิมพ์ใหม่
+  const savedName = sessionStorage.getItem(NAME_STORAGE_KEY);
+  if (savedName) lockName(savedName);
+
   // ===== ระบบ Admin: เปิด/ปิดรับคำถาม, โหมดทดลอง =====
   let isAdmin = sessionStorage.getItem('fdm23067QAdmin') === '1';
   let currentOpen = true;
   let currentTrial = false;
+  let currentNameCheck = true; // true = ต้องพิมพ์ชื่อให้ตรงกับรายชื่อทีม 18 คน
   let latestQuestions = [];
 
   function renderStatus() {
@@ -759,6 +846,7 @@
     submitBtn.disabled = !currentOpen;
     toggleOpenBtn.textContent = currentOpen ? 'ปิดรับคำถาม' : 'เปิดรับคำถาม';
     toggleTrialBtn.textContent = currentTrial ? 'ปิดโหมดทดลอง' : 'เปิดโหมดทดลอง';
+    toggleNameCheckBtn.textContent = currentNameCheck ? 'ปิดการตรวจชื่อ (พิมพ์ชื่ออะไรก็ได้)' : 'เปิดการตรวจชื่อ (ต้องตรงกับทีม)';
   }
 
   function openAdminModal() {
@@ -782,6 +870,7 @@
     const d = snap.exists ? snap.data() : {};
     currentOpen = d.open !== false;
     currentTrial = !!d.trialMode;
+    currentNameCheck = d.nameCheckRequired !== false;
     renderStatus();
   }, err => {
     console.error(err);
@@ -842,6 +931,10 @@
 
   toggleTrialBtn.addEventListener('click', () => {
     metaRef.set({ trialMode: !currentTrial }, { merge: true });
+  });
+
+  toggleNameCheckBtn.addEventListener('click', () => {
+    metaRef.set({ nameCheckRequired: !currentNameCheck }, { merge: true });
   });
 
   clearTrialBtn.addEventListener('click', async () => {
@@ -1098,7 +1191,28 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentOpen) return;
-    const realName = realNameInput.value.trim();
+
+    let realName = realNameInput.value.trim();
+    const nameWasLocked = realNameInput.readOnly;
+
+    // ถ้ายังไม่ได้ล็อคชื่อไว้ ต้องตรวจก่อนว่าพิมพ์ครบชื่อ-นามสกุลจริง ไม่ใช่พิมพ์มั่ว
+    // (Admin ปิดการตรวจชื่อได้ตอนทดสอบ/โหมดทดลอง เพื่อพิมพ์ชื่ออะไรก็ได้)
+    if (!nameWasLocked) {
+      if (currentNameCheck) {
+        const check = validateName(realName);
+        if (!check.ok) {
+          nameError.textContent = check.msg;
+          realNameInput.focus();
+          return;
+        }
+        realName = check.value;
+      } else if (!realName) {
+        nameError.textContent = 'กรุณาพิมพ์ชื่อ-นามสกุล';
+        realNameInput.focus();
+        return;
+      }
+    }
+
     const positionId = positionInput.value;
     const positionName = ROLES.find(r => r.id === positionId)?.name || positionId;
     const question = questionInput.value.trim();
@@ -1119,7 +1233,11 @@
         trial: currentTrial,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      realNameInput.value = '';
+      // ล็อคชื่อไว้ในเครื่องนี้หลังส่งสำเร็จครั้งแรก จะได้ไม่ต้องพิมพ์ชื่อซ้ำ
+      if (!nameWasLocked) {
+        sessionStorage.setItem(NAME_STORAGE_KEY, realName);
+        lockName(realName);
+      }
       positionInput.selectedIndex = 0;
       questionInput.value = '';
       statusMsg.textContent = 'ส่งแล้ว ขอบคุณนะ';
@@ -1349,6 +1467,7 @@
     const d = metaSnap.exists ? metaSnap.data() : {};
     currentOpen = d.open !== false;
     currentTrial = !!d.trialMode;
+    currentNameCheck = d.nameCheckRequired !== false;
     renderStatus();
   }
 
