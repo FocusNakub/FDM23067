@@ -3,25 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>FDM23067 Crew Position System</title>
+<title>CMM21167 Crew Position System</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSI1OCIgaGVpZ2h0PSI1OCIgcng9IjE0IiBmaWxsPSIjMTUzMDRhIi8+CjxjbGlwUGF0aCBpZD0iYyI+PHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjU4IiBoZWlnaHQ9IjIwIiByeD0iOCIvPjwvY2xpcFBhdGg+CjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+CjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSI1OCIgaGVpZ2h0PSIyMCIgZmlsbD0iIzZmYThkYyIvPgo8cG9seWdvbiBwb2ludHM9IjYsMyAxNiwzIDgsMjMgLTIsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIyNCwzIDM0LDMgMjYsMjMgMTYsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSI0MiwzIDUyLDMgNDQsMjMgMzQsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSI2MCwzIDcwLDMgNjIsMjMgNTIsMjMiIGZpbGw9IiNmZmYiLz4KPC9nPgo8cmVjdCB4PSIzIiB5PSIyMyIgd2lkdGg9IjU4IiBoZWlnaHQ9IjM4IiByeD0iMCIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4=">
 
-<!-- แชร์ลิงก์นี้ในไลน์/เฟซบุ๊กแล้วจะมีรูปตัวอย่างขึ้นใต้ลิงก์ (ต้องอัปโหลด og-image.png ไปที่ repo ก่อน ดูวิธีในแชท) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://focusnakub.github.io/FDM23067/">
-<meta property="og:title" content="FDM23067 · Crew Position System">
-<meta property="og:description" content="ระบบเลือกตำแหน่งกองถ่ายหนังสั้น 1 ซีน 2 นาที แบบเรียลไทม์ สำหรับทีม 18 คน ใครกดก่อนได้ก่อน">
-<meta property="og:image" content="https://focusnakub.github.io/FDM23067/og-image.png">
+<meta property="og:title" content="CMM21167 · Crew Position System">
+<meta property="og:description" content="ระบบเลือกตำแหน่งกองถ่าย วิชา CMM21167 แบบเรียลไทม์ สำหรับทีม 18 คน ใครกดก่อนได้ก่อน">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FDM23067 · Crew Position System">
-<meta name="twitter:description" content="ระบบเลือกตำแหน่งกองถ่ายหนังสั้น 1 ซีน 2 นาที แบบเรียลไทม์ สำหรับทีม 18 คน">
-<meta name="twitter:image" content="https://focusnakub.github.io/FDM23067/og-image.png">
+<meta name="twitter:title" content="CMM21167 · Crew Position System">
+<meta name="twitter:description" content="ระบบเลือกตำแหน่งกองถ่าย วิชา CMM21167 แบบเรียลไทม์ สำหรับทีม 18 คน">
 
 <style>
 :root{
-  --bg:#f0f7fd;--card:#fff;--ink:#173049;--muted:#6b859c;--pink:#6fa8dc;--pink2:#e3f1fb;
-  --green:#25b86a;--yellow:#f7b731;--red:#ff4d5f;--line:#cfe6f7;--dark:#15304a;
-  --shadow:0 16px 40px rgba(23,79,120,.10);--radius:22px;--accent:#6fa8dc;
+  --bg:#fff5f8;--card:#fff;--ink:#5c2a3a;--muted:#c48a9c;--pink:#f7a8c4;--pink2:#ffe3ee;
+  --green:#25b86a;--yellow:#f7b731;--red:#ff6f91;--line:#f6d3e2;--dark:#d6597e;
+  --shadow:0 16px 40px rgba(214,89,126,.12);--radius:22px;--accent:#f7a8c4;
 }
 *{box-sizing:border-box;min-width:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -40,16 +36,14 @@ button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
 button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}button.ghost{background:transparent;color:var(--pink);box-shadow:none;padding:7px 8px}button.danger{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
 .setup{background:#fff3cd;border-color:#ffd36b;color:#5e4300;font-weight:800;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;margin:14px 0}
 
-/* ===== แถบสถานะรวม: ความคืบหน้า + วิธีใช้ + ประกาศ (แทนที่ Live Info Board เดิม) ===== */
 .status-strip{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:12px 16px;margin:14px 0}
 .status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .status-progress{flex:1;min-width:220px;font-weight:800;font-size:14px}
 .status-progress b{font-size:18px;color:var(--pink)}
 .status-progress .progressbar{margin-top:6px;height:8px}
-.top-countdown{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink),#8fc6ea);color:#fff;border-radius:999px;padding:8px 16px;font-weight:800;font-size:13px;white-space:nowrap;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 35%,transparent)}
+.top-countdown{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink),#ffc7dd);color:#fff;border-radius:999px;padding:8px 16px;font-weight:800;font-size:13px;white-space:nowrap;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 35%,transparent)}
 .top-countdown b{font-size:16px;color:#fff;font-variant-numeric:tabular-nums}
 .status-announce{margin-top:10px;background:var(--dark);color:#fff;border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;overflow-wrap:anywhere}
-.final-warn-mini{display:inline-block;max-width:100%;background:var(--red);color:#fff;font-weight:800;font-size:12px;line-height:1.3;text-align:center;padding:3px 9px;border-radius:14px;margin:0 0 8px;animation:finalWarnBlink 1.1s ease-in-out infinite;overflow-wrap:anywhere}
 .trial-banner{background:var(--yellow);color:#5e4300;font-weight:900;text-align:center;padding:12px 16px;border-radius:16px;margin:14px 0;box-shadow:var(--shadow);overflow-wrap:anywhere}
 @keyframes finalWarnBlink{0%,100%{opacity:1}50%{opacity:.5}}
 
@@ -64,19 +58,17 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;min-width:0}
 .dept-block .card{box-shadow:none;background:var(--bg)}
 .dept-block .card:hover{box-shadow:0 14px 30px rgba(23,79,120,.12)}
-.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:.2s ease;min-width:0}.card:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(23,79,120,.16)}.card.full:after{content:"เต็มแล้ว";position:absolute;right:-34px;top:18px;background:var(--red);color:#fff;transform:rotate(35deg);padding:6px 42px;font-size:12px;font-weight:950}.card.locked:after{content:"🔒 ล็อกไว้";background:var(--dark)}.role-title{display:flex;justify-content:space-between;gap:10px;align-items:start;min-width:0}.role-title h3{margin:0;font-size:18px;min-width:0;overflow-wrap:anywhere}.count{font-size:13px;color:var(--muted);font-weight:900;flex:0 0 auto}.slots{margin:13px 0;display:grid;gap:8px;min-width:0}.slot{background:#eef7fd;border:1px dashed var(--line);border-radius:14px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0}.slot>div{min-width:0}.slot.taken{background:#f7fff9;border-style:solid;border-color:#bfeccf}.name{font-weight:950;overflow-wrap:anywhere;word-break:break-word}.small{font-size:12px;color:var(--muted);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
-.panel{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0}.panel h2{margin:0 0 12px;font-size:16px}.stat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}.stat div{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.stat b{font-size:26px}.field{display:grid;gap:6px;margin:10px 0;min-width:0}.field label{font-size:13px;color:var(--muted);font-weight:900}input,select{width:100%;max-width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--ink);min-width:0}
+.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:.2s ease;min-width:0}.card:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(23,79,120,.16)}.card.full:after{content:"เต็มแล้ว";position:absolute;right:-34px;top:18px;background:var(--red);color:#fff;transform:rotate(35deg);padding:6px 42px;font-size:12px;font-weight:950}.card.locked:after{content:"🔒 ล็อกไว้";background:var(--dark)}.role-title{display:flex;justify-content:space-between;gap:10px;align-items:start;min-width:0}.role-title h3{margin:0;font-size:18px;min-width:0;overflow-wrap:anywhere}.count{font-size:13px;color:var(--muted);font-weight:900;flex:0 0 auto}.slots{margin:13px 0;display:grid;gap:8px;min-width:0}.slot{background:#fdeef4;border:1px dashed var(--line);border-radius:14px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0}.slot>div{min-width:0}.slot.taken{background:#f7fff9;border-style:solid;border-color:#bfeccf}.name{font-weight:950;overflow-wrap:anywhere;word-break:break-word}.small{font-size:12px;color:var(--muted);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
+.panel{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0}.panel h2{margin:0 0 12px;font-size:16px}.stat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}.stat div{background:#fdeef4;border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.stat b{font-size:26px}.field{display:grid;gap:6px;margin:10px 0;min-width:0}.field label{font-size:13px;color:var(--muted);font-weight:900}input,select{width:100%;max-width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--ink);min-width:0}
 .admin-box{display:none;min-width:0}.admin-on .admin-box{display:block}.admin-on #adminLogin{display:none}
-.panel.admin-box{max-height:440px;overflow-y:auto}.admin-box-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}.admin-box-head h2{margin:0}.admin-section{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}.admin-section h3{margin:0 0 10px;font-size:14px;font-weight:900;display:flex;align-items:center;gap:6px;color:var(--ink)}.admin-section .table-scroll{background:#fff;border-radius:12px;padding:4px}#callSheetModal .modal-card{max-width:900px}.csb-page{font-family:Arial,Helvetica,sans-serif;color:#111}.csb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}.csb-head h1{margin:0;font-size:19px;letter-spacing:.01em}.csb-head .csb-sub{font-size:12px;color:#555;margin-top:2px}.csb-day{font-weight:900;font-size:13px;background:#111;color:#fff;padding:6px 12px;border-radius:4px;white-space:nowrap}.csb-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid #111;margin-bottom:16px;border-radius:4px;overflow:hidden}.csb-info>div{border-right:1px solid #111;border-bottom:1px solid #111;padding:8px 10px}.csb-info>div:nth-last-child(-n+1){border-bottom:0}.csb-info label{display:block;font-size:10px;text-transform:uppercase;color:#666;font-weight:800;margin-bottom:3px;letter-spacing:.03em}.csb-info b{font-size:14px}.csb-dept-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12px;table-layout:fixed}.csb-dept-table th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.02em}.csb-dept-table td{border-bottom:1px solid #ccc;padding:7px 8px;vertical-align:top;overflow-wrap:anywhere}.csb-role{font-weight:800;width:22%}.csb-name{color:#222;width:28%}.csb-fill{color:#bbb}.csb-foot{margin-top:10px;font-size:11px;color:#555;border-top:1px solid #111;padding-top:8px}.csb-callinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.csb-callinfo-grid{grid-template-columns:1fr}}
+.panel.admin-box{max-height:440px;overflow-y:auto}.admin-box-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}.admin-box-head h2{margin:0}.admin-section{background:#fdeef4;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}.admin-section h3{margin:0 0 10px;font-size:14px;font-weight:900;display:flex;align-items:center;gap:6px;color:var(--ink)}.admin-section .table-scroll{background:#fff;border-radius:12px;padding:4px}#callSheetModal .modal-card{max-width:900px}.csb-page{font-family:Arial,Helvetica,sans-serif;color:#111}.csb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}.csb-head h1{margin:0;font-size:19px;letter-spacing:.01em}.csb-head .csb-sub{font-size:12px;color:#555;margin-top:2px}.csb-day{font-weight:900;font-size:13px;background:#111;color:#fff;padding:6px 12px;border-radius:4px;white-space:nowrap}.csb-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid #111;margin-bottom:16px;border-radius:4px;overflow:hidden}.csb-info>div{border-right:1px solid #111;border-bottom:1px solid #111;padding:8px 10px}.csb-info>div:nth-last-child(-n+1){border-bottom:0}.csb-info label{display:block;font-size:10px;text-transform:uppercase;color:#666;font-weight:800;margin-bottom:3px;letter-spacing:.03em}.csb-info b{font-size:14px}.csb-dept-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12px;table-layout:fixed}.csb-dept-table th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.02em}.csb-dept-table td{border-bottom:1px solid #ccc;padding:7px 8px;vertical-align:top;overflow-wrap:anywhere}.csb-role{font-weight:800;width:22%}.csb-name{color:#222;width:28%}.csb-fill{color:#bbb}.csb-foot{margin-top:10px;font-size:11px;color:#555;border-top:1px solid #111;padding-top:8px}.csb-callinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.csb-callinfo-grid{grid-template-columns:1fr}}
 #adminLogin{padding:12px}#adminLogin h2{font-size:15px;margin-bottom:4px}#adminLogin p{margin:0 0 8px}#adminLogin .field{margin:7px 0}
-.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;min-width:340px;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #cfe6f7;padding:8px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.table th{color:var(--muted)}.table td .admin-actions{flex-wrap:wrap}.table td .ghost{padding:6px 7px;font-size:12px}
+.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;min-width:340px;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #f6d3e2;padding:8px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.table th{color:var(--muted)}.table td .admin-actions{flex-wrap:wrap}.table td .ghost{padding:6px 7px;font-size:12px}
 .modal{position:fixed;inset:0;background:rgba(40,18,28,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.modal-card{max-width:500px;width:100%;background:#fff;border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.22);max-height:90vh;overflow:auto}.modal-card h2{margin:0 0 10px}.code{font-size:38px;letter-spacing:.08em;font-weight:950;background:var(--dark);color:#fff;border-radius:18px;text-align:center;padding:18px;margin:12px 0}
-.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#15304a;color:#fff;padding:12px 16px;border-radius:999px;display:none;font-weight:900;z-index:50}.toast.show{display:block;animation:pop .2s ease}
-.schedule-status{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:12px}.countdown{font-size:22px;font-weight:950;color:var(--pink);margin-top:4px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.time-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.progressbar{height:12px;background:#dcedf9;border-radius:999px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#9cc9ec);border-radius:999px;width:0%}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#eef7fd;border:1px solid var(--line);border-radius:14px;padding:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--pink2);display:inline-grid;place-items:center;font-weight:950;color:color-mix(in srgb,var(--pink) 70%,#222)}.call-card{border:1px solid var(--line);background:#eef7fd;border-radius:16px;padding:12px;margin:8px 0}.muted-btn{font-size:13px;padding:8px 10px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#8a3b56;color:#fff;padding:12px 16px;border-radius:999px;display:none;font-weight:900;z-index:50}.toast.show{display:block;animation:pop .2s ease}
+.schedule-status{background:#fdeef4;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:12px}.countdown{font-size:22px;font-weight:950;color:var(--pink);margin-top:4px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.time-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.progressbar{height:12px;background:#ffd9e8;border-radius:999px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#ffc7dd);border-radius:999px;width:0%}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#fdeef4;border:1px solid var(--line);border-radius:14px;padding:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--pink2);display:inline-grid;place-items:center;font-weight:950;color:color-mix(in srgb,var(--pink) 70%,#222)}.call-card{border:1px solid var(--line);background:#fdeef4;border-radius:16px;padding:12px;margin:8px 0}.muted-btn{font-size:13px;padding:8px 10px}
 @keyframes pop{from{transform:translateX(-50%) scale(.9);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
-/* แท็บเล็ต/ไอแพด: พับไซด์บาร์ลงล่าง แต่ตำแหน่งยังจัด 2 คอลัมน์ (กว้างพอ) */
 @media(max-width:1023px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
-/* มือถือ: ทุกอย่างจัดคอลัมน์เดียว กระชับขึ้น */
 @media(max-width:640px){
   .wrap{padding:14px}
   .cards{grid-template-columns:1fr}
@@ -94,16 +86,15 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
 <body>
 <div class="wrap" id="app">
   <header class="top">
-    <div class="brand"><h1>FDM23067</h1><p>หนังสั้น 1 ซีน 2 นาที · Crew Position System</p></div>
+    <div class="brand"><h1>CMM21167</h1><p>Crew Position System</p></div>
     <div class="top-actions">
       <span class="pill"><span class="status-dot"></span><span id="openText">กำลังโหลด...</span></span>
-      <a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" title="กลุ่ม Discord ทีมงาน" style="display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#5865F2;text-decoration:none;box-shadow:var(--shadow)"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.522 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
       <button class="secondary" onclick="openQR()">📱 QR</button>
       <button class="secondary" onclick="openAdmin()">⚙️ Management</button>
     </div>
   </header>
 
-  <div class="setup" id="setupWarn" style="display:none">⚠️ ยังไม่ได้ใส่ Firebase Config ในไฟล์ index.html</div>
+  <div class="setup" id="setupWarn" style="display:none">⚠️ ยังไม่ได้ใส่ Firebase Config ในไฟล์ index.html — ดูคอมเมนต์ "TODO: FIREBASE CONFIG" ในโค้ดด้านล่าง</div>
 
   <section class="status-strip">
     <div class="status-row">
@@ -125,7 +116,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
       <div class="panel" id="adminLogin"><h2>👑 Admin</h2><p class="small">กรอก Admin Key เพื่อจัดการข้อมูล</p><div class="field"><label>Admin Key</label><input id="adminKey" type="password" placeholder="กรอกรหัสผู้ดูแล"></div><button onclick="loginAdmin()">เข้าสู่ระบบ</button></div>
 
       <div class="panel admin-box"><div class="admin-box-head"><h2>⚙️ Admin Panel</h2><button class="ghost" onclick="logoutAdmin()">⬅️ ออกจากระบบ</button></div><div class="admin-actions"><button onclick="toggleOpen()" class="secondary">🔒 เปิด/ปิดลงตำแหน่ง</button><button onclick="exportCSV()" class="secondary">📥 CSV</button><button onclick="exportJSON()" class="secondary">📦 JSON</button><button onclick="resetAll()" class="danger">รีเซ็ตทั้งหมด</button></div>
-      <div class="admin-section"><h3>➕ เพิ่มคนลงตำแหน่งโดยตรง</h3><p class="small" style="margin:0 0 10px">สำหรับ Admin ใส่ให้เลย ไม่ต้องรอให้เจ้าตัวมากดเอง (เช่น ตำแหน่งที่ล็อกไว้)</p><div class="field"><label>เลือกชื่อ</label><select id="quickAddName"></select></div><div class="field"><label>เลือกตำแหน่ง</label><select id="quickAddRole"></select></div><div class="admin-actions"><button onclick="adminQuickAdd()">เพิ่มเข้าตำแหน่ง</button></div></div>
+      <div class="admin-section"><h3>➕ เพิ่มคนลงตำแหน่งโดยตรง</h3><p class="small" style="margin:0 0 10px">สำหรับ Admin ใส่ให้เลย ไม่ต้องรอให้เจ้าตัวมากดเอง</p><div class="field"><label>เลือกชื่อ</label><select id="quickAddName"></select></div><div class="field"><label>เลือกตำแหน่ง</label><select id="quickAddRole"></select></div><div class="admin-actions"><button onclick="adminQuickAdd()">เพิ่มเข้าตำแหน่ง</button></div></div>
       <div class="admin-section"><h3>🧪 โหมดทดลอง</h3><p class="small" style="margin:0 0 10px">เปิดไว้ให้ทีมกดลองเลือกตำแหน่งเล่นๆ ก่อนของจริง ระบบจะแท็กข้อมูลที่ลงตอนนี้ไว้ ลบทิ้งทีหลังได้โดยไม่กระทบข้อมูลจริง</p><div class="admin-actions"><button onclick="toggleTrialMode()" id="trialToggleBtn" class="secondary">🧪 เปิด/ปิดโหมดทดลอง</button><button onclick="clearTrialData()" class="danger">🗑️ ล้างข้อมูลทดลองทั้งหมด</button></div></div>
       <div class="admin-section"><h3>📢 ประกาศหน้าเว็บ</h3><div class="field"><label>ข้อความประกาศ</label><input id="announcementInput" placeholder="เช่น ขอให้ทุกคนลงตำแหน่งก่อน 20:00"></div><div class="admin-actions"><button onclick="saveAnnouncement()">Publish</button><button onclick="clearAnnouncement()" class="secondary">ล้างประกาศ</button></div></div>
       <div class="admin-section"><h3>👥 จำนวนช่องตำแหน่ง</h3><div id="roleAdminControls" class="time-grid"></div></div>
@@ -135,20 +126,18 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
   </main>
 
   <footer class="site-footer">
-    <div class="footer-title">FDM23067 Crew Position System</div>
-    <div>Adapted from Final Project v5.0 · Designed &amp; Developed by Focus Nakub</div>
-    <div>Powered by Firebase Firestore • GitHub Pages</div>
+    <div class="footer-title">CMM21167 Crew Position System</div>
+    <div>Adapted from Final Project Position System · Designed &amp; Developed by Focus Nakub</div>
+    <div>Powered by Firebase Firestore</div>
     <div>© 2026 Focus Nakub</div>
   </footer>
 </div>
-
-<div class="modal" id="discordAskModal"><div class="modal-card"><h2>💬 เข้ากลุ่ม Discord ทีมงานหรือยัง?</h2><p>อย่าลืมเข้ากลุ่ม Discord เพื่อรับข่าวสาร/นัดหมายกองถ่ายนะครับ</p><a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;background:#5865F2;color:#fff;border-radius:15px;padding:11px 14px;font-weight:900;margin-bottom:10px">💬 เข้าร่วม Discord ทีมงาน</a><button class="secondary" onclick="closeModal('discordAskModal')">เข้าร่วมแล้ว / ปิด</button></div></div>
 
 <div class="modal" id="rulesModal"><div class="modal-card"><h2>📋 วิธีใช้งาน</h2><p><b>1.</b> เลื่อนดูตำแหน่งที่แบ่งเป็นแผนกด้านล่าง<br><b>2.</b> กด "ลงตำแหน่งนี้" ที่ตำแหน่งที่ต้องการ<br><b>3.</b> เลือกชื่อตัวเองจากลิสต์แล้วกดยืนยัน<br><b>4.</b> เก็บรหัสแก้ไข 4 ตัวที่ได้ไว้ (แคปหน้าจอ)</p><p>✅ 1 คนเลือกได้ 1 ตำแหน่ง<br>✅ ย้ายตำแหน่งได้ 1 ครั้ง (ต้องใช้รหัสแก้ไข)<br>✅ ข้อมูลอัปเดตเรียลไทม์ทุกเครื่อง<br>✅ ตำแหน่งเต็มแล้วเลือกไม่ได้ ใครกดก่อนได้ก่อน</p><button onclick="closeModal('rulesModal')">เริ่มเลือกตำแหน่ง</button></div></div>
 
 <div class="modal" id="signupModal"><div class="modal-card"><h2 id="signupTitle">ลงตำแหน่ง</h2><p class="small" id="signupInfo"></p><div class="field"><label>เลือกชื่อของคุณ</label><select id="signupName"></select></div><p class="small">หลังยืนยัน ระบบจะสร้างรหัสแก้ไข 4 ตัว กรุณาแคปหน้าจอไว้</p><div class="admin-actions"><button onclick="confirmSignup()">ยืนยันลงตำแหน่ง</button><button class="secondary" onclick="closeModal('signupModal')">ยกเลิก</button></div></div></div>
 
-<div class="modal" id="successModal"><div class="modal-card"><h2>🎉 ลงตำแหน่งสำเร็จ</h2><p id="successText"></p><div class="code" id="editCodeBox">D418</div><p class="small">📷 กรุณาแคปหน้าจอนี้ไว้ ใช้สำหรับแก้ไขข้อมูลภายหลัง</p><a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;background:#5865F2;color:#fff;border-radius:15px;padding:11px 14px;font-weight:900;margin-bottom:10px">💬 เข้ากลุ่ม Discord ทีมงาน</a><button onclick="copyCode()">คัดลอกรหัส</button> <button class="secondary" onclick="closeSuccessThenAskDiscord()">ปิด</button></div></div>
+<div class="modal" id="successModal"><div class="modal-card"><h2>🎉 ลงตำแหน่งสำเร็จ</h2><p id="successText"></p><div class="code" id="editCodeBox">D418</div><p class="small">📷 กรุณาแคปหน้าจอนี้ไว้ ใช้สำหรับแก้ไขข้อมูลภายหลัง</p><button onclick="copyCode()">คัดลอกรหัส</button> <button class="secondary" onclick="closeModal('successModal')">ปิด</button></div></div>
 
 <div class="modal" id="editModal"><div class="modal-card"><h2>✏️ แก้ไขข้อมูล</h2><div class="field"><label>ชื่อ</label><input id="editName" placeholder="ชื่อที่ลงไว้"></div><div class="field"><label>รหัสแก้ไข</label><input id="editCode" placeholder="เช่น D418"></div><div class="field"><label>ย้ายไปตำแหน่ง</label><select id="editRole"></select></div><button onclick="submitEdit()">ยืนยันแก้ไข</button> <button class="secondary" onclick="closeModal('editModal')">ยกเลิก</button></div></div>
 
@@ -163,23 +152,25 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);b
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-import { getFirestore, doc, collection, getDocs, onSnapshot, runTransaction, setDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { getFirestore, doc, collection, getDocs, onSnapshot, runTransaction, setDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
+// TODO: FIREBASE CONFIG — ไปสร้างโปรเจกต์ใหม่ที่ https://console.firebase.google.com
+// แล้วเปิด Firestore Database (โหมด production หรือ test ก็ได้) จากนั้นเอาค่า config มาวางแทนด้านล่างนี้
 const firebaseConfig = {
-  apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
-  authDomain: "fdm13167.firebaseapp.com",
-  projectId: "fdm13167",
-  storageBucket: "fdm13167.firebasestorage.app",
-  messagingSenderId: "638048330365",
-  appId: "1:638048330365:web:961daeac412d5d6332c714",
-  measurementId: "G-08XDS71QRF"
+  apiKey: "AIzaSyB_PwJLQVTfqyLgZwMRttDM_7dclT5-A8Y",
+  authDomain: "cmm21167.firebaseapp.com",
+  projectId: "cmm21167",
+  storageBucket: "cmm21167.firebasestorage.app",
+  messagingSenderId: "247523612135",
+  appId: "1:247523612135:web:11530850e1479c8efad942"
 };
-const ADMIN_KEY = "Focus3256";
+const ADMIN_KEY = "Focus3256"; // เปลี่ยนรหัสผู้ดูแลตรงนี้ได้ตามต้องการ
 
+// รายการตำแหน่ง — แก้ชื่อ/จำนวน (max) ได้ตามจริงของวิชา CMM21167
 const roles=[
   {id:'producer',emoji:'🗂️',name:'Producer',max:1},
   {id:'director',emoji:'🎬',name:'Director',max:1},
-  {id:'script',emoji:'📝',name:'Script Supervisor',max:1},
+  {id:'script',emoji:'📝',name:'Scriptwriter',max:1},
   {id:'runner',emoji:'📋',name:'AD1',max:1},
   {id:'dop',emoji:'📷',name:'DOP',max:1},
   {id:'camoperator',emoji:'🎥',name:'Camera Operator',max:1},
@@ -202,37 +193,36 @@ const DEPARTMENTS=[
   {name:'แต่งหน้า / คอสตูม',ids:['makeup']},
 ];
 const DEPT_ICON={'กำกับ / โปรดักชั่น':'🎬','ฝ่ายกล้อง':'📷','ไฟ / ไฟฟ้า':'💡','เสียง':'🎤','ศิลป์':'🎨','แต่งหน้า / คอสตูม':'💄'};
-// รายชื่อทีม 18 คน — ใช้รหัสนักศึกษาเป็นตัวอ้างอิงไม่ซ้ำ (กันคนเดียวลงหลายตำแหน่ง)
+// รายชื่อทีม 18 คน — ไม่มีรหัสนักศึกษา จึงใช้ชื่อ-นามสกุลเป็นตัวอ้างอิงกันคนเดียวลงหลายตำแหน่ง (จับคู่แบบ normalize ชื่อ)
 const ROSTER=[
-  {id:'68018544',name:'หิรัญ ดิษฐสกุล'},
-  {id:'68020620',name:'จันทิมา จันทร์ช่วง'},
-  {id:'68006622',name:'ธัญพิสิษฐ์ พูนพานิช'},
-  {id:'68018328',name:'ศิริวัฒน์ เดชอุดม'},
-  {id:'68036744',name:'ทีปกร จิณเสน'},
-  {id:'68038946',name:'ธนพัฒน์ พรมวิชัย'},
-  {id:'68022911',name:'พิยดา ด่วนดี'},
-  {id:'68015892',name:'วริชยา ไชยสงค์'},
-  {id:'68023745',name:'พีชานิกา ทองประศรี'},
-  {id:'68005278',name:'กัณญาพัฒน์ จันทร์เกษมสุข'},
-  {id:'68007970',name:'วิโรจน์ สวนสระแก้ว'},
-  {id:'68040382',name:'ภูริพัฒน์ อนุโชติ'},
-  {id:'68026555',name:'กมลพร พูลแก้ว'},
-  {id:'68028928',name:'ณัฐวุฒิ ทับทอง'},
-  {id:'68010119',name:'ณรงค์เดช แสนสิทธิ์'},
-  {id:'68010397',name:'ขันเงิน สาครธนะศักดิ์'},
-  {id:'68011018',name:'วัชรพล ดำสมอ'},
-  {id:'68104276',name:'รวีโรจน์ เชื้อแฉ่ง'},
-  {id:'68059069',name:'อังค์นิษา ดุลยเสนีย์'},
+  {id:'p01',name:'ปานชีวา เปลี่ยนศรี (ปริม)'},
+  {id:'p02',name:'หิรัญ ดิษฐสกุล (โฟกัส)'},
+  {id:'p03',name:'รวีโรจน์ เชื้อแฉ่ง (มูน)'},
+  {id:'p04',name:'พรนิพา ดอนเมือง (ดัชมิลล์)'},
+  {id:'p05',name:'ธัญพิสิษฐ์ พูนพานิช (เน็น)'},
+  {id:'p06',name:'วิโรจน์ สวนสระแก้ว (ออโต้)'},
+  {id:'p07',name:'ฐิติยา คำสีเขียว (ปาย)'},
+  {id:'p08',name:'ศิริวัฒน์ เดชอุดม (ทีเจ)'},
+  {id:'p09',name:'ชนิดาภา ทองหนูน (ต้นส้ม)'},
+  {id:'p10',name:'พิเชฐ ตรงเพชร (ตอริก/จ๊อย)'},
+  {id:'p11',name:'วัชรพล ดำสมอ (เอ๊าะ)'},
+  {id:'p12',name:'กัณญาพัฒน์ จันทร์เกษมสุข'},
+  {id:'p13',name:'พรพรรณ พุ่มเจริญ (จ๋า)'},
+  {id:'p14',name:'มหรณพ ปู่เปี่ยมช้าง (ณพ)'},
+  {id:'p15',name:'ปัญญากร ศรีอัดฮาด (เบน)'},
+  {id:'p16',name:'ขันเงิน สาครธนะศักดิ์ (โฟล์ค)'},
+  {id:'p17',name:'ณรงค์เดช แสนสิทธิ์ (แม็กกี้)'},
+  {id:'p18',name:'จิรภัทร ไกรเมฆ (TJ)'},
 ];
-// ตำแหน่งที่ล็อกไว้ให้คนใดคนหนึ่งโดยเฉพาะ ห้ามคนอื่นแย่ง/ห้ามย้ายออก (ยกเว้น Admin แก้ไขเอง)
-const LOCKED_ROLES={producer:'68018544',script:'68020620'};
+// ไม่มีตำแหน่งล็อก — เปิดให้ทุกคนแย่งกันลงอย่างอิสระ
+const LOCKED_ROLES={};
 function lockedStudentId(roleId){return LOCKED_ROLES[roleId]||null}
 function lockedName(roleId){const sid=lockedStudentId(roleId);return sid?(ROSTER.find(p=>p.id===sid)?.name||''):''}
-let db=null,isAdmin=false,lastCode='',selectedRoleId='',liveIndex=0,liveSlideCount=1;
+let db=null,isAdmin=false,lastCode='',selectedRoleId='';
 let state={open:true,scheduleStart:'',scheduleEnd:'',announcement:'',roleCaps:{},entries:[],callSheet:{},trialMode:false};
-const entryCol=()=>collection(db,'fdm23067','settings','entries');
-const entryDoc=(id)=>doc(db,'fdm23067','settings','entries',id);
-const settingsDoc=()=>doc(db,'fdm23067','settings');
+const entryCol=()=>collection(db,'cmm21167','settings','entries');
+const entryDoc=(id)=>doc(db,'cmm21167','settings','entries',id);
+const settingsDoc=()=>doc(db,'cmm21167','settings');
 const isConfigured=()=>!firebaseConfig.apiKey.includes('PASTE_')&&!firebaseConfig.projectId.includes('PASTE_');
 if(!isConfigured()){document.getElementById('setupWarn').style.display='block'}else{const app=initializeApp(firebaseConfig);db=getFirestore(app);initOnline();}
 
@@ -247,7 +237,6 @@ function getOpenStatus(){const now=Date.now(),start=state.scheduleStart?new Date
 function effectiveOpen(){return getOpenStatus().open}function formatDuration(ms){ms=Math.max(0,ms);const h=String(Math.floor(ms/3600000)).padStart(2,'0'),m=String(Math.floor(ms%3600000/60000)).padStart(2,'0'),s=String(Math.floor(ms%60000/1000)).padStart(2,'0');return`${h}:${m}:${s}`}function formatThaiDate(v){if(!v)return'-';return new Date(v).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}
 let scheduleDirty=false;function syncScheduleInputs(force=false){const a=document.getElementById('scheduleStart'),b=document.getElementById('scheduleEnd');if(!a||!b)return;if(force&&!scheduleDirty){a.value=state.scheduleStart||'';b.value=state.scheduleEnd||''}}function markScheduleDirty(){scheduleDirty=true}
 function show(id){document.getElementById(id).classList.add('show')}function closeModal(id){document.getElementById(id).classList.remove('show')}function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
-function closeSuccessThenAskDiscord(){closeModal('successModal');show('discordAskModal')}
 function render(){updateCountdown();renderLiveBanner();renderCards();renderSidePanels();renderAdmin();}
 function renderLiveBanner(){
   const total=totalSlots(), joined=state.entries.length, pct=total?Math.min(100,Math.round(joined/total*100)):0;
@@ -259,14 +248,13 @@ function renderLiveBanner(){
   const tb=document.getElementById('trialBanner');if(tb)tb.style.display=state.trialMode?'block':'none';
 }
 function renderCards(){
-  
   const cardHTML=r=>{
     const max=roleMax(r.id),entries=state.entries.filter(e=>e.role===r.id),full=entries.length>=max;const locked=!!lockedStudentId(r.id);
     const slotsHTML=max===1
       ? (entries[0]?`<div class="slot taken"><div><div class="name">${entries[0].name}</div><div class="small">เลือกเวลา ${entries[0].time||'-'}</div></div>✅</div>`
                     :`<div class="slot"><div><div class="name">ว่าง</div><div class="small">รอคนกดเลือก</div></div>🟢</div>`)
       : Array.from({length:max}).map((_,i)=>{const e=entries[i];return`<div class="slot ${e?'taken':''}"><div><div class="name">${e?e.name:'ว่าง'}</div><div class="small">${e?'เลือกเวลา '+(e.time||'-'):'รอคนกดเลือก'}</div></div>${e?'✅':'🟢'}</div>`}).join('');
-    return`<article class="card ${full?'full':''} ${locked?'locked':''}"><div class="final-warn-mini">⚠️ ครั้งสุดท้าย ไม่มีเปลี่ยนอีก</div><div class="role-title"><h3>${r.emoji} ${r.name} ${locked?'🔒':''}</h3><span class="count">${entries.length}/${max}</span></div><div class="slots">${slotsHTML}</div><button ${locked||full||!effectiveOpen()||!isConfigured()?'disabled':''} onclick="openSignup('${r.id}')">${locked?'🔒 ตำแหน่งถูกล็อกไว้':'ลงตำแหน่งนี้'}</button></article>`;
+    return`<article class="card ${full?'full':''} ${locked?'locked':''}"><div class="role-title"><h3>${r.emoji} ${r.name} ${locked?'🔒':''}</h3><span class="count">${entries.length}/${max}</span></div><div class="slots">${slotsHTML}</div><button ${locked||full||!effectiveOpen()||!isConfigured()?'disabled':''} onclick="openSignup('${r.id}')">${locked?'🔒 ตำแหน่งถูกล็อกไว้':'ลงตำแหน่งนี้'}</button></article>`;
   };
   document.getElementById('roleCards').innerHTML=DEPARTMENTS.map(dept=>{
     const deptRoles=dept.ids.map(id=>roles.find(r=>r.id===id)).filter(Boolean);
@@ -280,7 +268,7 @@ function renderCards(){
   const adminEditRole=document.getElementById('adminEditRole');if(adminEditRole)adminEditRole.innerHTML=roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
 }
 function renderSidePanels(){renderMyProfile();renderActivity();}
-function renderMyProfile(){const saved=JSON.parse(localStorage.getItem('fdm23067_my_entry')||'null'),box=document.getElementById('myProfileBox'),cont=document.getElementById('myProfileContent');if(!saved){box.style.display='none';return}const live=state.entries.find(e=>e.id===saved.id)||(saved.studentId&&state.entries.find(e=>e.studentId===saved.studentId))||state.entries.find(e=>norm(e.name)===norm(saved.name)&&e.code===saved.code);if(!live){box.style.display='none';return}box.style.display='block';cont.innerHTML=`<div class="mini-row"><span class="avatar">${initials(live.name)}</span><div style="flex:1"><div class="name">${live.name}</div><div class="small">${roleName(live.role)} · ${live.time||'-'}</div><div class="small">รหัสแก้ไข: <b>${live.code}</b></div></div></div><div class="admin-actions" style="margin-top:10px"><button class="secondary muted-btn" onclick="fillMyEdit('${live.name}','${live.code}')">✏️ แก้ไข</button><button class="secondary muted-btn" onclick="copyText('${live.code}')">📋 Copy Code</button></div>`}
+function renderMyProfile(){const saved=JSON.parse(localStorage.getItem('cmm21167_my_entry')||'null'),box=document.getElementById('myProfileBox'),cont=document.getElementById('myProfileContent');if(!saved){box.style.display='none';return}const live=state.entries.find(e=>e.id===saved.id)||(saved.studentId&&state.entries.find(e=>e.studentId===saved.studentId))||state.entries.find(e=>norm(e.name)===norm(saved.name)&&e.code===saved.code);if(!live){box.style.display='none';return}box.style.display='block';cont.innerHTML=`<div class="mini-row"><span class="avatar">${initials(live.name)}</span><div style="flex:1"><div class="name">${live.name}</div><div class="small">${roleName(live.role)} · ${live.time||'-'}</div><div class="small">รหัสแก้ไข: <b>${live.code}</b></div></div></div><div class="admin-actions" style="margin-top:10px"><button class="secondary muted-btn" onclick="fillMyEdit('${live.name}','${live.code}')">✏️ แก้ไข</button><button class="secondary muted-btn" onclick="copyText('${live.code}')">📋 Copy Code</button></div>`}
 function renderActivity(){const el=document.getElementById('activityFeed'),rows=[...state.entries].sort(entrySort).slice(-5).reverse();el.innerHTML=rows.length?rows.map(e=>`<div class="mini-row"><span class="avatar">${initials(e.name)}</span><div style="flex:1"><div class="name">${e.name}</div><div class="small">ลง ${roleName(e.role)} · ${e.time||'-'}</div></div></div>`).join(''):'<div class="small">ยังไม่มีข้อมูล</div>'}
 function renderAdmin(){const roleCtl=document.getElementById('roleAdminControls');if(roleCtl)roleCtl.innerHTML=roles.map(r=>{const max=roleMax(r.id),used=state.entries.filter(e=>e.role===r.id).length;return`<div class="slot"><div><div class="name">${r.emoji} ${r.name}</div><div class="small">ใช้แล้ว ${used}/${max}</div></div><div class="admin-actions"><button class="secondary" onclick="changeRoleCap('${r.id}',-1)" ${max<=used?'disabled':''}>-</button><button class="secondary" onclick="changeRoleCap('${r.id}',1)">+</button></div></div>`}).join('');
   document.getElementById('adminTable').innerHTML=state.entries.map(e=>`<tr><td>${e.trial?'🧪 ':''}${e.name}<br><span class="small">รหัส: ${e.code}</span></td><td>${roleName(e.role)}</td><td><button class="ghost" onclick="openAdminEdit('${e.id}')">แก้ไข</button><button class="ghost" onclick="copyText('${e.code}')">Copy</button><button class="ghost" onclick="adminDelete('${e.id}')">ลบ</button></td></tr>`).join('')||'<tr><td colspan="3" class="small">ยังไม่มีข้อมูล</td></tr>';
@@ -293,7 +281,7 @@ function renderAdmin(){const roleCtl=document.getElementById('roleAdminControls'
 function buildNameOptions(){const taken=new Set(state.entries.map(e=>e.studentId).filter(Boolean));return '<option value="">— เลือกชื่อ —</option>'+ROSTER.map(p=>`<option value="${p.id}" ${taken.has(p.id)?'disabled':''}>${p.name}${taken.has(p.id)?' (เลือกไปแล้ว)':''}</option>`).join('')}
 function openSignup(roleId){selectedRoleId=roleId;const r=roles.find(x=>x.id===roleId);document.getElementById('signupTitle').textContent=`${r.emoji} ${r.name}`;document.getElementById('signupInfo').textContent=`เหลือ ${Math.max(0,roleFree(roleId))} ที่ จากทั้งหมด ${roleMax(roleId)} ที่`;document.getElementById('signupName').innerHTML=buildNameOptions();show('signupModal')}
 async function confirmSignup(){const studentId=document.getElementById('signupName').value;if(!selectedRoleId)return toast('กรุณาเลือกตำแหน่ง');if(!studentId)return toast('กรุณาเลือกชื่อก่อน');const person=ROSTER.find(p=>p.id===studentId);await selectRole(selectedRoleId,person.name,studentId)}
-async function selectRole(roleId,name,studentId){if(!db)return toast('ยังไม่ได้ตั้งค่า Firebase');if(!effectiveOpen())return toast(getOpenStatus().label);if(!name)return toast('กรุณาเลือกชื่อก่อน');if(lockedStudentId(roleId)&&lockedStudentId(roleId)!==studentId)return toast('ตำแหน่งนี้ถูกล็อกไว้สำหรับ '+lockedName(roleId)+' แล้ว');const code=makeCode(),entryId=crypto.randomUUID();try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),entries=snaps.docs.map(d=>d.data()).filter(e=>!e.removed);if(studentId&&entries.some(e=>e.studentId===studentId))throw new Error('คุณเลือกตำแหน่งไปแล้ว');if(!studentId&&entries.some(e=>norm(e.name)===norm(name)))throw new Error('ชื่อนี้เลือกตำแหน่งไปแล้ว');if(entries.filter(e=>e.role===roleId).length>=roleMax(roleId))throw new Error('ตำแหน่งนี้เต็มแล้ว');tx.set(entryDoc(entryId),{name,studentId:studentId||null,role:roleId,code,edited:false,trial:!!state.trialMode,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),createdAt:serverTimestamp()})});lastCode=code;localStorage.setItem('fdm23067_my_entry',JSON.stringify({id:entryId,name,code,role:roleId,studentId}));closeModal('signupModal');document.getElementById('successText').innerHTML=(state.trialMode?'<b>🧪 นี่คือการลงตำแหน่งแบบทดลอง</b><br>':'')+`ชื่อ <b>${name}</b><br>ตำแหน่ง <b>${roleName(roleId)}</b><br>รหัสแก้ไขของคุณคือ`;document.getElementById('editCodeBox').textContent=code;show('successModal')}catch(e){toast(e.message||'เลือกไม่สำเร็จ')}}
+async function selectRole(roleId,name,studentId){if(!db)return toast('ยังไม่ได้ตั้งค่า Firebase');if(!effectiveOpen())return toast(getOpenStatus().label);if(!name)return toast('กรุณาเลือกชื่อก่อน');if(lockedStudentId(roleId)&&lockedStudentId(roleId)!==studentId)return toast('ตำแหน่งนี้ถูกล็อกไว้สำหรับ '+lockedName(roleId)+' แล้ว');const code=makeCode(),entryId=crypto.randomUUID();try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),entries=snaps.docs.map(d=>d.data()).filter(e=>!e.removed);if(studentId&&entries.some(e=>e.studentId===studentId))throw new Error('คุณเลือกตำแหน่งไปแล้ว');if(!studentId&&entries.some(e=>norm(e.name)===norm(name)))throw new Error('ชื่อนี้เลือกตำแหน่งไปแล้ว');if(entries.filter(e=>e.role===roleId).length>=roleMax(roleId))throw new Error('ตำแหน่งนี้เต็มแล้ว');tx.set(entryDoc(entryId),{name,studentId:studentId||null,role:roleId,code,edited:false,trial:!!state.trialMode,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),createdAt:serverTimestamp()})});lastCode=code;localStorage.setItem('cmm21167_my_entry',JSON.stringify({id:entryId,name,code,role:roleId,studentId}));closeModal('signupModal');document.getElementById('successText').innerHTML=(state.trialMode?'<b>🧪 นี่คือการลงตำแหน่งแบบทดลอง</b><br>':'')+`ชื่อ <b>${name}</b><br>ตำแหน่ง <b>${roleName(roleId)}</b><br>รหัสแก้ไขของคุณคือ`;document.getElementById('editCodeBox').textContent=code;show('successModal')}catch(e){toast(e.message||'เลือกไม่สำเร็จ')}}
 async function submitEdit(){const name=norm(document.getElementById('editName').value),code=document.getElementById('editCode').value.trim().toUpperCase(),newRole=document.getElementById('editRole').value;try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),docs=snaps.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!x.removed),e=docs.find(x=>norm(x.name)===name&&x.code===code);if(!e)throw new Error('ชื่อหรือรหัสแก้ไขไม่ถูกต้อง');if(lockedStudentId(e.role)&&lockedStudentId(e.role)===e.studentId)throw new Error('ตำแหน่งนี้ถูกล็อกไว้ ไม่สามารถแก้ไขได้');if(lockedStudentId(newRole))throw new Error('ตำแหน่งนี้ถูกล็อกไว้ ไม่สามารถย้ายเข้าได้');if(e.edited)throw new Error('ใช้สิทธิ์แก้ไขไปแล้ว');if(newRole!==e.role&&docs.filter(x=>x.role===newRole).length>=roleMax(newRole))throw new Error('ตำแหน่งใหม่เต็มแล้ว');tx.update(entryDoc(e.id),{role:newRole,edited:true,authCode:code,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})})});closeModal('editModal');toast('แก้ไขสำเร็จ ใช้สิทธิ์แก้ไขครบแล้ว')}catch(e){toast(e.message||'แก้ไขไม่สำเร็จ')}}
 function fillMyEdit(name,code){document.getElementById('editName').value=name;document.getElementById('editCode').value=code;show('editModal')}
 function loginAdmin(fromModal=false){const key=(fromModal?document.getElementById('adminKey2').value:document.getElementById('adminKey').value).trim();if(key===ADMIN_KEY){isAdmin=true;document.body.classList.add('admin-on');closeModal('adminModal');toast('เข้าสู่ระบบ Admin แล้ว')}else toast('Admin Key ไม่ถูกต้อง')}function logoutAdmin(){isAdmin=false;document.body.classList.remove('admin-on');toast('ออกจากระบบ Admin แล้ว')}
@@ -352,13 +340,13 @@ function buildCallSheetHTML(){
     return `<table class="csb-dept-table"><thead><tr><th colspan="2">${gA.name}</th><th colspan="2">${gB.name}</th></tr></thead><tbody>${body}</tbody></table>`;
   }).join('');
   const notes=cs.notes?`<div class="csb-foot"><b>หมายเหตุ:</b> ${cs.notes}</div>`:'';
-  return `<div class="csb-page"><div class="csb-head"><div><h1>FDM23067 — หนังสั้น 1 ซีน (2 นาที)</h1><div class="csb-sub">Sripatum University · FDM23067</div></div><div class="csb-day">CALL SHEET — Day 1/1</div></div>${info}${groupsHTML}${notes}</div>`;
+  return `<div class="csb-page"><div class="csb-head"><div><h1>CMM21167 — Crew Position System</h1><div class="csb-sub">Sripatum University · CMM21167</div></div><div class="csb-day">CALL SHEET — Day 1/1</div></div>${info}${groupsHTML}${notes}</div>`;
 }
 function openMembers(){const s=document.getElementById('membersSearch');if(s)s.value='';renderMembersList();show('membersModal')}function openCallSheet(){document.getElementById('callSheetList').innerHTML=buildCallSheetHTML();show('callSheetModal')}function printCallSheet(){window.print()}
 function openQR(){const url=location.href;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(url);show('qrModal')}
 function copyPageLink(){navigator.clipboard?.writeText(location.href);toast('คัดลอกลิงก์เว็บแล้ว')}function copyText(text){navigator.clipboard?.writeText(text);toast('คัดลอกแล้ว')}function copyAdminEditCode(){copyText(document.getElementById('adminEditCode').value)}function copyCode(){navigator.clipboard?.writeText(lastCode);toast('คัดลอกรหัสแล้ว')}
-function exportCSV(){const csv='name,studentId,role,time,editCode\n'+state.entries.map(e=>`${e.name},${e.studentId||''},${roleName(e.role)},${e.time||''},${e.code}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='final-project-positions.csv';a.click()}
-function exportJSON(){const data={exportedAt:new Date().toISOString(),settings:{open:state.open,scheduleStart:state.scheduleStart,scheduleEnd:state.scheduleEnd,announcement:state.announcement,roleCaps:state.roleCaps},entries:state.entries};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='final-project-backup.json';a.click()}
+function exportCSV(){const csv='name,role,time,editCode\n'+state.entries.map(e=>`${e.name},${roleName(e.role)},${e.time||''},${e.code}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='cmm21167-positions.csv';a.click()}
+function exportJSON(){const data={exportedAt:new Date().toISOString(),settings:{open:state.open,scheduleStart:state.scheduleStart,scheduleEnd:state.scheduleEnd,announcement:state.announcement,roleCaps:state.roleCaps},entries:state.entries};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='cmm21167-backup.json';a.click()}
 function openAdmin(){show('adminModal')}function openEdit(){show('editModal')}function showRules(){show('rulesModal')}
 function updateCountdown(){const st=getOpenStatus(),openText=document.getElementById('openText'),dot=document.querySelector('.status-dot'),scheduleLabel=document.getElementById('scheduleLabel'),countdownText=document.getElementById('countdownText'),scheduleInfo=document.getElementById('scheduleInfo');if(openText)openText.textContent=st.label;if(dot)dot.style.background=st.open?'var(--green)':(state.open?'var(--yellow)':'var(--red)');if(scheduleLabel)scheduleLabel.textContent=st.label;if(countdownText)countdownText.textContent=st.count;if(scheduleInfo)scheduleInfo.textContent=st.info;
   const tc=document.getElementById('topCountdown'),tcLabel=document.getElementById('topCountdownLabel'),tcText=document.getElementById('topCountdownText');
@@ -372,7 +360,7 @@ function repositionProfile(){
   else { if(aside.firstElementChild!==box) aside.insertAdjacentElement('afterbegin',box); }
 }
 window.addEventListener('resize',repositionProfile);
-Object.assign(window,{openSignup,confirmSignup,submitEdit,loginAdmin,adminDelete,resetAll,toggleOpen,saveSchedule,clearSchedule,exportCSV,exportJSON,openAdmin,openEdit,showRules,closeModal,copyCode,markScheduleDirty,changeRoleCap,saveAnnouncement,clearAnnouncement,openAdminEdit,saveAdminEdit,copyText,copyAdminEditCode,openMembers,openCallSheet,printCallSheet,copyPageLink,openQR,fillMyEdit,closeSuccessThenAskDiscord,logoutAdmin,saveCallSheetInfo,renderMembersList,toggleTrialMode,clearTrialData,adminQuickAdd});
+Object.assign(window,{openSignup,confirmSignup,submitEdit,loginAdmin,adminDelete,resetAll,toggleOpen,saveSchedule,clearSchedule,exportCSV,exportJSON,openAdmin,openEdit,showRules,closeModal,copyCode,markScheduleDirty,changeRoleCap,saveAnnouncement,clearAnnouncement,openAdminEdit,saveAdminEdit,copyText,copyAdminEditCode,openMembers,openCallSheet,printCallSheet,copyPageLink,openQR,fillMyEdit,logoutAdmin,saveCallSheetInfo,renderMembersList,toggleTrialMode,clearTrialData,adminQuickAdd});
 setInterval(updateCountdown,1000);repositionProfile();show('rulesModal');render();
 </script>
 </body>
