@@ -869,7 +869,7 @@
       const group = items.filter(q => normalizeStatus(q.data.status) === statusKey);
       if (group.length === 0) return;
       groupsHtml += `
-        <section class="group">
+        <section class="group" data-status="${statusKey}">
           <h2><span class="dot" style="background:${STATUS_DOT[statusKey]}"></span>${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">${group.length}</span></h2>
           <div class="cards">
       `;
@@ -951,11 +951,49 @@
   .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
   .save-img-btn{ background: #25b86a; box-shadow: 0 8px 18px rgba(37,184,106,.35); }
   .save-img-btn:disabled{ opacity:.6; cursor: wait; }
-  @media print{ .btn-row{ display:none; } body{ background:#fff; padding:0; } .card, .stat{ box-shadow:none; } }
+
+  .filter-row{ display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+  .filter-chip{
+    padding: 7px 16px; border-radius: 999px; border: 1px solid var(--border);
+    background: #fff; color: var(--text-soft); font-family:inherit; font-size:12.5px; font-weight:700; cursor:pointer;
+  }
+  .filter-chip.active{ background: var(--primary); border-color: var(--primary); color:#fff; }
+
+  /* โหมดจัดหน้าเฉพาะตอนถ่ายรูป ให้กลุ่มสถานะเรียงเป็นคอลัมน์ ภาพจะออกมาสี่เหลี่ยมแทนที่จะยาวเป็นทาง */
+  #capture.capture-grid{ width: 1040px; padding: 6px; }
+  #capture.capture-grid .groups-wrap{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+  #capture.capture-grid .group{ margin-bottom: 0; }
+  #capture.capture-grid .card{ padding: 12px 14px; }
+  #capture.capture-grid .question{ font-size: 12.5px; }
+  #capture.capture-grid .name{ font-size: 13px; }
+
+  /* เลือกดูสถานะเดียว ให้การ์ดของกลุ่มนั้นจัดเป็นตาราง จะได้ไม่ไล่ยาวลงล่าง */
+  .groups-wrap[data-filter="pending"] .group:not([data-status="pending"]),
+  .groups-wrap[data-filter="received"] .group:not([data-status="received"]),
+  .groups-wrap[data-filter="asked"] .group:not([data-status="asked"]){ display:none; }
+  .groups-wrap[data-filter="pending"] .group[data-status="pending"] .cards,
+  .groups-wrap[data-filter="received"] .group[data-status="received"] .cards,
+  .groups-wrap[data-filter="asked"] .group[data-status="asked"] .cards{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+  }
+  @media print{ .btn-row, .filter-row{ display:none; } body{ background:#fff; padding:0; } .card, .stat{ box-shadow:none; } }
 </style>
 </head>
 <body>
   <div class="wrap">
+    <div class="filter-row" id="filterRow">
+      <button type="button" class="filter-chip active" data-filter="all">ทั้งหมด</button>
+      <button type="button" class="filter-chip" data-filter="pending">ยังไม่เห็น</button>
+      <button type="button" class="filter-chip" data-filter="received">รับเรื่องแล้ว</button>
+      <button type="button" class="filter-chip" data-filter="asked">ถามแล้ว</button>
+    </div>
     <div class="btn-row">
       <button class="print-btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
       <button class="print-btn save-img-btn" id="saveImgBtn">🖼️ บันทึกเป็นรูปภาพ</button>
@@ -971,27 +1009,41 @@
           <div class="stat"><b>${items.length - askedCount}</b><span>กำลังดำเนินการ</span></div>
         </div>
       </div>
-      ${groupsHtml}
+      <div class="groups-wrap" id="groupsWrap" data-filter="all">${groupsHtml}</div>
       <div class="foot">FDM23067 — ถามอาจารย์ · ทำโดย Focus Nakub</div>
     </div>
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
   <script>
-    // จับภาพส่วนสรุปคำถามทั้งหมด แปลงเป็นไฟล์รูปภาพ PNG แล้วดาวน์โหลดให้อัตโนมัติ
+    // ปุ่มเลือกดู/บันทึกเฉพาะสถานะเดียว
+    const FILTER_LABEL = { all: 'ทั้งหมด', pending: 'ยังไม่เห็น', received: 'รับเรื่องแล้ว', asked: 'ถามแล้ว' };
+    let currentFilter = 'all';
+    const groupsWrap = document.getElementById('groupsWrap');
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        currentFilter = chip.dataset.filter;
+        groupsWrap.setAttribute('data-filter', currentFilter);
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.toggle('active', c === chip));
+      });
+    });
+
+    // จับภาพส่วนสรุปคำถามทั้งหมด (หรือเฉพาะสถานะที่เลือก) แปลงเป็นไฟล์รูปภาพ PNG แล้วดาวน์โหลดให้อัตโนมัติ
     document.getElementById('saveImgBtn').addEventListener('click', async function () {
       const btn = this;
       btn.disabled = true;
       btn.textContent = 'กำลังสร้างรูปภาพ...';
+      const target = document.getElementById('capture');
+      target.classList.add('capture-grid');
       try {
-        const target = document.getElementById('capture');
-        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#f0f7fd', useCORS: true });
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#f0f7fd', useCORS: true, windowWidth: 1080 });
         const link = document.createElement('a');
-        link.download = 'คำถาม-FDM23067-' + new Date().toISOString().slice(0, 10) + '.png';
+        link.download = 'คำถาม-FDM23067-' + FILTER_LABEL[currentFilter] + '-' + new Date().toISOString().slice(0, 10) + '.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (err) {
         alert('สร้างรูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง');
       } finally {
+        target.classList.remove('capture-grid');
         btn.disabled = false;
         btn.textContent = '🖼️ บันทึกเป็นรูปภาพ';
       }
