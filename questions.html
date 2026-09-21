@@ -584,6 +584,7 @@
     <div class="admin-actions">
       <button type="button" class="secondary" id="toggleOpenBtn">เปิด/ปิดรับคำถาม</button>
       <button type="button" class="secondary" id="toggleTrialBtn">เปิด/ปิดโหมดทดลอง</button>
+      <button type="button" class="secondary" id="exportBtn">📄 ส่งออกคำถามทั้งหมด</button>
       <button type="button" class="danger" id="clearTrialBtn">ล้างคำถามทดลอง</button>
       <button type="button" class="ghost" id="adminLogoutBtn">ออกจากระบบ</button>
     </div>
@@ -712,6 +713,7 @@
   const toggleOpenBtn = document.getElementById('toggleOpenBtn');
   const toggleTrialBtn = document.getElementById('toggleTrialBtn');
   const clearTrialBtn = document.getElementById('clearTrialBtn');
+  const exportBtn = document.getElementById('exportBtn');
 
   // เติมตัวเลือกตำแหน่งในฟอร์ม
   ROLES.forEach(r => {
@@ -826,6 +828,48 @@
     const batch = db.batch();
     trialDocs.forEach(q => batch.delete(questionsRef.doc(q.id)));
     await batch.commit();
+  });
+
+  // รวมคำถามทั้งหมดเป็นไฟล์ข้อความ อ่านง่าย แยกตามสถานะ แล้วดาวน์โหลดให้อัตโนมัติ
+  exportBtn.addEventListener('click', () => {
+    if (latestQuestions.length === 0) {
+      alert('ยังไม่มีคำถามให้ส่งออก');
+      return;
+    }
+    const items = [...latestQuestions].filter(q => !q.data.trial);
+    const now = new Date().toLocaleString('th-TH', { dateStyle: 'long', timeStyle: 'short' });
+
+    let text = `สรุปคำถามจากทีมงาน FDM23067\n`;
+    text += `ส่งออกเมื่อ: ${now}\n`;
+    text += `จำนวนทั้งหมด: ${items.length} คำถาม\n`;
+    text += `${'='.repeat(50)}\n\n`;
+
+    STATUS_ORDER.forEach(statusKey => {
+      const group = items.filter(q => normalizeStatus(q.data.status) === statusKey);
+      if (group.length === 0) return;
+      text += `── ${STATUS_LABEL[statusKey]} (${group.length}) ──\n\n`;
+      group.forEach((q, idx) => {
+        const d = q.data;
+        const time = d.createdAt
+          ? d.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
+          : 'ไม่ทราบเวลา';
+        text += `${idx + 1}. ${d.realName || 'ไม่ระบุชื่อ'}${d.position ? ' (' + d.position + ')' : ''}\n`;
+        text += `   เวลา: ${time}\n`;
+        text += `   หมวด: ${getTopic(d.question).label}\n`;
+        text += `   คำถาม: ${d.question}\n\n`;
+      });
+    });
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fileDate = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `คำถาม-FDM23067-${fileDate}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   });
 
   // กดที่ป้ายสถานะแล้ววนไปสถานะถัดไปทีละขั้น (ยังไม่เห็น → รับเรื่องแล้ว → ถามอาจารย์เรียบร้อยแล้ว → วนกลับ) ทำได้เฉพาะตอนล็อกอิน Admin
