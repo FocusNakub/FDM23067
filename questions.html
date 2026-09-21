@@ -249,6 +249,27 @@
     padding: 2px 8px;
     border-radius: 999px;
   }
+  .q-role.trial{
+    color: #8a6400;
+    background: #fff3cd;
+    animation: trialBlink 1.1s ease-in-out infinite;
+  }
+  @keyframes trialBlink{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: .35; }
+  }
+  .q-delete-btn{
+    width: auto;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #ffe8ea;
+    color: var(--danger);
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: none;
+    margin-left: 8px;
+  }
+  .q-delete-btn:hover{ filter: brightness(0.95); }
   .q-time{
     font-size: 11px;
     color: var(--text-soft);
@@ -281,6 +302,7 @@
     background: var(--bg2);
     padding: 4px 10px;
     border-radius: 999px;
+    margin-bottom: 8px;
   }
   .q-topic-icon{ font-size: 13px; }
   .empty{
@@ -874,12 +896,23 @@
 
   // กดที่ป้ายสถานะแล้ววนไปสถานะถัดไปทีละขั้น (ยังไม่เห็น → รับเรื่องแล้ว → ถามอาจารย์เรียบร้อยแล้ว → วนกลับ) ทำได้เฉพาะตอนล็อกอิน Admin
   questionList.addEventListener('click', (e) => {
-    const btn = e.target.closest('.q-status');
-    if (!btn || !isAdmin) return;
-    const id = btn.dataset.id;
-    const currentIndex = STATUS_ORDER.indexOf(btn.dataset.status);
-    const newStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
-    questionsRef.doc(id).update({ status: newStatus });
+    const statusBtn = e.target.closest('.q-status');
+    if (statusBtn && isAdmin) {
+      const id = statusBtn.dataset.id;
+      const currentIndex = STATUS_ORDER.indexOf(statusBtn.dataset.status);
+      const newStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
+      questionsRef.doc(id).update({ status: newStatus });
+      return;
+    }
+
+    // ลบคำถามได้เลย ไม่ว่าจะเป็นโหมดทดลองหรือเปิดใช้งานจริง (เฉพาะ Admin)
+    const deleteBtn = e.target.closest('.q-delete-btn');
+    if (deleteBtn && isAdmin) {
+      const id = deleteBtn.dataset.deleteId;
+      if (confirm('ลบคำถามนี้เลยไหม? กู้คืนไม่ได้นะ')) {
+        questionsRef.doc(id).delete();
+      }
+    }
   });
 
   renderAdminUI();
@@ -1099,14 +1132,16 @@
               <span class="q-who">
                 <span class="q-name">${escapeHtml(data.realName)}</span>
                 ${data.position ? '<span class="q-role">' + escapeHtml(data.position) + '</span>' : ''}
-                ${data.trial ? '<span class="q-role">ทดลอง</span>' : ''}
+                ${data.trial ? '<span class="q-role trial">ทดลอง</span>' : ''}
               </span>
               <span class="q-time">${time}</span>
             </div>
+            <div class="q-topic"><span class="q-topic-icon">${getTopic(data.question).icon}</span>${escapeHtml(getTopic(data.question).label)}</div>
             <div class="q-text">${escapeHtml(data.question)}</div>
             <div class="q-status-row">
               <span class="q-status-label">สถานะ</span>
               <button type="button" class="q-status ${status}" data-id="${id}" data-status="${status}">${STATUS_LABEL[status]}</button>
+              <button type="button" class="q-delete-btn" data-delete-id="${id}">ลบ</button>
             </div>
           </div>
         </div>
