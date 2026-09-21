@@ -863,38 +863,35 @@
     const askedCount = items.filter(q => normalizeStatus(q.data.status) === 'asked').length;
 
     let groupsHtml = '';
-    let runningNo = 0;
     STATUS_ORDER.forEach(statusKey => {
       const group = items.filter(q => normalizeStatus(q.data.status) === statusKey);
       if (group.length === 0) return;
       groupsHtml += `
         <section class="group" data-status="${statusKey}">
-          <h2>สถานะ: ${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">(${group.length} รายการ)</span></h2>
-          <ol class="q-list">
+          <h2><span class="status-dot ${statusKey}"></span>${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">(${group.length} รายการ)</span></h2>
+          <ul class="q-list">
       `;
       group.forEach((q) => {
-        runningNo += 1;
         const d = q.data;
         const time = d.createdAt
           ? d.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
           : 'ไม่ทราบเวลา';
         const topic = getTopic(d.question);
         groupsHtml += `
-          <li class="q-entry">
-            <div class="q-entry-head">
-              <span class="q-num">คำถามที่ ${runningNo}</span>
+          <li class="q-card">
+            <div class="q-card-head">
+              <span class="q-topic">${topic.icon ? escapeHtml(topic.icon) + ' ' : ''}${escapeHtml(topic.label)}</span>
               <span class="q-time">${time}</span>
             </div>
             <div class="q-entry-meta">
-              <span>ผู้ถาม: <b>${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</b>${d.position ? ' (' + escapeHtml(d.position) + ')' : ''}</span>
-              <span>หมวด: <b>${escapeHtml(topic.label)}</b></span>
+              <span><b>${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</b>${d.position ? ' · ' + escapeHtml(d.position) : ''}</span>
               ${d.trial ? '<span class="q-trial-tag">ทดลอง</span>' : ''}
             </div>
             <p class="q-entry-text">${escapeHtml(d.question)}</p>
           </li>
         `;
       });
-      groupsHtml += `</ol></section>`;
+      groupsHtml += `</ul></section>`;
     });
 
     const html = `<!DOCTYPE html>
@@ -905,69 +902,82 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink: #1f2530; --text-soft: #7c8591; --border: #e3e5e8; --border-mid: #d6d9dd;
-    --accent: #2c3e50;
+    --primary: #6fa8dc; --primary-dark: #4f8fc7;
+    --ink: #173049; --text-soft: #6b859c; --border: #cfe6f7;
+    --danger: #ff4d5f; --ok: #25b86a; --warn: #8a6400;
   }
   *{ box-sizing: border-box; }
   body{
     margin:0; font-family:'Noto Sans Thai', sans-serif;
-    background: #eef0f2; color: var(--ink); padding: 40px 20px 60px;
+    background: linear-gradient(180deg, #eaf3fb, #f4f8fb 320px, #f4f8fb);
+    color: var(--ink); padding: 40px 20px 60px;
   }
-  .wrap{ max-width: 720px; margin: 0 auto; }
-  #capture{ background:#fff; padding: 48px 50px; }
-  .doc-head{ text-align:center; border-bottom: 1px solid var(--border-mid); padding-bottom: 20px; margin-bottom: 28px; }
-  .doc-head .doc-title{ font-family:'Noto Serif Thai', serif; font-weight:700; font-size: 21px; letter-spacing:.3px; }
-  .doc-head .doc-sub{ font-size: 12.5px; color: var(--text-soft); margin-top: 6px; }
-  .doc-meta{ display:flex; justify-content:center; gap: 28px; flex-wrap:wrap; font-size: 12.5px; margin-bottom: 34px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
-  .doc-meta .meta-item{ text-align:center; }
-  .doc-meta .meta-item .meta-label{ color: var(--text-soft); margin-bottom: 3px; }
-  .doc-meta .meta-item .meta-value{ font-weight:700; font-size: 15px; }
-  .group{ margin-bottom: 30px; }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+  .doc-head{ text-align:center; margin-bottom: 22px; }
+  .doc-head .doc-title{ font-weight:800; font-size: 22px; color: var(--ink); }
+  .doc-head .doc-sub{ font-size: 12.5px; color: var(--text-soft); margin-top: 5px; }
+  .doc-meta{ display:flex; justify-content:center; gap: 14px; flex-wrap:wrap; margin-bottom: 26px; }
+  .doc-meta .meta-item{
+    flex:1; min-width: 120px; max-width: 170px; text-align:center; background:#fff;
+    border-radius: 14px; padding: 14px 10px; box-shadow: 0 2px 10px rgba(111,168,220,.18);
+  }
+  .doc-meta .meta-item .meta-label{ color: var(--text-soft); font-size: 11.5px; margin-bottom: 4px; }
+  .doc-meta .meta-item .meta-value{ font-weight:800; font-size: 20px; color: var(--primary-dark); }
+  .group{ margin-bottom: 22px; }
   .group:last-child{ margin-bottom: 0; }
   .group h2{
-    font-family:'Noto Serif Thai', serif; font-size: 14.5px; font-weight:700;
-    color: var(--accent); margin: 0 0 16px; letter-spacing:.2px;
+    font-size: 14px; font-weight:700; color: var(--ink);
+    display:flex; align-items:center; gap: 8px; margin: 0 0 12px;
   }
-  .group h2 .count{ font-family:'Noto Sans Thai', sans-serif; font-weight:500; color: var(--text-soft); font-size: 12px; }
-  .q-list{ list-style:none; margin:0; padding:0; }
-  .q-entry{ padding: 16px 0; }
-  .q-entry + .q-entry{ border-top: 1px solid var(--border); }
-  .q-entry:first-child{ padding-top: 0; }
-  .q-entry:last-child{ padding-bottom: 0; }
-  .q-entry-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom: 7px; }
-  .q-num{ font-weight:700; font-size: 13px; color: var(--accent); }
+  .status-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .status-dot.pending{ background: var(--danger); }
+  .status-dot.received{ background: var(--warn); }
+  .status-dot.asked{ background: var(--ok); }
+  .group h2 .count{ font-weight:500; color: var(--text-soft); font-size: 12px; }
+  .q-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 10px; }
+  .q-card{
+    background:#fff; border-radius: 14px; padding: 15px 18px;
+    box-shadow: 0 2px 10px rgba(111,168,220,.14); border-left: 4px solid var(--primary);
+  }
+  .group[data-status="pending"] .q-card{ border-left-color: var(--danger); }
+  .group[data-status="received"] .q-card{ border-left-color: var(--warn); }
+  .group[data-status="asked"] .q-card{ border-left-color: var(--ok); }
+  .q-card-head{ display:flex; justify-content:space-between; align-items:baseline; gap: 10px; margin-bottom: 6px; }
+  .q-topic{ font-weight:800; font-size: 16px; color: var(--ink); }
   .q-time{ font-size: 11px; color: var(--text-soft); white-space:nowrap; }
-  .q-entry-meta{ display:flex; gap: 14px; flex-wrap:wrap; font-size: 11.5px; color: var(--text-soft); margin-bottom: 8px; }
-  .q-entry-meta b{ color: var(--ink); font-weight:600; }
-  .q-trial-tag{ font-weight:600; color:#8a6400; background:#fff8e6; padding:1px 8px; border-radius:3px; font-size:10.5px; }
-  .q-entry-text{ font-size: 14px; line-height: 1.75; margin:0; white-space:pre-wrap; word-break:break-word; color: var(--ink); }
-  .doc-foot{ text-align:center; font-size: 10.5px; color: var(--text-soft); margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .q-entry-meta{ display:flex; gap: 10px; align-items:center; flex-wrap:wrap; font-size: 12px; color: var(--text-soft); margin-bottom: 8px; }
+  .q-entry-meta b{ color: var(--ink); font-weight:700; }
+  .q-trial-tag{ font-weight:600; color: var(--warn); background:#fff3cd; padding:1px 8px; border-radius:8px; font-size:10.5px; }
+  .q-entry-text{ font-size: 14px; line-height: 1.7; margin:0; white-space:pre-wrap; word-break:break-word; color: var(--ink); }
+  .doc-foot{ text-align:center; font-size: 10.5px; color: var(--text-soft); margin-top: 26px; }
   .print-btn{
-    padding: 10px 22px; border: none; border-radius:6px;
-    background: var(--accent); color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;
+    padding: 10px 22px; border: none; border-radius:20px;
+    background: var(--primary-dark); color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;
+    box-shadow: 0 4px 12px rgba(79,143,199,.3);
   }
-  .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
-  .save-img-btn{ background: #3d6b52; }
+  .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:18px; flex-wrap:wrap; }
+  .save-img-btn{ background: #3d9e6e; box-shadow: 0 4px 12px rgba(61,158,110,.3); }
   .save-img-btn:disabled{ opacity:.6; cursor: wait; }
 
   .filter-row{ display:flex; gap:8px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
   .filter-chip{
-    padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border-mid);
+    padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border);
     background: #fff; color: var(--text-soft); font-family:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
   }
-  .filter-chip.active{ background: var(--accent); border-color: var(--accent); color:#fff; }
+  .filter-chip.active{ background: var(--primary-dark); border-color: var(--primary-dark); color:#fff; }
 
   /* โหมดจัดหน้าเฉพาะตอนถ่ายรูป ให้กลุ่มสถานะเรียงเป็นคอลัมน์ ภาพจะออกมาสี่เหลี่ยมแทนที่จะยาวเป็นทาง */
-  #capture.capture-grid{ width: 1040px; }
+  #capture.capture-grid{ width: 1060px; padding: 24px; }
   #capture.capture-grid .groups-wrap{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0 36px;
+    gap: 0 24px;
     align-items: start;
   }
   #capture.capture-grid .group{ margin-bottom: 0; }
+  #capture.capture-grid .q-topic{ font-size: 14px; }
   #capture.capture-grid .q-entry-text{ font-size: 12px; line-height: 1.6; }
-  #capture.capture-grid .q-entry{ padding: 11px 0; }
+  #capture.capture-grid .q-card{ padding: 12px 14px; }
 
   /* เลือกดูสถานะเดียว */
   .groups-wrap[data-filter="pending"] .group:not([data-status="pending"]),
@@ -981,8 +991,7 @@
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 12px 20px;
   }
-  #capture.capture-grid.filter-single .q-entry{ border-top:none !important; background:#fafbfc; border-radius:6px; padding: 14px 16px; }
-  @media print{ .btn-row, .filter-row{ display:none; } body{ background:#fff; padding:0; } .wrap{ max-width:none; } #capture{ padding:0; } }
+  @media print{ .btn-row, .filter-row{ display:none; } body{ background:#fff; padding:0; } .wrap{ max-width:none; } }
 </style>
 </head>
 <body>
@@ -1035,7 +1044,7 @@
       target.classList.add('capture-grid');
       target.classList.toggle('filter-single', currentFilter !== 'all');
       try {
-        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 1080 });
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#eaf3fb', useCORS: true, windowWidth: 1080 });
         const link = document.createElement('a');
         link.download = 'คำถาม-FDM23067-' + FILTER_LABEL[currentFilter] + '-' + new Date().toISOString().slice(0, 10) + '.png';
         link.href = canvas.toDataURL('image/png');
