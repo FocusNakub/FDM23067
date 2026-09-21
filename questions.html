@@ -860,7 +860,7 @@
       alert('ยังไม่มีคำถามให้ส่งออก');
       return;
     }
-    const items = [...latestQuestions].filter(q => !q.data.trial);
+    const items = [...latestQuestions];
     const now = new Date().toLocaleString('th-TH', { dateStyle: 'long', timeStyle: 'short' });
     const askedCount = items.filter(q => normalizeStatus(q.data.status) === 'asked').length;
 
@@ -885,6 +885,7 @@
               <div class="who">
                 <span class="name">${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</span>
                 ${d.position ? `<span class="role">${escapeHtml(d.position)}</span>` : ''}
+                ${d.trial ? `<span class="role trial">ทดลอง</span>` : ''}
               </div>
               <span class="time">${time}</span>
             </div>
@@ -937,6 +938,7 @@
   .who{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .name{ font-weight:800; font-size:14px; }
   .role{ font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:2px 8px; border-radius:999px; }
+  .role.trial{ color:#8a6400; background:#fff3cd; }
   .time{ font-size:11px; color: var(--text-soft); white-space:nowrap; }
   .topic{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:3px 10px; border-radius:999px; margin-bottom:8px; }
   .question{ font-size:14px; line-height:1.6; margin:0; white-space:pre-wrap; word-break:break-word; }
