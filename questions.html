@@ -853,6 +853,8 @@
   });
 
   // รวมคำถามทั้งหมดเป็นไฟล์ข้อความ อ่านง่าย แยกตามสถานะ แล้วดาวน์โหลดให้อัตโนมัติ
+  const STATUS_DOT = { pending: '#ff4d5f', received: '#8a6400', asked: '#25b86a' };
+
   exportBtn.addEventListener('click', () => {
     if (latestQuestions.length === 0) {
       alert('ยังไม่มีคำถามให้ส่งออก');
@@ -860,38 +862,150 @@
     }
     const items = [...latestQuestions].filter(q => !q.data.trial);
     const now = new Date().toLocaleString('th-TH', { dateStyle: 'long', timeStyle: 'short' });
+    const askedCount = items.filter(q => normalizeStatus(q.data.status) === 'asked').length;
 
-    let text = `สรุปคำถามจากทีมงาน FDM23067\n`;
-    text += `ส่งออกเมื่อ: ${now}\n`;
-    text += `จำนวนทั้งหมด: ${items.length} คำถาม\n`;
-    text += `${'='.repeat(50)}\n\n`;
-
+    let groupsHtml = '';
     STATUS_ORDER.forEach(statusKey => {
       const group = items.filter(q => normalizeStatus(q.data.status) === statusKey);
       if (group.length === 0) return;
-      text += `── ${STATUS_LABEL[statusKey]} (${group.length}) ──\n\n`;
+      groupsHtml += `
+        <section class="group">
+          <h2><span class="dot" style="background:${STATUS_DOT[statusKey]}"></span>${escapeHtml(STATUS_LABEL[statusKey])} <span class="count">${group.length}</span></h2>
+          <div class="cards">
+      `;
       group.forEach((q, idx) => {
         const d = q.data;
         const time = d.createdAt
           ? d.createdAt.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' })
           : 'ไม่ทราบเวลา';
-        text += `${idx + 1}. ${d.realName || 'ไม่ระบุชื่อ'}${d.position ? ' (' + d.position + ')' : ''}\n`;
-        text += `   เวลา: ${time}\n`;
-        text += `   หมวด: ${getTopic(d.question).label}\n`;
-        text += `   คำถาม: ${d.question}\n\n`;
+        const topic = getTopic(d.question);
+        groupsHtml += `
+          <article class="card">
+            <div class="card-top">
+              <div class="who">
+                <span class="name">${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</span>
+                ${d.position ? `<span class="role">${escapeHtml(d.position)}</span>` : ''}
+              </div>
+              <span class="time">${time}</span>
+            </div>
+            <div class="topic"><span class="topic-icon">${topic.icon}</span>${escapeHtml(topic.label)}</div>
+            <p class="question">${escapeHtml(d.question)}</p>
+          </article>
+        `;
       });
+      groupsHtml += `</div></section>`;
     });
 
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const fileDate = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `คำถาม-FDM23067-${fileDate}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const html = `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>สรุปคำถาม FDM23067</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f0f7fd; --bg2: #e3f1fb; --card: #ffffff;
+    --primary: #6fa8dc; --primary-dark: #4f8fc7; --ink: #173049;
+    --text-soft: #6b859c; --border: #cfe6f7; --shadow: 0 12px 30px rgba(23,79,120,.10); --radius: 18px;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; font-family:'Noto Sans Thai', sans-serif;
+    background: radial-gradient(circle at top left, var(--bg2), transparent 40%), var(--bg);
+    color: var(--ink); padding: 32px 20px 60px;
+  }
+  .wrap{ max-width: 780px; margin: 0 auto; }
+  .head{ text-align:center; margin-bottom: 28px; }
+  .head .badge{
+    display:inline-flex; align-items:center; gap:6px; background:#fff;
+    border:1px solid var(--border); box-shadow: var(--shadow); border-radius:999px;
+    padding:6px 14px; font-size:12px; font-weight:800; color: var(--primary-dark); margin-bottom:10px;
+  }
+  .head h1{ margin: 6px 0; font-size: 22px; }
+  .head p{ color: var(--text-soft); font-size: 13px; margin: 4px 0; }
+  .stats{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap: wrap; }
+  .stat{ background:#fff; border:1px solid var(--border); border-radius: 14px; padding:10px 18px; box-shadow: var(--shadow); }
+  .stat b{ display:block; font-size:20px; }
+  .stat span{ font-size:11px; color: var(--text-soft); font-weight:700; }
+  .group{ margin-bottom: 26px; }
+  .group h2{ display:flex; align-items:center; gap:8px; font-size:15px; margin: 0 0 12px; }
+  .group h2 .dot{ width:9px; height:9px; border-radius:50%; }
+  .group h2 .count{ background: var(--bg2); color: var(--primary-dark); font-size:11px; font-weight:800; padding:2px 9px; border-radius:999px; }
+  .cards{ display:flex; flex-direction:column; gap:10px; }
+  .card{ background: var(--card); border:1px solid var(--border); border-radius: var(--radius); padding:16px 18px; box-shadow: var(--shadow); }
+  .card-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:8px; }
+  .who{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .name{ font-weight:800; font-size:14px; }
+  .role{ font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:2px 8px; border-radius:999px; }
+  .time{ font-size:11px; color: var(--text-soft); white-space:nowrap; }
+  .topic{ display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color: var(--primary-dark); background: var(--bg2); padding:3px 10px; border-radius:999px; margin-bottom:8px; }
+  .question{ font-size:14px; line-height:1.6; margin:0; white-space:pre-wrap; word-break:break-word; }
+  .foot{ text-align:center; font-size:11px; color: var(--text-soft); margin-top:30px; }
+  .print-btn{
+    padding: 10px 22px; border:none; border-radius:14px;
+    background: var(--primary); color:#fff; font-family:inherit; font-size:14px; font-weight:800; cursor:pointer;
+    box-shadow: 0 8px 18px rgba(79,143,199,.35);
+  }
+  .btn-row{ display:flex; gap:10px; justify-content:center; margin-bottom:24px; flex-wrap:wrap; }
+  .save-img-btn{ background: #25b86a; box-shadow: 0 8px 18px rgba(37,184,106,.35); }
+  .save-img-btn:disabled{ opacity:.6; cursor: wait; }
+  @media print{ .btn-row{ display:none; } body{ background:#fff; padding:0; } .card, .stat{ box-shadow:none; } }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="btn-row">
+      <button class="print-btn" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+      <button class="print-btn save-img-btn" id="saveImgBtn">🖼️ บันทึกเป็นรูปภาพ</button>
+    </div>
+    <div id="capture">
+      <div class="head">
+        <div class="badge"><span>●</span> FDM23067</div>
+        <h1>สรุปคำถามจากทีมงาน</h1>
+        <p>ส่งออกเมื่อ ${escapeHtml(now)}</p>
+        <div class="stats">
+          <div class="stat"><b>${items.length}</b><span>คำถามทั้งหมด</span></div>
+          <div class="stat"><b>${askedCount}</b><span>ถามอาจารย์แล้ว</span></div>
+          <div class="stat"><b>${items.length - askedCount}</b><span>กำลังดำเนินการ</span></div>
+        </div>
+      </div>
+      ${groupsHtml}
+      <div class="foot">FDM23067 — ถามอาจารย์ · ทำโดย Focus Nakub</div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"><\/script>
+  <script>
+    // จับภาพส่วนสรุปคำถามทั้งหมด แปลงเป็นไฟล์รูปภาพ PNG แล้วดาวน์โหลดให้อัตโนมัติ
+    document.getElementById('saveImgBtn').addEventListener('click', async function () {
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'กำลังสร้างรูปภาพ...';
+      try {
+        const target = document.getElementById('capture');
+        const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#f0f7fd', useCORS: true });
+        const link = document.createElement('a');
+        link.download = 'คำถาม-FDM23067-' + new Date().toISOString().slice(0, 10) + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        alert('สร้างรูปภาพไม่สำเร็จ ลองใหม่อีกครั้ง');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🖼️ บันทึกเป็นรูปภาพ';
+      }
+    });
+  <\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank');
+    if (win) {
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+    } else {
+      alert('เบราว์เซอร์บล็อกหน้าต่างใหม่ กรุณาอนุญาตป๊อปอัปแล้วลองอีกครั้ง');
+    }
   });
 
   // กดที่ป้ายสถานะแล้ววนไปสถานะถัดไปทีละขั้น (ยังไม่เห็น → รับเรื่องแล้ว → ถามอาจารย์เรียบร้อยแล้ว → วนกลับ) ทำได้เฉพาะตอนล็อกอิน Admin
