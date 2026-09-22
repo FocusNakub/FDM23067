@@ -320,6 +320,7 @@
     margin-bottom: 8px;
   }
   .q-topic-icon{ font-size: 13px; }
+  .q-role.ask-topic{ color: #6a3fb5; background: #f1ebfb; }
   .empty{
     text-align:center;
     color: var(--text-soft);
@@ -649,6 +650,13 @@
         </div>
       </div>
 
+      <label for="topicInput">หัวข้อที่จะถาม</label>
+      <select id="topicInput" required>
+        <option value="" disabled selected>เลือกหัวข้อ</option>
+        <option value="master">Master Scene</option>
+        <option value="final">Final</option>
+      </select>
+
       <label for="questionInput">คำถาม</label>
       <textarea id="questionInput" placeholder="พิมพ์คำถามที่อยากให้ถามอาจารย์" maxlength="500" required></textarea>
 
@@ -735,7 +743,9 @@
   const nameError = document.getElementById('nameError');
   const unlockNameBtn = document.getElementById('unlockNameBtn');
   const positionInput = document.getElementById('positionInput');
+  const topicInput = document.getElementById('topicInput');
   const questionInput = document.getElementById('questionInput');
+  const ASK_TOPIC_LABEL = { master: 'Master Scene', final: 'Final' };
   const submitBtn = document.getElementById('submitBtn');
   const statusMsg = document.getElementById('statusMsg');
   const questionList = document.getElementById('questionList');
@@ -977,7 +987,7 @@
               <span class="q-time">${time}</span>
             </div>
             <div class="q-entry-meta">
-              <span><b>${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</b>${d.position ? ' · ' + escapeHtml(d.position) : ''}</span>
+              <span><b>${escapeHtml(d.realName || 'ไม่ระบุชื่อ')}</b>${d.position ? ' · ' + escapeHtml(d.position) : ''}${d.askTopic ? ' · ' + escapeHtml(d.askTopic) : ''}</span>
               ${d.trial ? '<span class="q-trial-tag">ทดลอง</span>' : ''}
             </div>
             <p class="q-entry-text">${escapeHtml(d.question)}</p>
@@ -1215,8 +1225,10 @@
 
     const positionId = positionInput.value;
     const positionName = ROLES.find(r => r.id === positionId)?.name || positionId;
+    const askTopicId = topicInput.value;
+    const askTopicLabel = ASK_TOPIC_LABEL[askTopicId] || askTopicId;
     const question = questionInput.value.trim();
-    if (!realName || !positionId || !question) return;
+    if (!realName || !positionId || !askTopicId || !question) return;
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'กำลังส่ง...';
@@ -1228,6 +1240,8 @@
         realName: realName,
         positionId: positionId,
         position: positionName,
+        askTopicId: askTopicId,
+        askTopic: askTopicLabel,
         question: question,
         status: 'pending',
         trial: currentTrial,
@@ -1239,6 +1253,7 @@
         lockName(realName);
       }
       positionInput.selectedIndex = 0;
+      topicInput.selectedIndex = 0;
       questionInput.value = '';
       statusMsg.textContent = 'ส่งแล้ว ขอบคุณนะ';
       statusMsg.className = 'status-msg ok';
@@ -1395,6 +1410,7 @@
               <div class="q-top">
                 <span class="q-who">
                   <span class="q-name">${escapeHtml(data.realName)}</span>
+                  ${data.askTopic ? '<span class="q-role ask-topic">' + escapeHtml(data.askTopic) + '</span>' : ''}
                 </span>
                 <span class="q-time">${time}</span>
               </div>
@@ -1427,6 +1443,7 @@
               <span class="q-who">
                 <span class="q-name">${escapeHtml(data.realName)}</span>
                 ${data.position ? '<span class="q-role">' + escapeHtml(data.position) + '</span>' : ''}
+                ${data.askTopic ? '<span class="q-role ask-topic">' + escapeHtml(data.askTopic) + '</span>' : ''}
                 ${data.trial ? '<span class="q-role trial">ทดลอง</span>' : ''}
               </span>
               <span class="q-time">${time}</span>
