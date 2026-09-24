@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0e0c0b">
+<title>โหวตธีม</title>
+
+<!-- ไอคอนหน้าแท็บ (ใช้ไฟล์เดียวกับหน้าอื่นใน repo) -->
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- ฟอนต์: Kanit สำหรับหัวข้อ / IBM Plex Sans Thai สำหรับเนื้อหา -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --bg:#0e0c0b; --surface:#171412; --surface2:#1f1b18;
+    --line:#2e2824; --ink:#f3ede7; --soft:#a39990; --faint:#6e655e;
+    --accent:#f3ede7; --ok:#7fd49b; --err:#ff7a6b;
+    /* สีประจำธีม */
+    --greed:#e8b43a; --anger:#ef5b45; --delusion:#9b7cf2; --love:#f2729f;
+  }
+  *{box-sizing:border-box;margin:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    font-family:'IBM Plex Sans Thai',sans-serif; background:var(--bg); color:var(--ink);
+    min-height:100vh; line-height:1.55; overflow-x:hidden;
+  }
+  .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:28px 16px 56px;}
+  .main{min-width:0;}
+  .side{margin-top:22px;}
+  .side-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 10px;}
+  .side-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .side-head h2{font-family:'Kanit',sans-serif;font-weight:500;font-size:17px;}
+  .side-head span{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums;}
+  .prog{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:-2px 0 12px;}
+  .prog i{display:block;height:100%;width:0;background:var(--ok);border-radius:3px;transition:width .6s ease;}
+  .side-list li.me-row .nm::after{content:" (คุณ)";color:var(--faint);font-size:12px;}
+  .side-list{list-style:none;padding:0;margin:0;}
+  .side-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:14px;color:var(--soft);
+    padding:7px 0;border-top:1px solid var(--line);}
+  .side-list li:first-child{border-top:none;}
+  .side-list li .nm{min-width:0;overflow-wrap:anywhere;}
+  .side-list li.yes .nm{color:var(--ink);}
+  .tag{flex:0 0 auto;font-size:11px;border-radius:999px;padding:2px 9px;border:1px solid var(--line);color:var(--faint);white-space:nowrap;}
+  .yes .tag{border-color:rgba(127,212,155,.45);color:var(--ok);}
+  .tag.th{border-color:var(--c);color:var(--c);font-weight:600;} /* Admin เห็นธีม */
+  @media (min-width:960px){
+    .wrap{max-width:1040px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:32px;align-items:start;}
+    .side{margin-top:0;position:sticky;top:24px;max-height:calc(100vh - 48px);display:flex;}
+    .side-card{overflow:auto;width:100%;}
+  }
+
+  .hero{padding:20px 0 24px;}
+  .gap{height:22px;}
+  .hero h1{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(36px,9vw,52px);line-height:1.05;letter-spacing:-.01em;}
+  .hero p{color:var(--soft);font-size:15px;margin-top:14px;max-width:460px;}
+
+  /* ===== หัวข้อแต่ละขั้น ===== */
+  .step{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px;}
+  .step h2{font-family:'Kanit',sans-serif;font-weight:500;font-size:20px;}
+
+  /* ===== ช่องกรอก ===== */
+  .field{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px 8px;transition:border-color .15s;}
+  .field:focus-within{border-color:var(--soft);}
+  .field label{display:block;font-size:11px;letter-spacing:.08em;color:var(--faint);}
+  .field input,.field select{width:100%;background:none;border:none;outline:none;color:var(--ink);
+    font:inherit;font-size:16px;padding:2px 0 4px;appearance:none;-webkit-appearance:none;}
+  .field select{cursor:pointer;}
+  .me{display:none;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;
+    font-family:'Kanit',sans-serif;font-weight:700;font-size:17px;flex:0 0 auto;}
+  .me-info{min-width:0;flex:1;}
+  .me-name{font-weight:600;font-size:15px;overflow-wrap:anywhere;}
+  .me-sub{font-size:12px;color:var(--faint);}
+  .linkbtn{background:none;border:none;color:var(--faint);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;flex:0 0 auto;}
+  .guest .theme,.locked .theme{opacity:.4;cursor:default;filter:saturate(.5);} .guest .theme:hover,.locked .theme:hover{transform:none;box-shadow:none;}
+  .guest .theme .state,.locked .theme .state{visibility:hidden;}
+  .field select option{background:var(--surface);color:var(--ink);}
+
+  /* ===== การ์ดธีม ===== */
+  .themes{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .theme{
+    --glow:color-mix(in srgb,var(--c) 45%,transparent);
+    position:relative;overflow:hidden;isolation:isolate;cursor:pointer;text-align:left;font:inherit;color:var(--ink);
+    background:linear-gradient(160deg,color-mix(in srgb,var(--c) 14%,var(--surface)) 0%,var(--surface) 55%,color-mix(in srgb,var(--c) 6%,var(--bg)) 100%);
+    border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-radius:22px;
+    aspect-ratio:1/1;padding:16px;display:flex;flex-direction:column;justify-content:space-between;
+    transition:transform .25s cubic-bezier(.2,.9,.3,1.2),box-shadow .25s,border-color .25s,opacity .25s,filter .25s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  /* วงแสงสีธีม ลอยอยู่มุมขวาบน */
+  .theme::before{
+    content:"";position:absolute;z-index:-1;width:90%;aspect-ratio:1;right:-30%;top:-30%;border-radius:50%;
+    background:radial-gradient(circle,var(--c) 0%,transparent 65%);opacity:.28;filter:blur(6px);
+    transition:transform .5s ease,opacity .3s;
+  }
+  /* วงแหวนเส้นบางๆ ให้มีมิติ */
+  .theme::after{
+    content:"";position:absolute;z-index:-1;width:120%;aspect-ratio:1;right:-55%;top:-55%;border-radius:50%;
+    background:repeating-radial-gradient(circle,transparent 0 14px,color-mix(in srgb,var(--c) 30%,transparent) 14px 15px);
+    opacity:.35;mask:radial-gradient(circle,#000 30%,transparent 70%);-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);
+    transition:transform .8s ease;
+  }
+  /* ตัวหนังสือจางๆ ใหญ่ๆ เป็นลายพื้นหลัง */
+  .theme .ghost{position:absolute;z-index:-1;right:-6%;bottom:-18%;font-family:'Kanit',sans-serif;font-weight:800;
+    font-size:clamp(90px,26vw,130px);line-height:1;color:var(--c);opacity:.07;white-space:nowrap;pointer-events:none;
+    transition:transform .5s ease,opacity .3s;}
+  .theme .state{font-size:12px;color:var(--soft);display:flex;align-items:center;gap:6px;}
+  .theme .state::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.7;}
+  .theme .word{position:relative;font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(36px,11vw,50px);line-height:1;
+    color:var(--c);letter-spacing:-.01em;transition:color .25s,transform .3s;}
+  .theme .tick{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;
+    border:1.5px solid color-mix(in srgb,var(--c) 40%,var(--line));display:grid;place-items:center;font-size:14px;
+    color:var(--c);background:rgba(0,0,0,.25);transition:.25s;}
+  @media (hover:hover){
+    .theme:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--c) 55%,var(--line));box-shadow:0 18px 40px -18px var(--glow);}
+    .theme:hover::before{transform:translate(-12%,12%) scale(1.15);opacity:.4;}
+    .theme:hover::after{transform:rotate(25deg) scale(1.08);}
+    .theme:hover .ghost{transform:translateX(-6%);opacity:.12;}
+  }
+  .theme:active{transform:scale(.97);}
+  .theme:focus-visible{outline:2px solid var(--c);outline-offset:3px;}
+  /* เลือกแล้ว: การ์ดกลายเป็นสีธีมทั้งใบ */
+  .theme.sel{
+    background:linear-gradient(155deg,color-mix(in srgb,var(--c) 92%,#fff) 0%,var(--c) 45%,color-mix(in srgb,var(--c) 55%,#000) 100%);
+    border-color:var(--c);transform:translateY(-4px);box-shadow:0 22px 44px -16px var(--glow),inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .theme.sel::before{background:radial-gradient(circle,#fff 0%,transparent 60%);opacity:.35;}
+  .theme.sel::after{background:repeating-radial-gradient(circle,transparent 0 14px,rgba(255,255,255,.35) 14px 15px);opacity:.5;}
+  .theme.sel .ghost{color:#000;opacity:.1;}
+  .theme.sel .word{color:#17110e;animation:pop .45s cubic-bezier(.2,1.6,.4,1);}
+  .theme.sel .state{color:rgba(23,17,14,.75);} .theme.sel .state::before{background:#17110e;}
+  .theme.sel .tick{background:#17110e;border-color:#17110e;color:var(--c);}
+  .theme.sel .tick::after{content:"✓";font-weight:800;}
+  @keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:none}}
+  /* พอเลือกแล้ว ใบอื่นจางลงนิดนึง */
+  .themes.has-pick .theme:not(.sel){opacity:.55;filter:saturate(.6);}
+  .themes.has-pick .theme:not(.sel):hover{opacity:.9;filter:none;}
+  @media (prefers-reduced-motion:reduce){ .theme,.theme::before,.theme::after,.theme .ghost{transition:none;} .theme.sel .word{animation:none;} }
+
+  /* ===== ปุ่มส่ง ===== */
+  .send{margin-top:14px;width:100%;border:none;border-radius:14px;padding:13px;transition:background .2s,box-shadow .2s,opacity .15s;cursor:pointer;
+    font-family:'Kanit',sans-serif;font-weight:500;font-size:18px;letter-spacing:.02em;
+    background:var(--ink);color:var(--bg);transition:opacity .15s,transform .1s;}
+  .send:active:not(:disabled){transform:scale(.99);}
+  .send:disabled{opacity:.25;cursor:default;}
+  .send.picked{background:var(--c);color:#16110f;box-shadow:0 10px 30px -12px var(--c);}
+  .msg{text-align:center;font-size:14px;min-height:1.5em;margin-top:12px;color:var(--soft);}
+  .msg.ok{color:var(--ok);} .msg.err{color:var(--err);}
+
+  /* ===== ผลโหวต ===== */
+  /* ===== ผลโหวต: คอลัมน์ธีม ซ้อนบล็อกทีละเสียง ===== */
+  .board{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px;}
+  .board-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;min-height:1.6em;}
+  .headline{font-family:'Kanit',sans-serif;font-size:15px;font-weight:500;}
+  .headline b{color:var(--c,var(--ink));font-weight:700;}
+  .board-head span{font-size:13px;color:var(--faint);}
+  /* ธีมที่นำ (โชว์ตลอด) */
+  .leader{display:flex;gap:8px;flex-wrap:wrap;}
+  .lead-card{flex:1 1 200px;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;isolation:isolate;
+    border-radius:16px;padding:10px 14px 10px 10px;
+    background:linear-gradient(100deg,color-mix(in srgb,var(--c) 18%,var(--surface2)),var(--surface2) 75%);
+    border:1px solid color-mix(in srgb,var(--c) 35%,var(--line));animation:pop .45s cubic-bezier(.2,1.5,.4,1);}
+  /* วงแหวนเปอร์เซ็นต์ */
+  .ring{--p:0;width:48px;height:48px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+    background:conic-gradient(var(--c) calc(var(--p)*1%),color-mix(in srgb,var(--c) 15%,transparent) 0);
+    transition:--p .6s;}
+  .ring span{width:38px;height:38px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;
+    font-size:12px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .lead-card .lt{min-width:0;flex:1;}
+  .lead-card .lw{font-family:'Kanit',sans-serif;font-weight:700;font-size:24px;line-height:1.15;color:var(--c);}
+  .lead-card .ln{font-size:12px;color:var(--soft);}
+  .lead-card .lk{flex:0 0 auto;font-size:11px;font-weight:600;color:#17110e;background:var(--c);border-radius:999px;padding:3px 9px;
+    display:flex;align-items:center;gap:4px;}
+  .lead-empty{width:100%;text-align:center;color:var(--faint);font-size:13px;padding:14px 0;border:1px dashed var(--line);border-radius:14px;}
+  /* ผลทั้งหมด (กดขยาย) */
+  .all{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease;}
+  .all > *{overflow:hidden;min-height:0;}
+  .all{overflow:hidden;}
+  .board.open .all{grid-template-rows:1fr;}
+  .board.open .cols{margin-top:22px;}
+  .more{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:10px;background:none;border:none;
+    border-radius:10px;padding:6px;color:var(--soft);font:inherit;font-size:13px;cursor:pointer;transition:color .2s,background .2s;}
+  .more:hover{background:var(--surface2);color:var(--ink);}
+  .more i{font-style:normal;transition:transform .3s;}
+  .board.open .more i{transform:rotate(180deg);}
+  .cols{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:10px;}
+  .col{display:flex;flex-direction:column;align-items:center;min-width:0;}
+  .crown{height:22px;font-size:18px;line-height:22px;color:var(--c);opacity:0;transform:translateY(6px) scale(.6);
+    transition:opacity .3s,transform .3s;}
+  .col.lead .crown{opacity:1;transform:none;animation:bob 1.8s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-4px) rotate(6deg)}}
+  .cnt{font-family:'Kanit',sans-serif;font-weight:700;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums;}
+  .col.lead .cnt{color:var(--c);}
+  .pct{font-size:12px;color:var(--faint);margin-bottom:8px;font-variant-numeric:tabular-nums;}
+  .track{position:relative;width:100%;max-width:92px;height:220px;border-radius:14px;
+    background:var(--surface2);
+    border:1px dashed var(--line);padding:4px;overflow:hidden;}
+  .stack{height:100%;display:flex;flex-direction:column-reverse;gap:0;}
+  .chip{flex:0 0 calc(100% / var(--slots));padding:2px 0;transition:flex-basis .4s ease;}
+  .chip i{display:block;height:100%;border-radius:8px;background:var(--c);
+    box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);}
+  .chip.drop i{animation:drop .55s cubic-bezier(.3,1.5,.5,1) both;}
+  @keyframes drop{0%{transform:translateY(-240px);opacity:0}60%{opacity:1}100%{transform:none}}
+  .col.lead .track{border-style:solid;border-color:var(--c);box-shadow:0 0 24px -6px var(--c);}
+  .col.bump .cnt{animation:bump .5s ease;}
+  @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+  .cname{font-family:'Kanit',sans-serif;font-weight:700;font-size:22px;color:var(--c);margin-top:10px;}
+  .who-admin{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;display:none;}
+  .who-admin p{font-size:13px;color:var(--faint);margin:4px 0;}
+  .who-admin b{color:var(--c);font-weight:600;margin-right:6px;}
+  @media (max-width:420px){ .track{height:180px;} .cnt{font-size:24px;} .cname{font-size:19px;} .cols{gap:8px;} }
+  @media (prefers-reduced-motion:reduce){ .chip.drop i,.col.lead .crown,.col.bump .cnt{animation:none;} }
+  .sum{display:flex;justify-content:flex-end;font-size:13px;color:var(--faint);margin-top:12px;padding:0 4px;}
+
+  footer{grid-column:1/-1;text-align:center;font-size:12px;color:var(--faint);margin-top:44px;letter-spacing:.04em;}
+  footer button{background:none;border:none;color:var(--faint);font:inherit;cursor:pointer;text-decoration:underline;margin-left:8px;}
+
+  /* สถานะเปิด/ปิด */
+  .status{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-top:12px;}
+  .status i{width:7px;height:7px;border-radius:50%;background:var(--faint);}
+  .status.on i{background:var(--ok);} .status.wait i{background:var(--greed);} .status.off i{background:var(--err);}
+  .status b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;}
+  /* ===== ประกาศ: แถบเล็กด้านบน + หน้าต่างป๊อปอัป ===== */
+  .ann-pill{display:none;align-items:center;gap:10px;width:100%;margin:0 0 18px;padding:9px 12px 9px 9px;cursor:pointer;text-align:left;
+    background:linear-gradient(100deg,rgba(232,180,58,.14),var(--surface) 70%);border:1px solid rgba(232,180,58,.35);border-radius:14px;
+    color:var(--ink);font:inherit;transition:border-color .2s,transform .15s;}
+  .ann-pill:hover{border-color:var(--greed);}
+  .ann-pill:active{transform:scale(.99);}
+  .ann-ico{flex:0 0 auto;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:15px;
+    background:var(--greed);color:#17110e;position:relative;}
+  .ann-ico.new::after{content:"";position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--err);
+    border:2px solid var(--bg);animation:ping 1.6s infinite;}
+  @keyframes ping{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+  .ann-txt{min-width:0;flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ann-txt small{color:var(--faint);font-size:12px;margin-right:6px;}
+  .ann-go{flex:0 0 auto;font-size:12px;color:var(--greed);}
+
+  .ann-modal{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;padding:16px;
+    background:rgba(8,6,5,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .ann-modal.show{display:flex;animation:fadein .25s ease;}
+  .ann-card{position:relative;width:100%;max-width:400px;max-height:85vh;overflow:auto;border-radius:22px;padding:22px 20px 18px;
+    background:linear-gradient(170deg,#2a2217,var(--surface) 45%);border:1px solid rgba(232,180,58,.35);
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03) inset;animation:rise .4s cubic-bezier(.2,1.3,.4,1);}
+  @keyframes rise{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+  .ann-card .ann-ico{width:46px;height:46px;border-radius:14px;font-size:22px;margin-bottom:14px;box-shadow:0 10px 30px -10px var(--greed);}
+  .ann-card h3{font-family:'Kanit',sans-serif;font-weight:600;font-size:20px;margin-bottom:2px;}
+  .ann-time{font-size:12px;color:var(--faint);margin-bottom:14px;}
+  .ann-body{font-size:15px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);
+    background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:14px;padding:14px;}
+  .ann-ok{width:100%;margin-top:16px;border:none;border-radius:12px;padding:12px;background:var(--greed);color:#17110e;
+    font:inherit;font-weight:600;font-size:15px;cursor:pointer;}
+  .ann-x{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+    background:rgba(0,0,0,.25);color:var(--soft);font-size:16px;cursor:pointer;}
+  .admin textarea{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    font:inherit;font-size:14px;padding:10px 12px;min-height:70px;resize:vertical;}
+  .trial{display:none;margin-top:10px;font-size:13px;color:var(--greed);border:1px dashed var(--greed);border-radius:12px;padding:8px 12px;}
+
+  /* แผง Admin */
+  .admin{display:none;margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;}
+  .admin h3{font-family:'Kanit',sans-serif;font-weight:500;font-size:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .admin h3 button{font-size:13px;}
+  .arow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap;}
+  .arow span{font-size:14px;} .arow small{display:block;font-size:12px;color:var(--faint);}
+  .abtn{background:var(--surface2);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:14px;
+    border-radius:10px;padding:8px 14px;cursor:pointer;}
+  .abtn.on{background:var(--ok);border-color:var(--ok);color:var(--bg);}
+  .abtn.warn{color:var(--err);border-color:rgba(255,122,107,.4);}
+  .times{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+  .times label{font-size:12px;color:var(--faint);}
+  .times input{width:100%;margin-top:4px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;
+    color:var(--ink);font:inherit;font-size:14px;padding:8px 10px;color-scheme:dark;}
+  .tbtns{display:flex;gap:8px;width:100%;}
+  .tbtns .abtn{flex:1;}
+
+  /* ===== หน้าฉลองผู้ชนะ ===== */
+  .win{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:24px 16px;
+    background:radial-gradient(ellipse at 50% 40%,color-mix(in srgb,var(--c) 28%,#0e0c0b),#0e0c0b 70%);overflow:auto;}
+  .win.show{display:flex;animation:fadein .4s ease;}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .win canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;}
+  .win-box{position:relative;text-align:center;max-width:520px;width:100%;}
+  .win-kicker{font-size:16px;color:var(--soft);}
+  .win-word{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(96px,32vw,190px);line-height:1;color:var(--c);
+    margin:14px 0 6px;text-shadow:0 0 60px color-mix(in srgb,var(--c) 55%,transparent);animation:zoom .9s cubic-bezier(.2,1.6,.4,1) both .2s;}
+  .win-word.tie{font-size:clamp(56px,17vw,110px);}
+  @keyframes zoom{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+  .win-sub{font-size:17px;color:var(--ink);animation:up .6s ease both .7s;}
+  .win-sub b{font-family:'Kanit',sans-serif;font-size:22px;color:var(--c);}
+  @keyframes up{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+  .win-rank{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:8px;margin:30px 0 26px;animation:up .6s ease both 1s;}
+  .win-rank div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:10px 4px;}
+  .win-rank b{display:block;font-family:'Kanit',sans-serif;font-size:20px;color:var(--rc);}
+  .win-rank span{font-size:12px;color:var(--faint);}
+  .win-rank .top{border-color:var(--rc);background:color-mix(in srgb,var(--rc) 12%,transparent);}
+  .win-btn{background:var(--ink);color:var(--bg);border:none;border-radius:14px;padding:13px 26px;font:inherit;font-weight:600;
+    font-size:15px;cursor:pointer;animation:up .6s ease both 1.2s;}
+  .win-foot{font-size:12px;color:var(--faint);margin-top:14px;animation:up .6s ease both 1.3s;}
+  .reopen{display:none;margin:14px auto 0;background:none;border:1px solid var(--line);color:var(--soft);font:inherit;font-size:13px;
+    border-radius:999px;padding:6px 14px;cursor:pointer;}
+  @media (prefers-reduced-motion:reduce){ .win-word,.win-sub,.win-rank,.win-btn,.win-foot{animation:none;} }
+
+  /* ส่วนแก้ไขใน Admin */
+  .asec{border-top:1px solid var(--line);padding:4px 0 12px;}
+  .asec summary{cursor:pointer;padding:12px 0 8px;font-size:15px;font-weight:600;list-style:none;display:flex;justify-content:space-between;}
+  .asec summary::after{content:"▾";color:var(--faint);transition:transform .2s;}
+  .asec:not([open]) summary::after{transform:rotate(-90deg);}
+  .anote{font-size:12px;color:var(--faint);margin:0 0 10px;}
+  .anote b{color:var(--greed);font-weight:600;}
+  .ptable{display:flex;flex-direction:column;gap:6px;max-height:460px;overflow:auto;padding-right:2px;}
+  .prow{display:grid;grid-template-columns:minmax(0,1fr) 108px auto;gap:6px;align-items:center;background:var(--surface2);
+    border:1px solid var(--line);border-radius:10px;padding:6px;}
+  .prow.hidden{opacity:.45;}
+  .prow input,.prow select,.addrow input,.agrid input,.threw input[type=text]{background:var(--bg);border:1px solid var(--line);border-radius:8px;
+    color:var(--ink);font:inherit;font-size:13px;padding:6px 8px;min-width:0;width:100%;}
+  .prow select{cursor:pointer;}
+  .pmeta{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--faint);}
+  .pmeta .sp{margin-right:auto;}
+  .mini{background:none;border:1px solid var(--line);color:var(--soft);border-radius:8px;font:inherit;font-size:12px;padding:4px 9px;cursor:pointer;}
+  .mini.warn{color:var(--err);border-color:rgba(255,122,107,.35);}
+  .mini:disabled{opacity:.3;cursor:default;}
+  .addrow{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:10px;}
+  .threw{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;margin-bottom:6px;}
+  .threw input[type=color]{width:40px;height:34px;border:1px solid var(--line);border-radius:8px;background:none;padding:2px;cursor:pointer;}
+  .agrid{display:grid;gap:10px;margin-bottom:10px;}
+  .agrid label{font-size:12px;color:var(--faint);display:flex;flex-direction:column;gap:4px;}
+  .asec .tbtns{margin-top:8px;}
+  @media (max-width:420px){ .addrow{grid-template-columns:1fr;} .prow{grid-template-columns:minmax(0,1fr) 96px;} .prow .pdel{display:none;} }
+
+  /* กล่องใส่รหัส */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:16px;z-index:10;}
+  .modal.show{display:flex;}
+  .modal-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;width:100%;max-width:340px;}
+  .modal-card input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:10px;color:var(--ink);
+    font:inherit;font-size:16px;padding:10px 12px;margin:12px 0;}
+  .modal-card .tbtns .abtn:last-child{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+  @media (min-width:600px){ .themes{grid-template-columns:repeat(var(--n,4),minmax(0,1fr));} }
+  @media (max-width:420px){
+    .theme{padding:13px;border-radius:18px;}
+    .times{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="main">
+
+  <section class="hero">
+    <button class="ann-pill" id="annPill" aria-label="เปิดประกาศ">
+      <span class="ann-ico" id="annDot">📢</span>
+      <span class="ann-txt"><small>ประกาศ</small><span id="annPreview"></span></span>
+      <span class="ann-go">อ่าน ›</span>
+    </button>
+    <h1 id="title">โหวตธีม</h1>
+    <p id="subtitle">โหวตธีมที่ตัวเองชอบ</p>
+    <div class="status" id="status"><i></i><span id="statusText">กำลังโหลด…</span></div>
+    <div class="trial" id="trialBar">โหมดทดลอง · โหวตตอนนี้ไม่นับจริง</div>
+  </section>
+
+  <!-- เลือกชื่อตัวเอง -->
+  <div class="idbox" id="loginBox">
+    <div class="field">
+      <label for="who">ชื่อ</label>
+      <select id="who"><option value="">เลือกชื่อตัวเอง</option></select>
+    </div>
+  </div>
+
+  <div class="me" id="meBox">
+    <div class="avatar" id="meAvatar"></div>
+    <div class="me-info">
+      <div class="me-name" id="meName"></div>
+      <div class="me-sub" id="meSub"></div>
+    </div>
+    <button class="linkbtn" id="logout">ไม่ใช่ฉัน</button>
+  </div>
+
+  <div class="gap"></div>
+  <div class="themes" id="themes"></div>
+  <button class="send" id="send" disabled>ส่งโหวต</button>
+  <p class="msg" id="msg"></p>
+
+  <!-- ผลโหวต -->
+  <div class="step"><h2>ผลโหวต</h2></div>
+  <div class="board" id="board">
+    <div class="board-head"><div class="headline" id="headline">ยังไม่มีใครโหวต</div><span id="boardTotal"></span></div>
+    <div class="leader" id="leader"></div>
+    <div class="all" id="allRes"><div>
+      <div class="cols" id="cols"></div>
+      <div class="who-admin" id="whoAdmin"></div>
+    </div></div>
+    <button class="more" id="moreBtn" aria-expanded="false"><span>ดูผลทั้งหมด</span><i>▾</i></button>
+    <button class="reopen" id="reopen">🎉 ดูหน้าประกาศผู้ชนะอีกครั้ง</button>
+  </div>
+
+  <!-- แผง Admin (โชว์หลังใส่รหัส) -->
+  <section class="admin" id="admin">
+    <h3>Admin <button class="abtn" id="aLogout">ออก</button></h3>
+    <div class="arow">
+      <textarea id="aAnnounce" maxlength="500" placeholder="พิมพ์ประกาศ (เว้นว่าง = ไม่โชว์)"></textarea>
+      <div class="tbtns"><button class="abtn" id="aClearAnn">ลบประกาศ</button><button class="abtn" id="aSaveAnn">บันทึกประกาศ</button></div>
+    </div>
+    <div class="arow">
+      <span>เปิดรับโหวต<small>ปิดตรงนี้ = ปิดทันที ไม่สนเวลาที่ตั้ง</small></span>
+      <button class="abtn" id="aOpen">–</button>
+    </div>
+    <div class="arow">
+      <div class="times">
+        <div><label>เปิดเวลา</label><input type="datetime-local" id="aStart"></div>
+        <div><label>ปิดเวลา</label><input type="datetime-local" id="aEnd"></div>
+      </div>
+      <div class="tbtns"><button class="abtn" id="aClearTime">ล้างเวลา</button><button class="abtn" id="aSaveTime">บันทึกเวลา</button></div>
+    </div>
+    <div class="arow">
+      <span>โหมดทดลอง<small>โหวตจะแยกไว้ ไม่ปนกับของจริง</small></span>
+      <button class="abtn" id="aTrial">–</button>
+    </div>
+    <div class="arow">
+      <span>ล้างโหวตทดลอง<small id="aTrialCount">0 เสียง</small></span>
+      <button class="abtn warn" id="aClearTrial">ล้าง</button>
+    </div>
+    <div class="arow">
+      <span>ล้างโหวตจริงทั้งหมด<small id="aRealCount">0 เสียง</small></span>
+      <button class="abtn warn" id="aClearReal">ล้าง</button>
+    </div>
+    <details class="asec" open>
+      <summary>คนโหวต &amp; โหวตรายคน</summary>
+      <p class="anote">เลือกธีมแทนใครก็ได้ · ลบโหวต · คืนสิทธิ์ · แก้ชื่อ · ซ่อนคน (โหมดที่ใช้อยู่: <b id="aModeName">จริง</b>)</p>
+      <div class="ptable" id="aPeople"></div>
+      <div class="addrow">
+        <input id="aNewName" placeholder="ชื่อคนที่จะเพิ่ม" maxlength="60">
+        <input id="aNewId" placeholder="รหัสนักศึกษา (ไม่ใส่ก็ได้)" maxlength="20">
+        <button class="abtn" id="aAddPerson">เพิ่มคน</button>
+      </div>
+    </details>
+
+    <details class="asec">
+      <summary>ธีม</summary>
+      <p class="anote">แก้ชื่อ/สี · เพิ่มได้สูงสุด 6 ธีม · ลบธีมแล้วโหวตของธีมนั้นจะไม่ถูกนับ</p>
+      <div id="aThemes"></div>
+      <div class="tbtns"><button class="abtn" id="aAddTheme">+ เพิ่มธีม</button><button class="abtn" id="aResetThemes">คืนค่าเดิม</button><button class="abtn on" id="aSaveThemes">บันทึกธีม</button></div>
+    </details>
+
+    <details class="asec">
+      <summary>ข้อความ &amp; สิทธิ์โหวต</summary>
+      <div class="agrid">
+        <label>หัวข้อ<input id="aTitle" maxlength="40"></label>
+        <label>คำอธิบายใต้หัวข้อ<input id="aSubtitle" maxlength="120"></label>
+        <label>สิทธิ์โหวตต่อคน (ครั้ง)<input id="aMax" type="number" min="1" max="20"></label>
+      </div>
+      <div class="tbtns"><button class="abtn on" id="aSaveText">บันทึก</button></div>
+    </details>
+
+    <div class="arow">
+      <span>ดูหน้าฉลอง<small>ลองดูหน้าตาจากผลตอนนี้ (เห็นแค่เครื่องนี้)</small></span>
+      <button class="abtn" id="aPreviewWin">เปิดดู</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- แถบคนที่ยังไม่โหวต -->
+<aside class="side">
+  <div class="side-card">
+    <div class="side-head"><h2>รายชื่อ</h2><span id="pendingCount">0</span></div>
+    <div class="prog"><i id="progBar"></i></div>
+    <ul class="side-list" id="pending"></ul>
+  </div>
+</aside>
+<footer>ทำโดย Focus Nakub<button id="adminBtn">Admin</button></footer>
+
+  <!-- หน้าต่างประกาศ -->
+  <div class="ann-modal" id="annModal" role="dialog" aria-modal="true" aria-labelledby="annTitle">
+    <div class="ann-card">
+      <button class="ann-x" id="annX" aria-label="ปิด">✕</button>
+      <div class="ann-ico">📢</div>
+      <h3 id="annTitle">ประกาศ</h3>
+      <div class="ann-time" id="annTime"></div>
+      <div class="ann-body" id="annBody"></div>
+      <button class="ann-ok" id="annOk">รับทราบ</button>
+    </div>
+  </div>
+
+  <!-- หน้าฉลอง: โชว์เมื่อทุกคนโหวตครบ -->
+  <div class="win" id="win">
+    <canvas id="confetti"></canvas>
+    <div class="win-box">
+      <div class="win-kicker" id="winKicker">ผลโหวตออกแล้ว</div>
+      <div class="win-word" id="winWord"></div>
+      <div class="win-sub" id="winSub"></div>
+      <div class="win-rank" id="winRank"></div>
+      <button class="win-btn" id="winClose">ดูผลโหวต</button>
+      <div class="win-foot" id="winFoot"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="loginModal">
+    <div class="modal-card">
+      <div>รหัส Admin</div>
+      <input type="password" id="aKey" autocomplete="off">
+      <div class="tbtns"><button class="abtn" id="aCancel">ยกเลิก</button><button class="abtn" id="aLogin">เข้า</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ตั้งค่า Firebase (โปรเจกต์เดียวกับหน้าอื่นใน repo แต่ใช้ collection แยก)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+    authDomain: "fdm13167.firebaseapp.com",
+    projectId: "fdm13167",
+    storageBucket: "fdm13167.firebasestorage.app",
+    messagingSenderId: "638048330365",
+    appId: "1:638048330365:web:961daeac412d5d6332c714"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const fs = firebase.firestore();
+  const votesRef = fs.collection("fdm23067ThemeVotes");
+  // อ่านอย่างเดียว: ตำแหน่งที่แต่ละคนลงไว้ใน Position System (index.html)
+  const entriesRef = fs.collection("fdm23067").doc("settings").collection("entries");
+
+  // รายชื่อสำรอง — ของจริงจะดึงจาก index.html ตอนเปิดหน้า (ใช้ index.html เป็นหลัก)
+  let BASE_ROSTER = [
+    {id:'68018544',name:'หิรัญ ดิษฐสกุล'},
+    {id:'68020620',name:'จันทิมา จันทร์ช่วง'},
+    {id:'68006622',name:'ธัญพิสิษฐ์ พูนพานิช'},
+    {id:'68018328',name:'ศิริวัฒน์ เดชอุดม'},
+    {id:'68036744',name:'ทีปกร จิณเสน'},
+    {id:'68038946',name:'ธนพัฒน์ พรมวิชัย'},
+    {id:'68022911',name:'พิยดา ด่วนดี'},
+    {id:'68015892',name:'วริชยา ไชยสงค์'},
+    {id:'68023745',name:'พีชานิกา ทองประศรี'},
+    {id:'68005278',name:'กัณญาพัฒน์ จันทร์เกษมสุข'},
+    {id:'68007970',name:'วิโรจน์ สวนสระแก้ว'},
+    {id:'68040382',name:'ภูริพัฒน์ อนุโชติ'},
+    {id:'68026555',name:'กมลพร พูลแก้ว'},
+    {id:'68028928',name:'ณัฐวุฒิ ทับทอง'},
+    {id:'68010119',name:'ณรงค์เดช แสนสิทธิ์'},
+    {id:'68010397',name:'ขันเงิน สาครธนะศักดิ์'},
+    {id:'68011018',name:'วัชรพล ดำสมอ'},
+    {id:'68104276',name:'รวีโรจน์ เชื้อแฉ่ง'},
+    {id:'68059069',name:'อังค์นิษา ดุลยเสนีย์'}
+  ];
+  let ROSTER = BASE_ROSTER.slice(); // รายชื่อที่ใช้จริง = จาก index.html + ที่ Admin เพิ่ม/ซ่อน/แก้ชื่อ
+  function buildRoster(){
+    const ed = settings.roster || {};
+    const hide = new Set(ed.hide || []), rename = ed.rename || {};
+    ROSTER = BASE_ROSTER.filter(p => !hide.has(p.id)).map(p => ({ id: p.id, name: rename[p.id] || p.name }))
+      .concat((ed.add || []).filter(p => !hide.has(p.id)).map(p => ({ id: p.id, name: rename[p.id] || p.name, extra: true })));
+  }
+  // ชื่อตำแหน่งสำรอง — ของจริงดึงจาก index.html เช่นกัน
+  let ROLE_NAMES = {producer:'Producer',director:'Director',script:'Script Supervisor',runner:'AD1',dop:'DOP',
+    camoperator:'Camera Operator',focuspuller:'Focus Puller',camop:'Cam Assistant',gaffer:'Gaffer',
+    bestboy:'Best Boy Electric',sound:'Sound',art:'Art Director',artprop:'Art/Prop',makeup:'Makeup & Costume'};
+  let rolesById = {}; // รหัสนักศึกษา → [ตำแหน่ง]
+  let votes = [];     // โหวตที่นับอยู่ (จริง หรือ ทดลอง ตามโหมด)
+  let allVotes = [];  // โหวตทั้งหมดใน collection
+
+  // ตั้งค่าเปิด/ปิด + โหมดทดลอง (แยก doc ไม่ปนกับหน้าอื่น)
+  const settingsRef = fs.collection("fdm23067ThemeVotesMeta").doc("settings");
+  const ADMIN_KEY = "Focus3256"; // รหัสเดียวกับหน้าอื่นใน repo
+  let MAX_TRIES = 2; // สิทธิ์โหวตต่อคน (Admin แก้ได้)
+  // นับว่าคนนี้โหวตไปกี่ครั้งแล้ว (แยกโหมดจริง/ทดลอง)
+  const docIdOf = id => (settings.trialMode ? "trial_" : "") + id;
+  function triesOf(id){
+    const v = allVotes.find(x => x.docId === docIdOf(id));
+    return v ? (v.count ?? 1) : 0; // count = 0 คือ Admin รีเซ็ตสิทธิ์ให้
+  }
+  let settings = { open: true, start: "", end: "", trialMode: false, announcement: "" };
+  let isAdmin = false;
+
+  // ธีมเริ่มต้น (Admin เพิ่ม/ลบ/แก้ชื่อ/เปลี่ยนสีได้)
+  const DEFAULT_THEMES = [
+    {key:"greed",    th:"โลภ",  color:"#e8b43a"},
+    {key:"anger",    th:"โกรธ", color:"#ef5b45"},
+    {key:"delusion", th:"หลง",  color:"#9b7cf2"},
+    {key:"love",     th:"รัก",  color:"#f2729f"}
+  ];
+  let THEMES = DEFAULT_THEMES.slice();
+  const $ = id => document.getElementById(id);
+  let picked = null;
+  let firstRender = true;
+
+  // สร้างการ์ดธีม (เรียกใหม่เมื่อ Admin แก้ธีม)
+  function buildThemes(){
+    const root = document.documentElement;
+    THEMES.forEach(t => root.style.setProperty("--" + t.key, t.color)); // สีธีมเป็นตัวแปร CSS
+    root.style.setProperty("--n", THEMES.length);
+    $("themes").replaceChildren(); $("cols").replaceChildren();
+    if (!THEMES.some(t => t.key === picked)) picked = null;
+    THEMES.forEach(makeCard); THEMES.forEach(makeCol);
+    firstRender = true;
+  }
+  function makeCard(t){
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "theme"; b.dataset.key = t.key;
+    b.style.setProperty("--c", `var(--${t.key})`);
+    b.innerHTML = `<span class="ghost" aria-hidden="true"></span><span class="tick"></span><span class="state">แตะเพื่อเลือก</span><span class="word"></span>`;
+    b.querySelector(".word").textContent = t.th;
+    b.querySelector(".ghost").textContent = t.th;
+    b.setAttribute("aria-label", "เลือกธีม " + t.th);
+    b.onclick = () => { if (!voteState().open || !meId) return; picked = t.key; sync(); };
+    $("themes").appendChild(b);
+  }
+
+  // ===== เลือกชื่อตัวเอง (เครื่องจะจำไว้) =====
+  let meId = "";
+  try { meId = localStorage.getItem("tv_me_id") || ""; } catch(e) {}
+
+  function fillWho(){
+    const cur = $("who").value;
+    $("who").length = 1; // เหลือแค่ "เลือกชื่อตัวเอง"
+    ROSTER.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.name; $("who").appendChild(o); });
+    $("who").value = ROSTER.some(p => p.id === cur) ? cur : "";
+  }
+  fillWho();
+
+  $("who").onchange = () => {
+    meId = $("who").value; picked = null;
+    try { localStorage.setItem("tv_me_id", meId); } catch(e) {}
+    $("who").value = "";
+    setMsg("", "", false); sync(); render();
+  };
+  $("logout").onclick = () => {
+    meId = ""; picked = null;
+    try { localStorage.removeItem("tv_me_id"); } catch(e) {}
+    setMsg("", "", false); sync(); render();
+  };
+
+  // โชว์การ์ด "คุณคือ…" + โหวตของตัวเอง (เห็นแค่ของตัวเอง)
+  function showMe(){
+    const person = ROSTER.find(p => p.id === meId);
+    const on = !!person;
+    $("loginBox").style.display = on ? "none" : "block";
+    $("meBox").style.display = on ? "flex" : "none";
+    $("themes").classList.toggle("guest", !on);
+    if (!on) return;
+    $("meAvatar").textContent = person.name.trim().charAt(0);
+    $("meName").textContent = person.name;
+    const r = rolesById[meId];
+    const left = MAX_TRIES - triesOf(meId);
+    $("meSub").textContent = (r && r.length ? r.join(", ") : "ยังไม่ได้ลงตำแหน่ง") + (left > 0 ? ` · เหลือสิทธิ์ ${left} ครั้ง` : " · ใช้สิทธิ์ครบแล้ว");
+  }
+
+  // ดึงรายชื่อ + ตำแหน่งจาก index.html (ไฟล์เดียวกันใน repo) ให้ตรงกันเสมอ
+  fetch("index.html", { cache: "no-store" }).then(r => r.ok ? r.text() : Promise.reject()).then(html => {
+    const rosterSrc = (html.match(/const\s+ROSTER\s*=\s*\[([\s\S]*?)\];/) || [])[1];
+    const rolesSrc  = (html.match(/const\s+roles\s*=\s*\[([\s\S]*?)\];/) || [])[1];
+    if (rosterSrc) {
+      const list = [...rosterSrc.matchAll(/id\s*:\s*['"]([^'"]+)['"]\s*,\s*name\s*:\s*['"]([^'"]+)['"]/g)]
+        .map(m => ({ id: m[1], name: m[2] }));
+      if (list.length) BASE_ROSTER = list;
+    }
+    if (rolesSrc) {
+      const map = {};
+      for (const m of rolesSrc.matchAll(/id\s*:\s*['"]([^'"]+)['"][^}]*?name\s*:\s*['"]([^'"]+)['"]/g)) map[m[1]] = m[2];
+      if (Object.keys(map).length) ROLE_NAMES = map;
+    }
+    applyConfig();
+  }).catch(() => { /* เปิดไฟล์ในเครื่อง/โหลดไม่ได้ → ใช้รายชื่อสำรอง */ });
+  const posText = id => (rolesById[id] || []).join(", ") || "-";
+
+  // อัปเดตสถานะปุ่ม
+  function sync(){
+    document.querySelectorAll(".theme").forEach(b => {
+      const on = b.dataset.key === picked;
+      b.classList.toggle("sel", on);
+      b.setAttribute("aria-pressed", on);
+      b.querySelector(".state").textContent = on ? "เลือกแล้ว" : "แตะเพื่อเลือก";
+    });
+    $("themes").classList.toggle("has-pick", !!picked);
+    const open = voteState().open;
+    $("themes").classList.toggle("locked", !open);
+    const full = meId && triesOf(meId) >= MAX_TRIES;
+    const ready = open && !full && picked && meId;
+    $("send").disabled = !ready;
+    const pt = THEMES.find(t => t.key === picked);
+    $("send").textContent = !open ? "ปิดโหวตอยู่" : !meId ? "เลือกชื่อก่อนโหวต" : full ? `ใช้สิทธิ์ครบ ${MAX_TRIES} ครั้งแล้ว`
+      : pt ? `ส่งโหวต “${pt.th}”` : "เลือกธีมก่อน";
+    $("send").classList.toggle("picked", !!(ready && pt));
+    if (pt) $("send").style.setProperty("--c", `var(--${pt.key})`);
+    if ($("msg").dataset.hint) setMsg("");
+    showMe();
+  }
+  function setMsg(text, cls = "", hint = true){
+    $("msg").textContent = text; $("msg").className = "msg " + cls;
+    $("msg").dataset.hint = hint && text ? "1" : "";
+  }
+
+  // ส่งโหวต (ใช้รหัสนักศึกษาเป็นไอดี → 1 คน 1 เสียง ส่งซ้ำจะทับของเดิม)
+  $("send").onclick = async () => {
+    const id = meId, person = ROSTER.find(p => p.id === id);
+    if (!picked || !person) return;
+    if (!voteState().open) { setMsg("ปิดโหวตอยู่", "err", false); sync(); return; }
+    $("send").disabled = true; setMsg("กำลังส่ง…", "", false);
+    try {
+      const trial = !!settings.trialMode;
+      const tries = triesOf(id);
+      if (tries >= MAX_TRIES) { setMsg(`ชื่อนี้โหวตครบ ${MAX_TRIES} ครั้งแล้ว`, "err", false); sync(); return; }
+      await votesRef.doc(docIdOf(id)).set({
+        studentId: id, name: person.name, position: posText(id), theme: picked, trial, count: tries + 1,
+        at: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      setMsg(MAX_TRIES - tries - 1 > 0 ? `${tries ? "แก้โหวตแล้ว" : "โหวตแล้ว"} · แก้ได้อีก ${MAX_TRIES - tries - 1} ครั้ง` : `${tries ? "แก้โหวตแล้ว" : "โหวตแล้ว"} · ใช้สิทธิ์ครบแล้ว`, "ok", false);
+      picked = null;
+      $("board").scrollIntoView({behavior:"smooth", block:"start"});
+    } catch (e) {
+      console.error(e); setMsg("ส่งไม่ได้ ลองอีกที", "err", false);
+    }
+    sync();
+  };
+
+  // สร้างคอลัมน์ผลโหวต (ลำดับคงที่ ไม่สลับไปมา)
+  function makeCol(t){
+    const c = document.createElement("div");
+    c.className = "col"; c.id = "col-" + t.key;
+    c.style.setProperty("--c", `var(--${t.key})`);
+    c.innerHTML = `<div class="crown">♛</div><div class="cnt">0</div><div class="pct">0%</div>
+      <div class="track"><div class="stack"></div></div><div class="cname"></div>`;
+    c.querySelector(".cname").textContent = t.th;
+    c.dataset.n = "0";
+    $("cols").appendChild(c);
+  }
+  // ปุ่มดูผลทั้งหมด (จำสถานะไว้ในเครื่อง)
+  function setOpen(on){
+    $("board").classList.toggle("open", on);
+    $("moreBtn").setAttribute("aria-expanded", on);
+    $("moreBtn").querySelector("span").textContent = on ? "ย่อ" : "ดูผลทั้งหมด";
+    try { localStorage.setItem("tv_open", on ? "1" : ""); } catch(e) {}
+  }
+  $("moreBtn").onclick = () => setOpen(!$("board").classList.contains("open"));
+  try { if (localStorage.getItem("tv_open")) setOpen(true); } catch(e) {}
+
+  // นับเลขขึ้น/ลงแบบไหลๆ
+  function countTo(el, from, to){
+    if (from === to) { el.textContent = to; return; }
+    const t0 = performance.now(), dur = 450;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / dur);
+      el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ฟังผลแบบเรียลไทม์ เรียงจากมากไปน้อย
+  votesRef.onSnapshot(snap => {
+    allVotes = snap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().studentId || d.id }));
+    pickVotes();
+  }, err => {
+    console.error(err);
+    setMsg("โหลดผลไม่ได้ ลองรีเฟรช", "err", false);
+  });
+
+  // เลือกชุดโหวตที่จะนับ: โหมดทดลอง → เฉพาะทดลอง / ปกติ → เฉพาะของจริง (นับแค่คนในรายชื่อ)
+  function pickVotes(){
+    votes = allVotes.filter(v => !!v.trial === !!settings.trialMode &&
+      ROSTER.some(p => p.id === v.id) && THEMES.some(t => t.key === v.theme));
+    render(); renderAdmin(); sync();
+  }
+
+  // ===== สถานะเปิด/ปิด =====
+  const toMs = v => v ? new Date(v).getTime() : null;
+  function voteState(){
+    const now = Date.now(), st = toMs(settings.start), en = toMs(settings.end);
+    if (!settings.open) return { open:false, cls:"off", text:"ปิดโหวต" };
+    if (st && now < st) return { open:false, cls:"wait", text:"เปิดใน", left: st - now };
+    if (en && now >= en) return { open:false, cls:"off", text:"หมดเวลาโหวตแล้ว" };
+    if (en) return { open:true, cls:"on", text:"เปิดโหวต · ปิดใน", left: en - now };
+    return { open:true, cls:"on", text:"เปิดโหวต" };
+  }
+  // แปลงมิลลิวินาทีเป็น "1 วัน 02:13:05"
+  function fmt(ms){
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms % 864e5 / 36e5), m = Math.floor(ms % 36e5 / 6e4), s = Math.floor(ms % 6e4 / 1e3);
+    const p = n => String(n).padStart(2, "0");
+    return (d ? d + " วัน " : "") + `${p(h)}:${p(m)}:${p(s)}`;
+  }
+  let lastOpen = null;
+  function tick(){
+    const st = voteState();
+    $("status").className = "status " + st.cls;
+    $("statusText").innerHTML = "";
+    $("statusText").append(st.text);
+    if (st.left != null) { const b = document.createElement("b"); b.textContent = " " + fmt(st.left); $("statusText").append(b); }
+    $("trialBar").style.display = settings.trialMode ? "block" : "none";
+    if (lastOpen !== st.open) { lastOpen = st.open; sync(); } // เปิด/ปิดเองตามเวลา
+  }
+  setInterval(tick, 1000);
+
+  settingsRef.onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : {};
+    const prevTrial = settings.trialMode;
+    settings = { open: d.open !== false, start: d.start || "", end: d.end || "", trialMode: !!d.trialMode, announcement: d.announcement || "",
+      themes: Array.isArray(d.themes) && d.themes.length ? d.themes : null, title: d.title || "", subtitle: d.subtitle ?? null,
+      maxTries: Number(d.maxTries) || 2, roster: d.roster || {} };
+    applyConfig();
+    settings.announcedAt = d.announcedAt || 0;
+    showAnnouncement();
+    if (!annDirty) $("aAnnounce").value = settings.announcement;
+    lastOpen = null; tick();
+    if (prevTrial !== settings.trialMode) { picked = null; sync(); }
+    pickVotes(); fillTimes();
+  }, err => console.error(err));
+
+  // ===== ประกาศ =====
+  // เด้งหน้าต่างขึ้นเองครั้งแรกที่เจอประกาศใหม่ หลังจากนั้นเหลือแถบเล็กให้กดอ่านซ้ำ
+  const annKey = () => "tv_ann_" + (settings.announcedAt || settings.announcement.length + ":" + settings.announcement.slice(0, 20));
+  function showAnnouncement(){
+    const txt = (settings.announcement || "").trim();
+    $("annPill").style.display = txt ? "flex" : "none";
+    if (!txt) { $("annModal").classList.remove("show"); return; }
+    $("annPreview").textContent = txt.split("\n")[0];
+    $("annBody").textContent = txt;
+    $("annTime").textContent = settings.announcedAt
+      ? "อัปเดต " + new Date(settings.announcedAt).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + " น."
+      : "";
+    let seen = false; try { seen = !!localStorage.getItem(annKey()); } catch(e) {}
+    $("annDot").classList.toggle("new", !seen);
+    if (!seen && !$("win").classList.contains("show")) openAnn();
+  }
+  function openAnn(){ $("annModal").classList.add("show"); }
+  function closeAnn(){
+    $("annModal").classList.remove("show");
+    try { localStorage.setItem(annKey(), "1"); } catch(e) {}
+    $("annDot").classList.remove("new");
+  }
+  $("annPill").onclick = openAnn;
+  $("annOk").onclick = $("annX").onclick = closeAnn;
+  $("annModal").onclick = e => { if (e.target === $("annModal")) closeAnn(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && $("annModal").classList.contains("show")) closeAnn(); });
+
+  // ===== หน้าฉลองผู้ชนะ =====
+  let winShownFor = ""; // กันโชว์ซ้ำตอนข้อมูลอัปเดต
+  function checkWinner(data, total){
+    const done = ROSTER.length > 0 && total >= ROSTER.length;
+    $("reopen").style.display = done ? "block" : "none";
+    const key = (settings.trialMode ? "t" : "r") + total + data.map(x => x.who.length).join("-");
+    if (done && winShownFor !== key) { winShownFor = key; showWinner(data, total); }
+  }
+  function showWinner(data, total){
+    data = data || THEMES.map(t => ({ t, who: votes.filter(v => v.theme === t.key) }));
+    total = total ?? votes.length;
+    const sorted = [...data].sort((a, b) => b.who.length - a.who.length);
+    const max = sorted[0].who.length;
+    const tops = sorted.filter(x => x.who.length === max && max > 0);
+    const w = $("win");
+    const main = tops[0] ? tops[0].t.key : "ink";
+    w.style.setProperty("--c", `var(--${main})`);
+    const word = $("winWord");
+    if (tops.length === 1) {
+      word.className = "win-word"; word.textContent = tops[0].t.th;
+      $("winKicker").textContent = "ธีมที่ชนะคือ";
+      $("winSub").innerHTML = ""; const b = document.createElement("b"); b.textContent = max;
+      $("winSub").append(b, ` เสียง จาก ${total} คน · ${Math.round(max / (total || 1) * 100)}%`);
+    } else if (tops.length > 1) {
+      word.className = "win-word tie"; word.textContent = tops.map(x => x.t.th).join(" · ");
+      $("winKicker").textContent = "ผลออกมา เสมอกัน!";
+      $("winSub").textContent = `ได้ ${max} เสียงเท่ากัน · ต้องตัดสินกันอีกรอบ`;
+    } else {
+      word.className = "win-word tie"; word.textContent = "–";
+      $("winKicker").textContent = "ยังไม่มีผล"; $("winSub").textContent = "ยังไม่มีใครโหวต";
+    }
+    $("winRank").replaceChildren(...THEMES.map(t => {
+      const n = data.find(x => x.t.key === t.key).who.length;
+      const d = document.createElement("div"); d.style.setProperty("--rc", `var(--${t.key})`);
+      if (tops.some(x => x.t.key === t.key)) d.className = "top";
+      const b = document.createElement("b"); b.textContent = t.th;
+      const sp = document.createElement("span"); sp.textContent = `${n} เสียง`;
+      d.append(b, sp); return d;
+    }));
+    $("winFoot").textContent = settings.trialMode ? "ผลจากโหมดทดลอง" : "โหวตครบทั้ง " + ROSTER.length + " คนแล้ว";
+    w.classList.add("show");
+    confetti(tops.map(x => x.t.key));
+  }
+  $("winClose").onclick = () => { $("win").classList.remove("show"); stopConfetti(); };
+  $("reopen").onclick = () => showWinner();
+
+  // พลุกระดาษ (วาดเองบน canvas ไม่ใช้ไลบรารี)
+  let confRAF = 0;
+  function stopConfetti(){ cancelAnimationFrame(confRAF); const c = $("confetti"); c.getContext("2d").clearRect(0, 0, c.width, c.height); }
+  function confetti(keys){
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const cv = $("confetti"), ctx = cv.getContext("2d"), dpr = window.devicePixelRatio || 1;
+    const W = cv.width = innerWidth * dpr, H = cv.height = innerHeight * dpr;
+    const css = getComputedStyle(document.documentElement);
+    const cols = (keys.length ? keys : THEMES.map(t => t.key)).map(k => css.getPropertyValue("--" + k).trim());
+    cols.push("#f3ede7");
+    const parts = [];
+    const burst = (x, n) => { for (let i = 0; i < n; i++) parts.push({
+      x, y: H * 0.95, vx: (Math.random() - .5) * 16 * dpr, vy: -(Math.random() * 16 + 12) * dpr,
+      w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 10) * dpr, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+      c: cols[i % cols.length], life: 0 }); };
+    burst(W * .15, 90); burst(W * .85, 90);
+    setTimeout(() => burst(W * .5, 110), 500);
+    const t0 = performance.now();
+    cancelAnimationFrame(confRAF);
+    const frame = now => {
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach(p => {
+        p.vy += .35 * dpr; p.vx *= .99; p.vy *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2)) + 1);
+        ctx.restore();
+      });
+      if (now - t0 < 5500) confRAF = requestAnimationFrame(frame); else ctx.clearRect(0, 0, W, H);
+    };
+    confRAF = requestAnimationFrame(frame);
+  }
+
+  // ===== Admin =====
+  try { isAdmin = sessionStorage.getItem("tvAdmin") === "1"; } catch(e) {}
+  const saveSettings = patch => settingsRef.set(patch, { merge: true }).catch(e => { console.error(e); alertMsg("บันทึกไม่ได้"); });
+  const alertMsg = t => setMsg(t, "err", false);
+
+  function renderAdmin(){
+    $("admin").style.display = isAdmin ? "block" : "none";
+    $("adminBtn").style.display = isAdmin ? "none" : "inline";
+    if (!isAdmin) return;
+    $("aOpen").textContent = settings.open ? "เปิดอยู่" : "ปิดอยู่";
+    $("aOpen").classList.toggle("on", settings.open);
+    $("aTrial").textContent = settings.trialMode ? "เปิดอยู่" : "ปิดอยู่";
+    $("aTrial").classList.toggle("on", settings.trialMode);
+    $("aTrialCount").textContent = allVotes.filter(v => v.trial).length + " เสียง";
+    $("aRealCount").textContent = allVotes.filter(v => !v.trial).length + " เสียง";
+    renderPeople(); renderThemeEditor(); fillTextInputs();
+  }
+  let timesDirty = false, annDirty = false;
+  $("aAnnounce").oninput = () => { annDirty = true; };
+  $("aSaveAnn").onclick = async () => { annDirty = false; await saveSettings({ announcement: $("aAnnounce").value.trim(), announcedAt: Date.now() }); setMsg("บันทึกประกาศแล้ว", "ok", false); };
+  $("aClearAnn").onclick = () => { annDirty = false; $("aAnnounce").value = ""; saveSettings({ announcement: "", announcedAt: 0 }); };
+  function fillTimes(){ if (!timesDirty) { $("aStart").value = settings.start; $("aEnd").value = settings.end; } }
+  $("aStart").oninput = $("aEnd").oninput = () => { timesDirty = true; };
+
+  $("adminBtn").onclick = () => { $("loginModal").classList.add("show"); $("aKey").value = ""; setTimeout(() => $("aKey").focus(), 50); };
+  $("aCancel").onclick = () => $("loginModal").classList.remove("show");
+  function login(){
+    if ($("aKey").value !== ADMIN_KEY) { $("aKey").value = ""; $("aKey").placeholder = "รหัสไม่ถูก"; return; }
+    isAdmin = true; try { sessionStorage.setItem("tvAdmin", "1"); } catch(e) {}
+    $("loginModal").classList.remove("show"); renderAdmin(); render();
+    $("admin").scrollIntoView({ behavior: "smooth" });
+  }
+  $("aLogin").onclick = login;
+  $("aKey").onkeydown = e => { if (e.key === "Enter") login(); };
+  $("aLogout").onclick = () => { isAdmin = false; try { sessionStorage.removeItem("tvAdmin"); } catch(e) {} renderAdmin(); render(); };
+
+  $("aPreviewWin").onclick = () => showWinner();
+  $("aOpen").onclick = () => saveSettings({ open: !settings.open });
+  $("aTrial").onclick = () => saveSettings({ trialMode: !settings.trialMode });
+  $("aSaveTime").onclick = async () => {
+    const start = $("aStart").value, end = $("aEnd").value;
+    if (start && end && toMs(end) <= toMs(start)) { alertMsg("เวลาปิดต้องหลังเวลาเปิด"); return; }
+    timesDirty = false; await saveSettings({ start, end });
+    setMsg("บันทึกเวลาแล้ว", "ok", false);
+  };
+  $("aClearTime").onclick = () => { timesDirty = false; $("aStart").value = $("aEnd").value = ""; saveSettings({ start: "", end: "" }); };
+
+  // ปุ่มล้าง: กดครั้งแรกถามยืนยัน กดซ้ำภายใน 3 วิถึงลบจริง
+  function confirmBtn(btn, run){
+    let armed = false, timer;
+    btn.onclick = async () => {
+      if (!armed) { armed = true; btn.textContent = "กดอีกครั้งเพื่อยืนยัน"; timer = setTimeout(() => { armed = false; btn.textContent = "ล้าง"; }, 3000); return; }
+      clearTimeout(timer); armed = false; btn.textContent = "กำลังล้าง…";
+      try { await run(); } catch(e) { console.error(e); alertMsg("ล้างไม่ได้"); }
+      btn.textContent = "ล้าง";
+    };
+  }
+  const wipe = list => Promise.all(list.map(v => votesRef.doc(v.docId).delete()));
+  confirmBtn($("aClearTrial"), () => wipe(allVotes.filter(v => v.trial)));
+  confirmBtn($("aClearReal"),  () => wipe(allVotes.filter(v => !v.trial)));
+
+  // ===== ใช้ค่าตั้งค่าจาก Admin กับทั้งหน้า =====
+  let themeSig = "";
+  function applyConfig(){
+    THEMES = (settings.themes || DEFAULT_THEMES).map(t => ({ key: String(t.key), th: String(t.th || "?"), color: t.color || "#f3ede7" }));
+    MAX_TRIES = Math.max(1, settings.maxTries || 2);
+    $("title").textContent = settings.title || "โหวตธีม";
+    $("subtitle").textContent = settings.subtitle ?? "โหวตธีมที่ตัวเองชอบ";
+    buildRoster();
+    const sig = JSON.stringify(THEMES);
+    if (sig !== themeSig) { themeSig = sig; buildThemes(); }
+    fillWho();
+    if (meId && !ROSTER.some(p => p.id === meId)) meId = "";
+    pickVotes(); showMe();
+  }
+
+  // ===== Admin: จัดการคน + โหวตรายคน =====
+  const inAdminEdit = el => el && el.closest && el.closest("#aPeople, #aThemes, .agrid, .addrow");
+  function allPeople(){ // ทุกคนรวมคนที่ซ่อน
+    const ed = settings.roster || {}, rename = ed.rename || {}, hide = new Set(ed.hide || []);
+    return BASE_ROSTER.map(p => ({ ...p, base: true })).concat((ed.add || []).map(p => ({ ...p, extra: true })))
+      .map(p => ({ ...p, name: rename[p.id] || p.name, orig: p.name, hidden: hide.has(p.id) }));
+  }
+  const saveRoster = patch => saveSettings({ roster: { ...(settings.roster || {}), ...patch } });
+
+  function renderPeople(){
+    if (!isAdmin || inAdminEdit(document.activeElement)) return;
+    $("aModeName").textContent = settings.trialMode ? "ทดลอง" : "จริง";
+    $("aPeople").replaceChildren(...allPeople().map(p => {
+      const row = document.createElement("div"); row.className = "prow" + (p.hidden ? " hidden" : "");
+      const v = allVotes.find(x => x.docId === docIdOf(p.id));
+      // ชื่อ (แก้ได้)
+      const nm = document.createElement("input"); nm.value = p.name; nm.title = "แก้ชื่อ แล้วกด Enter";
+      nm.onchange = () => {
+        const rename = { ...((settings.roster || {}).rename || {}) };
+        const val = nm.value.trim();
+        if (!val || val === p.orig) delete rename[p.id]; else rename[p.id] = val;
+        saveRoster({ rename });
+      };
+      // เลือกธีมแทน
+      const sel = document.createElement("select");
+      sel.innerHTML = '<option value="">ยังไม่โหวต</option>';
+      THEMES.forEach(t => { const o = document.createElement("option"); o.value = t.key; o.textContent = t.th; sel.appendChild(o); });
+      if (v && !THEMES.some(t => t.key === v.theme)) { const o = document.createElement("option"); o.value = v.theme; o.textContent = "(ธีมที่ลบแล้ว)"; sel.appendChild(o); }
+      sel.value = v ? v.theme : "";
+      sel.onchange = () => {
+        if (!sel.value) return votesRef.doc(docIdOf(p.id)).delete().catch(adminErr);
+        votesRef.doc(docIdOf(p.id)).set({ studentId: p.id, name: p.name, position: posText(p.id), theme: sel.value,
+          trial: !!settings.trialMode, count: v ? (v.count ?? 1) : 1, byAdmin: true,
+          at: firebase.firestore.FieldValue.serverTimestamp() }).catch(adminErr);
+      };
+      const del = document.createElement("button"); del.className = "mini warn pdel"; del.textContent = "ลบโหวต";
+      del.disabled = !v; del.onclick = () => votesRef.doc(docIdOf(p.id)).delete().catch(adminErr);
+      // แถวล่าง: สิทธิ์ + ปุ่ม
+      const meta = document.createElement("div"); meta.className = "pmeta";
+      const sp = document.createElement("span"); sp.className = "sp";
+      const used = v ? (v.count ?? 1) : 0;
+      sp.textContent = (p.extra ? "เพิ่มเอง · " : "") + (p.id.startsWith("x_") ? "" : p.id + " · ") + `ใช้สิทธิ์ ${used}/${MAX_TRIES}` + (v && v.byAdmin ? " · Admin ตั้ง" : "");
+      const reset = document.createElement("button"); reset.className = "mini"; reset.textContent = "คืนสิทธิ์";
+      reset.disabled = !v || used === 0;
+      reset.onclick = () => votesRef.doc(docIdOf(p.id)).update({ count: 0 }).catch(adminErr);
+      const hide = document.createElement("button"); hide.className = "mini"; hide.textContent = p.hidden ? "แสดง" : "ซ่อน";
+      hide.onclick = () => {
+        const h = new Set((settings.roster || {}).hide || []);
+        p.hidden ? h.delete(p.id) : h.add(p.id);
+        saveRoster({ hide: [...h] });
+      };
+      meta.append(sp, reset, hide);
+      if (p.extra) {
+        const rm = document.createElement("button"); rm.className = "mini warn"; rm.textContent = "ลบคน";
+        rm.onclick = () => saveRoster({ add: ((settings.roster || {}).add || []).filter(x => x.id !== p.id) });
+        meta.append(rm);
+      }
+      row.append(nm, sel, del, meta);
+      return row;
+    }));
+  }
+  const adminErr = e => { console.error(e); setMsg("บันทึกไม่ได้", "err", false); };
+  $("aAddPerson").onclick = () => {
+    const name = $("aNewName").value.trim(); if (!name) return;
+    let id = $("aNewId").value.trim().replace(/[\/.#$\[\]\s]/g, "") || "x_" + Date.now().toString(36);
+    if (allPeople().some(p => p.id === id)) { setMsg("รหัสนี้มีอยู่แล้ว", "err", false); return; }
+    saveRoster({ add: [ ...((settings.roster || {}).add || []), { id, name } ] });
+    $("aNewName").value = $("aNewId").value = "";
+  };
+
+  // ===== Admin: ธีม =====
+  let themeDraft = null; // ร่างที่ยังไม่บันทึก
+  function renderThemeEditor(){
+    if (!isAdmin || inAdminEdit(document.activeElement)) return;
+    const list = themeDraft || THEMES;
+    $("aThemes").replaceChildren(...list.map((t, i) => {
+      const r = document.createElement("div"); r.className = "threw";
+      const c = document.createElement("input"); c.type = "color"; c.value = /^#[0-9a-f]{6}$/i.test(t.color) ? t.color : "#f3ede7";
+      const n = document.createElement("input"); n.type = "text"; n.value = t.th; n.maxLength = 12;
+      const x = document.createElement("button"); x.className = "mini warn"; x.textContent = "ลบ";
+      const edit = () => { themeDraft = themeDraft || THEMES.map(o => ({ ...o })); return themeDraft[i]; };
+      c.oninput = () => { edit().color = c.value; };
+      n.oninput = () => { edit().th = n.value; };
+      x.onclick = () => {
+        themeDraft = themeDraft || THEMES.map(o => ({ ...o }));
+        if (themeDraft.length <= 2) { setMsg("ต้องมีอย่างน้อย 2 ธีม", "err", false); return; }
+        themeDraft.splice(i, 1); renderThemeEditor();
+      };
+      r.append(c, n, x); return r;
+    }));
+  }
+  $("aAddTheme").onclick = () => {
+    themeDraft = themeDraft || THEMES.map(o => ({ ...o }));
+    if (themeDraft.length >= 6) { setMsg("สูงสุด 6 ธีม", "err", false); return; }
+    const pal = ["#4fc3d9", "#7fd49b", "#ff9f43", "#c8d65a", "#e0e0e0"];
+    themeDraft.push({ key: "t" + Date.now().toString(36), th: "ธีมใหม่", color: pal[themeDraft.length % pal.length] });
+    renderThemeEditor();
+  };
+  $("aResetThemes").onclick = () => { themeDraft = DEFAULT_THEMES.map(o => ({ ...o })); renderThemeEditor(); };
+  $("aSaveThemes").onclick = async () => {
+    const list = (themeDraft || THEMES).map(t => ({ key: t.key, th: t.th.trim() || "?", color: t.color }));
+    themeDraft = null; await saveSettings({ themes: list }); setMsg("บันทึกธีมแล้ว", "ok", false);
+  };
+
+  // ===== Admin: ข้อความ + สิทธิ์ =====
+  function fillTextInputs(){
+    if (!isAdmin || inAdminEdit(document.activeElement)) return;
+    $("aTitle").value = settings.title || "โหวตธีม";
+    $("aSubtitle").value = settings.subtitle ?? "โหวตธีมที่ตัวเองชอบ";
+    $("aMax").value = MAX_TRIES;
+  }
+  $("aSaveText").onclick = async () => {
+    const maxTries = Math.min(20, Math.max(1, parseInt($("aMax").value, 10) || 2));
+    await saveSettings({ title: $("aTitle").value.trim(), subtitle: $("aSubtitle").value.trim(), maxTries });
+    setMsg("บันทึกแล้ว", "ok", false);
+  };
+
+  buildThemes();
+  renderAdmin();
+
+  // ดึงตำแหน่งจาก Position System (ไม่นับที่ถูกลบ/ข้อมูลทดลอง)
+  entriesRef.onSnapshot(snap => {
+    rolesById = {};
+    snap.docs.map(d => d.data()).filter(e => !e.removed && !e.trial && e.studentId).forEach(e => {
+      (rolesById[e.studentId] ||= []).push(ROLE_NAMES[e.role] || e.role);
+    });
+    showMe(); sync(); render();
+  }, err => console.error(err));
+
+  // วาดผลโหวต
+  function render(){
+    const total = votes.length;
+    const data = THEMES.map(t => ({ t, who: votes.filter(v => v.theme === t.key) }));
+    const max = Math.max(...data.map(x => x.who.length));
+    // สเกลคอลัมน์: บล็อกใหญ่ตอนเสียงน้อย แล้วค่อยเล็กลงเมื่อคะแนนสูงขึ้น (สูงสุด = จำนวนคนทั้งหมด)
+    $("cols").style.setProperty("--slots", Math.min(Math.max(6, max + 2), Math.max(ROSTER.length, 1)));
+    const leaders = data.filter(x => max > 0 && x.who.length === max);
+
+    data.forEach(x => {
+      const c = $("col-" + x.t.key), n = x.who.length, prev = +c.dataset.n;
+      c.dataset.n = n;
+      c.classList.toggle("lead", leaders.includes(x));
+      countTo(c.querySelector(".cnt"), prev, n);
+      c.querySelector(".pct").textContent = total ? Math.round(n / total * 100) + "%" : "0%";
+      // เพิ่ม/ลดบล็อกให้เท่าจำนวนเสียง บล็อกใหม่ตกลงมา
+      const stack = c.querySelector(".stack");
+      while (stack.children.length > n) stack.lastElementChild.remove();
+      for (let k = stack.children.length; k < n; k++) {
+        const chip = document.createElement("div");
+        chip.className = "chip" + (firstRender ? "" : " drop");
+        chip.innerHTML = "<i></i>";
+        if (!firstRender) chip.firstChild.style.animationDelay = ((k - prev) * 0.08) + "s";
+        stack.appendChild(chip);
+      }
+      if (!firstRender && n > prev) { c.classList.remove("bump"); void c.offsetWidth; c.classList.add("bump"); }
+    });
+    firstRender = false;
+    checkWinner(data, total);
+
+    // หัวข้อด้านบน
+    const hl = $("headline");
+    hl.style.removeProperty("--c");
+    hl.textContent = !total ? "ผลโหวต" : leaders.length === 1 ? "ธีมที่นำอยู่" : `เสมอกัน ${leaders.length} ธีม`;
+
+    // การ์ดธีมที่นำ (สร้างใหม่เฉพาะตอนผลเปลี่ยน จะได้เด้งตอนมีการเปลี่ยนแปลง)
+    const sig = total + "|" + leaders.map(x => x.t.key + x.who.length).join(",");
+    if ($("leader").dataset.sig !== sig) {
+      $("leader").dataset.sig = sig;
+      if (!total) {
+        const e = document.createElement("div"); e.className = "lead-empty"; e.textContent = "ยังไม่มีใครโหวต";
+        $("leader").replaceChildren(e);
+      } else $("leader").replaceChildren(...leaders.map(x => {
+        const n = x.who.length, pct = Math.round(n / total * 100);
+        const c = document.createElement("div"); c.className = "lead-card"; c.style.setProperty("--c", `var(--${x.t.key})`);
+        c.innerHTML = `<div class="ring" style="--p:${pct}"><span>${pct}%</span></div>
+          <div class="lt"><div class="lw"></div><div class="ln">${n} เสียง จาก ${total}</div></div>
+          <div class="lk">♛ ${leaders.length > 1 ? "นำร่วม" : "นำ"}</div>`;
+        c.querySelector(".lw").textContent = x.t.th;
+        return c;
+      }));
+    }
+    $("boardTotal").textContent = `${total}/${ROSTER.length} คน`;
+
+    // ชื่อคนโหวต เฉพาะ Admin
+    const wa = $("whoAdmin");
+    wa.style.display = isAdmin && total ? "block" : "none";
+    wa.replaceChildren(...(isAdmin ? data.filter(x => x.who.length) : []).map(x => {
+      const p = document.createElement("p"); p.style.setProperty("--c", `var(--${x.t.key})`);
+      const b = document.createElement("b"); b.textContent = x.t.th;
+      p.append(b, x.who.map(v => { const nm = ROSTER.find(q => q.id === v.id).name, ps = rolesById[v.id]; return ps && ps.length ? `${nm} (${ps.join(", ")})` : nm; }).join(", "));
+      return p;
+    }));
+    // แถบรายชื่อ: บอกแค่ โหวตแล้ว / ยังไม่โหวต — Admin เห็นว่าเลือกธีมอะไร
+    $("pendingCount").textContent = `โหวตแล้ว ${total}/${ROSTER.length}`;
+    $("progBar").style.width = ROSTER.length ? (total / ROSTER.length * 100) + "%" : "0";
+    $("pending").replaceChildren(...ROSTER.map(p => {
+      const v = votes.find(x => x.id === p.id);
+      const li = document.createElement("li"); if (v) li.className = "yes";
+      if (p.id === meId) li.classList.add("me-row");
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = p.name;
+      const tag = document.createElement("span"); tag.className = "tag";
+      if (v && isAdmin) {
+        const t = THEMES.find(t => t.key === v.theme);
+        tag.classList.add("th"); tag.style.setProperty("--c", `var(--${t.key})`); tag.textContent = t.th;
+      } else tag.textContent = v ? "โหวตแล้ว" : "ยังไม่โหวต";
+      li.append(nm, tag); return li;
+    }));
+  }
+</script>
+</body>
+</html>
