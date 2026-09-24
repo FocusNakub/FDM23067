@@ -10,9 +10,9 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
-<!-- ฟอนต์: Kanit สำหรับหัวข้อ / IBM Plex Sans Thai สำหรับเนื้อหา -->
+<!-- ฟอนต์: Anuphan สำหรับหัวข้อ/ชื่อธีม · Noto Sans Thai สำหรับเนื้อหา (ไม่มีหัว อ่านง่าย ทันสมัย) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Firebase SDK (compat) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -29,7 +29,7 @@
   *{box-sizing:border-box;margin:0;}
   html{-webkit-text-size-adjust:100%;}
   body{
-    font-family:'IBM Plex Sans Thai',sans-serif; background:var(--bg); color:var(--ink);
+    font-family:'Noto Sans Thai',sans-serif; background:var(--bg); color:var(--ink);
     min-height:100vh; line-height:1.55; overflow-x:hidden;
   }
   .wrap{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:28px 16px 56px;}
@@ -37,7 +37,7 @@
   .side{margin-top:22px;}
   .side-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 16px 10px;}
   .side-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
-  .side-head h2{font-family:'Kanit',sans-serif;font-weight:500;font-size:17px;}
+  .side-head h2{font-family:'Anuphan',sans-serif;font-weight:500;font-size:17px;}
   .side-head span{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums;}
   .prog{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:-2px 0 12px;}
   .prog i{display:block;height:100%;width:0;background:var(--ok);border-radius:3px;transition:width .6s ease;}
@@ -59,19 +59,36 @@
 
   .hero{padding:20px 0 24px;}
   .hero-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start;}
-  @media (min-width:700px){ .hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);} }
+  @media (min-width:700px){ .hero-grid{grid-template-columns:minmax(0,1fr) 290px;} }
   /* กล่องรายงานตำแหน่ง */
-  .roles-box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px;
+  .roles-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 12px 10px;max-width:420px;
     position:relative;overflow:hidden;isolation:isolate;}
   .roles-box::before{content:"";position:absolute;z-index:-1;width:60%;aspect-ratio:1;right:-20%;top:-50%;border-radius:50%;
     background:radial-gradient(circle,rgba(155,124,242,.25),transparent 65%);}
   .rb-head{display:flex;justify-content:space-between;align-items:center;gap:8px;}
-  .rb-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;}
+  .rb-title{font-family:'Anuphan',sans-serif;font-weight:600;font-size:14px;}
   .rb-count{font-size:12px;color:var(--soft);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;
     font-variant-numeric:tabular-nums;}
-  .rb-bar{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:10px 0 12px;}
+  .rb-bar{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:10px 0 6px;}
   .rb-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--delusion),var(--love));transition:width .6s ease;}
-  .rb-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .rb-list{position:relative;height:calc(3 * 31px);overflow:hidden;}
+  .rb-page{position:absolute;inset:0;display:flex;flex-direction:column;animation:rbIn .5s cubic-bezier(.2,.9,.3,1) both;}
+  .rb-page.out{animation:rbOut .4s ease both;}
+  @keyframes rbIn{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+  @keyframes rbOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-40%)}}
+  .rb-pager{display:flex;gap:4px;justify-content:center;margin-top:8px;height:5px;}
+  .rb-pager i{width:5px;height:5px;border-radius:3px;background:var(--line);transition:width .3s,background .3s;}
+  .rb-pager i.on{width:14px;background:var(--soft);}
+  .rb-num{font-size:12px;color:var(--soft);font-variant-numeric:tabular-nums;}
+  .rb-row{height:31px;display:grid;grid-template-columns:minmax(0,1fr) auto 70px;align-items:center;gap:8px;padding:0;border-bottom:1px solid var(--line);font-size:13px;}
+  .rb-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rb-dots{display:flex;gap:3px;}
+  .rb-dots i{width:8px;height:8px;border-radius:50%;background:transparent;border:1.5px solid var(--faint);}
+  .rb-dots i.on{background:var(--ok);border-color:var(--ok);}
+  .rb-st{font-size:11px;color:var(--err);white-space:nowrap;min-width:62px;text-align:right;}
+  .rb-row.done .rb-st{color:var(--ok);}
+  .rb-row.done .rb-nm{color:var(--soft);}
+  .rb-row.other .rb-nm{color:var(--faint);font-style:italic;}
   .rb-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 9px 5px 8px;border-radius:9px;
     background:var(--surface2);border:1px dashed rgba(255,122,107,.45);color:var(--ink);}
   .rb-chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--err);}
@@ -81,12 +98,12 @@
   .rb-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--soft);text-decoration:none;}
   .rb-link:hover{color:var(--ink);}
   .gap{height:22px;}
-  .hero h1{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(36px,9vw,52px);line-height:1.05;letter-spacing:-.01em;}
+  .hero h1{font-family:'Anuphan',sans-serif;font-weight:700;font-size:clamp(36px,9vw,52px);line-height:1.05;letter-spacing:-.01em;}
   .hero p{color:var(--soft);font-size:15px;margin-top:14px;max-width:460px;}
 
   /* ===== หัวข้อแต่ละขั้น ===== */
   .step{display:flex;align-items:baseline;gap:12px;margin:34px 0 14px;}
-  .step h2{font-family:'Kanit',sans-serif;font-weight:500;font-size:20px;}
+  .step h2{font-family:'Anuphan',sans-serif;font-weight:500;font-size:20px;}
 
   /* ===== ช่องกรอก ===== */
   .field{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px 8px;transition:border-color .15s;}
@@ -106,7 +123,7 @@
   .pick-btn:hover{border-color:rgba(155,124,242,.7);box-shadow:0 14px 34px -16px rgba(155,124,242,.6);transform:translateY(-2px);}
   .pick-btn:active{transform:scale(.985);}
   .pick-btn:disabled{opacity:.5;cursor:default;} .pick-btn:disabled::after{display:none;}
-  .pick-av{width:44px;height:44px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Kanit',sans-serif;
+  .pick-av{width:44px;height:44px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Anuphan',sans-serif;
     font-size:20px;font-weight:700;color:#17110e;background:conic-gradient(from 200deg,var(--greed),var(--anger),var(--delusion),var(--love),var(--greed));
     box-shadow:0 0 0 3px var(--surface),0 0 0 4px rgba(155,124,242,.4);}
   .pick-t{flex:1;min-width:0;display:flex;flex-direction:column;}
@@ -125,7 +142,7 @@
   @keyframes slideup{from{transform:translateY(100%)}to{transform:none}}
   .sheet-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 10px;}
   .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-  .sheet-head h3{font-family:'Kanit',sans-serif;font-weight:600;font-size:20px;}
+  .sheet-head h3{font-family:'Anuphan',sans-serif;font-weight:600;font-size:20px;}
   .sheet-head .ann-x{position:static;}
   .search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-bottom:10px;}
   .search:focus-within{border-color:var(--soft);}
@@ -136,7 +153,7 @@
     background:var(--surface2);border:1px solid transparent;border-radius:14px;padding:9px 12px;transition:border-color .15s,background .15s,transform .1s;}
   .prow2:hover{border-color:var(--line);background:#26211d;}
   .prow2:active{transform:scale(.985);}
-  .prow2 .av{width:36px;height:36px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Kanit',sans-serif;
+  .prow2 .av{width:36px;height:36px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Anuphan',sans-serif;
     font-weight:700;font-size:15px;color:#17110e;background:var(--ac);}
   .prow2 .nm{flex:1;min-width:0;display:flex;flex-direction:column;}
   .prow2 .nm b{font-weight:500;font-size:15px;overflow-wrap:anywhere;}
@@ -151,7 +168,7 @@
 
   .me{display:none;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
   .avatar{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;
-    font-family:'Kanit',sans-serif;font-weight:700;font-size:17px;flex:0 0 auto;}
+    font-family:'Anuphan',sans-serif;font-weight:700;font-size:17px;flex:0 0 auto;}
   .me-info{min-width:0;flex:1;}
   .me-name{font-weight:600;font-size:15px;overflow-wrap:anywhere;}
   .me-sub{font-size:12px;color:var(--faint);}
@@ -185,12 +202,12 @@
     transition:transform .8s ease;
   }
   /* ตัวหนังสือจางๆ ใหญ่ๆ เป็นลายพื้นหลัง */
-  .theme .ghost{position:absolute;z-index:-1;right:-6%;bottom:-18%;font-family:'Kanit',sans-serif;font-weight:800;
+  .theme .ghost{position:absolute;z-index:-1;right:-6%;bottom:-18%;font-family:'Anuphan',sans-serif;font-weight:700;
     font-size:clamp(90px,26vw,130px);line-height:1;color:var(--c);opacity:.07;white-space:nowrap;pointer-events:none;
     transition:transform .5s ease,opacity .3s;}
   .theme .state{font-size:12px;color:var(--soft);display:flex;align-items:center;gap:6px;}
   .theme .state::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.7;}
-  .theme .word{position:relative;font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(36px,11vw,50px);line-height:1;
+  .theme .word{position:relative;font-family:'Anuphan',sans-serif;font-weight:700;font-size:clamp(36px,11vw,50px);line-height:1;
     color:var(--c);letter-spacing:-.01em;transition:color .25s,transform .3s;}
   .theme .tick{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;
     border:1.5px solid color-mix(in srgb,var(--c) 40%,var(--line));display:grid;place-items:center;font-size:14px;
@@ -214,7 +231,7 @@
   .theme.sel .word{color:#17110e;animation:pop .45s cubic-bezier(.2,1.6,.4,1);}
   .theme.sel .state{color:rgba(23,17,14,.75);} .theme.sel .state::before{background:#17110e;}
   .theme.sel .tick{background:#17110e;border-color:#17110e;color:var(--c);}
-  .theme.sel .tick::after{content:"✓";font-weight:800;}
+  .theme.sel .tick::after{content:"✓";font-weight:700;}
   @keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.08)}100%{transform:none}}
   /* พอเลือกแล้ว ใบอื่นจางลงนิดนึง */
   .themes.has-pick .theme:not(.sel){opacity:.55;filter:saturate(.6);}
@@ -223,7 +240,7 @@
 
   /* ===== ปุ่มส่ง ===== */
   .send{margin-top:14px;width:100%;border:none;border-radius:14px;padding:13px;transition:background .2s,box-shadow .2s,opacity .15s;cursor:pointer;
-    font-family:'Kanit',sans-serif;font-weight:500;font-size:18px;letter-spacing:.02em;
+    font-family:'Anuphan',sans-serif;font-weight:500;font-size:18px;letter-spacing:.02em;
     background:var(--ink);color:var(--bg);transition:opacity .15s,transform .1s;}
   .send:active:not(:disabled){transform:scale(.99);}
   .send:disabled{opacity:.25;cursor:default;}
@@ -235,7 +252,7 @@
   /* ===== ผลโหวต: คอลัมน์ธีม ซ้อนบล็อกทีละเสียง ===== */
   .board{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px;}
   .board-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;min-height:1.6em;}
-  .headline{font-family:'Kanit',sans-serif;font-size:15px;font-weight:500;}
+  .headline{font-family:'Anuphan',sans-serif;font-size:15px;font-weight:500;}
   .headline b{color:var(--c,var(--ink));font-weight:700;}
   .board-head span{font-size:13px;color:var(--faint);}
   /* ธีมที่นำ (โชว์ตลอด) */
@@ -251,7 +268,7 @@
   .ring span{width:38px;height:38px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;
     font-size:12px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;}
   .lead-card .lt{min-width:0;flex:1;}
-  .lead-card .lw{font-family:'Kanit',sans-serif;font-weight:700;font-size:24px;line-height:1.15;color:var(--c);}
+  .lead-card .lw{font-family:'Anuphan',sans-serif;font-weight:700;font-size:24px;line-height:1.15;color:var(--c);}
   .lead-card .ln{font-size:12px;color:var(--soft);}
   .lead-card .lk{flex:0 0 auto;font-size:11px;font-weight:600;color:#17110e;background:var(--c);border-radius:999px;padding:3px 9px;
     display:flex;align-items:center;gap:4px;}
@@ -273,7 +290,7 @@
     transition:opacity .3s,transform .3s;}
   .col.lead .crown{opacity:1;transform:none;animation:bob 1.8s ease-in-out infinite;}
   @keyframes bob{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-4px) rotate(6deg)}}
-  .cnt{font-family:'Kanit',sans-serif;font-weight:700;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums;}
+  .cnt{font-family:'Anuphan',sans-serif;font-weight:700;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums;}
   .col.lead .cnt{color:var(--c);}
   .pct{font-size:12px;color:var(--faint);margin-bottom:8px;font-variant-numeric:tabular-nums;}
   .track{position:relative;width:100%;max-width:92px;height:220px;border-radius:14px;
@@ -288,7 +305,7 @@
   .col.lead .track{border-style:solid;border-color:var(--c);box-shadow:0 0 24px -6px var(--c);}
   .col.bump .cnt{animation:bump .5s ease;}
   @keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
-  .cname{font-family:'Kanit',sans-serif;font-weight:700;font-size:22px;color:var(--c);margin-top:10px;}
+  .cname{font-family:'Anuphan',sans-serif;font-weight:700;font-size:22px;color:var(--c);margin-top:10px;}
   .who-admin{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;display:none;}
   .who-admin p{font-size:13px;color:var(--faint);margin:4px 0;}
   .who-admin b{color:var(--c);font-weight:600;margin-right:6px;}
@@ -306,6 +323,27 @@
   .status.on i{background:var(--ok);} .status.wait i{background:var(--greed);} .status.off i{background:var(--err);}
   .status b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums;}
   /* ===== ประกาศ: แถบเล็กด้านบน + หน้าต่างป๊อปอัป ===== */
+  .hero-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .hero-row .status{margin-top:0;}
+  .help-btn{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;color:var(--soft);cursor:pointer;
+    background:none;border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 8px;transition:color .2s,border-color .2s;}
+  .help-btn::before{content:"?";width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;
+    background:var(--surface2);color:var(--ink);}
+  .help-btn:hover{color:var(--ink);border-color:var(--soft);}
+  .ann-card.help-card{background:linear-gradient(170deg,#1f1b2b,var(--surface) 45%);border-color:rgba(155,124,242,.35);}
+  .help-card h3{margin-bottom:14px;}
+  .steps{list-style:none;padding:0;margin:0;counter-reset:st;display:flex;flex-direction:column;gap:10px;}
+  .steps li{counter-increment:st;display:grid;grid-template-columns:30px 1fr;column-gap:12px;align-items:start;}
+  .steps li::before{content:counter(st);grid-row:span 2;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;
+    font-family:'Anuphan',sans-serif;font-weight:700;font-size:14px;color:#17110e;background:var(--delusion);}
+  .steps li:nth-child(2)::before{background:var(--love);} .steps li:nth-child(3)::before{background:var(--anger);} .steps li:nth-child(4)::before{background:var(--greed);}
+  .steps b{font-size:15px;font-weight:600;}
+  .steps span{font-size:13px;color:var(--soft);line-height:1.55;}
+  .help-notes{margin-top:16px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.2);border:1px solid var(--line);}
+  .help-notes p{font-size:13px;color:var(--soft);line-height:1.6;padding-left:14px;position:relative;margin:0;}
+  .help-notes p+p{margin-top:6px;}
+  .help-notes p::before{content:"";position:absolute;left:0;top:.65em;width:5px;height:5px;border-radius:50%;background:var(--faint);}
+  .ann-ok.help-ok{background:var(--ink);}
   .ann-pill{display:none;align-items:center;gap:10px;width:100%;margin:0 0 18px;padding:9px 12px 9px 9px;cursor:pointer;text-align:left;
     background:linear-gradient(100deg,rgba(232,180,58,.14),var(--surface) 70%);border:1px solid rgba(232,180,58,.35);border-radius:14px;
     color:var(--ink);font:inherit;transition:border-color .2s,transform .15s;}
@@ -318,7 +356,13 @@
   @keyframes ping{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
   .ann-txt{min-width:0;flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .ann-txt small{color:var(--faint);font-size:12px;margin-right:6px;}
-  .ann-go{flex:0 0 auto;font-size:12px;color:var(--greed);}
+  .ann-go{flex:0 0 auto;font-size:12px;color:var(--greed);transition:transform .25s;}
+  .ann-txt em{display:none;font-style:normal;font-size:11px;color:var(--faint);margin-top:6px;}
+  .ann-pill.open{align-items:flex-start;}
+  .ann-pill.open .ann-txt{white-space:pre-wrap;overflow:visible;line-height:1.65;}
+  .ann-pill.open .ann-txt small{display:block;margin-bottom:2px;}
+  .ann-pill.open .ann-txt em{display:block;}
+  .ann-pill.open .ann-go{transform:rotate(180deg);margin-top:6px;}
 
   .ann-modal{position:fixed;inset:0;z-index:15;display:none;align-items:center;justify-content:center;padding:16px;
     background:rgba(8,6,5,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
@@ -328,7 +372,7 @@
     box-shadow:0 30px 80px -20px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.03) inset;animation:rise .4s cubic-bezier(.2,1.3,.4,1);}
   @keyframes rise{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:none;opacity:1}}
   .ann-card .ann-ico{width:46px;height:46px;border-radius:14px;font-size:22px;margin-bottom:14px;box-shadow:0 10px 30px -10px var(--greed);}
-  .ann-card h3{font-family:'Kanit',sans-serif;font-weight:600;font-size:20px;margin-bottom:2px;}
+  .ann-card h3{font-family:'Anuphan',sans-serif;font-weight:600;font-size:20px;margin-bottom:2px;}
   .ann-time{font-size:12px;color:var(--faint);margin-bottom:14px;}
   .ann-body{font-size:15px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);
     background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:14px;padding:14px;}
@@ -342,7 +386,7 @@
 
   /* แผง Admin */
   .admin{display:none;margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;}
-  .admin h3{font-family:'Kanit',sans-serif;font-weight:500;font-size:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .admin h3{font-family:'Anuphan',sans-serif;font-weight:500;font-size:18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
   .admin h3 button{font-size:13px;}
   .arow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line);flex-wrap:wrap;}
   .arow span{font-size:14px;} .arow small{display:block;font-size:12px;color:var(--faint);}
@@ -365,17 +409,17 @@
   .win canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;}
   .win-box{position:relative;text-align:center;max-width:520px;width:100%;}
   .win-kicker{font-size:16px;color:var(--soft);}
-  .win-word{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(96px,32vw,190px);line-height:1;color:var(--c);
+  .win-word{font-family:'Anuphan',sans-serif;font-weight:700;font-size:clamp(96px,32vw,190px);line-height:1;color:var(--c);
     margin:14px 0 6px;text-shadow:0 0 60px color-mix(in srgb,var(--c) 55%,transparent);animation:zoom .9s cubic-bezier(.2,1.6,.4,1) both .2s;}
   .win-word.landed{animation:zoom .7s cubic-bezier(.2,1.6,.4,1) both;}
   .win-word.tie{font-size:clamp(56px,17vw,110px);}
   @keyframes zoom{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
   .win-sub{font-size:17px;color:var(--ink);animation:up .6s ease both .7s;}
-  .win-sub b{font-family:'Kanit',sans-serif;font-size:22px;color:var(--c);}
+  .win-sub b{font-family:'Anuphan',sans-serif;font-size:22px;color:var(--c);}
   @keyframes up{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
   .win-rank{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:8px;margin:30px 0 26px;animation:up .6s ease both 1s;}
   .win-rank div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:10px 4px;}
-  .win-rank b{display:block;font-family:'Kanit',sans-serif;font-size:20px;color:var(--rc);}
+  .win-rank b{display:block;font-family:'Anuphan',sans-serif;font-size:20px;color:var(--rc);}
   .win-rank span{font-size:12px;color:var(--faint);}
   .win-rank .top{border-color:var(--rc);background:color-mix(in srgb,var(--rc) 12%,transparent);}
   .win-btn{background:var(--ink);color:var(--bg);border:none;border-radius:14px;padding:13px 26px;font:inherit;font-weight:600;
@@ -432,26 +476,29 @@
 <div class="main">
 
   <section class="hero">
-    <button class="ann-pill" id="annPill" aria-label="เปิดประกาศ">
+    <button class="ann-pill" id="annPill" aria-expanded="false" aria-label="ประกาศ กดเพื่ออ่านทั้งหมด">
       <span class="ann-ico" id="annDot">📢</span>
-      <span class="ann-txt"><small>ประกาศ</small><span id="annPreview"></span></span>
-      <span class="ann-go">อ่าน ›</span>
+      <span class="ann-txt"><small>ประกาศ</small><span id="annPreview"></span><em id="annPillTime"></em></span>
+      <span class="ann-go">▾</span>
     </button>
     <div class="hero-grid">
       <div>
         <h1 id="title">โหวตธีม</h1>
         <p id="subtitle">โหวตธีมที่ตัวเองชอบ</p>
-        <div class="status" id="status"><i></i><span id="statusText">กำลังโหลด…</span></div>
+        <div class="hero-row">
+          <div class="status" id="status"><i></i><span id="statusText">กำลังโหลด…</span></div>
+          <button class="help-btn" id="helpBtn">วิธีใช้</button>
+        </div>
       </div>
       <!-- รายงานตำแหน่งที่ยังไม่มีคนลง (ดึงจากระบบลงตำแหน่ง index.html) -->
       <div class="roles-box" id="rolesBox">
         <div class="rb-head">
-          <span class="rb-title">ตำแหน่งที่ยังว่าง</span>
+          <span class="rb-title">โหวตแล้วตามตำแหน่ง</span>
           <span class="rb-count" id="rbCount">–</span>
         </div>
         <div class="rb-bar"><i id="rbBar"></i></div>
         <div class="rb-list" id="rbList"><span class="rb-empty">กำลังโหลด…</span></div>
-        <a class="rb-link" href="index.html">ไปลงตำแหน่ง ›</a>
+        <div class="rb-pager" id="rbPager"></div>
       </div>
     </div>
     <div class="trial" id="trialBar">โหมดทดลอง · โหวตตอนนี้ไม่นับจริง</div>
@@ -584,6 +631,27 @@
     </div>
   </div>
 
+  <!-- หน้าต่างวิธีใช้ -->
+  <div class="ann-modal" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="ann-card help-card">
+      <button class="ann-x" id="helpX" aria-label="ปิด">✕</button>
+      <h3 id="helpTitle">วิธีโหวต</h3>
+      <ol class="steps">
+        <li><b>เลือกชื่อตัวเอง</b><span>แตะปุ่ม "แตะเพื่อเลือกชื่อตัวเอง" แล้วหาชื่อ พิมพ์ค้นหาได้</span></li>
+        <li><b>เลือกธีมที่ชอบ 1 ธีม</b><span>แตะการ์ดธีม การ์ดจะเปลี่ยนเป็นสีเต็มใบ</span></li>
+        <li><b>กดส่งโหวต</b><span>ปุ่มจะบอกชื่อธีมที่เลือก เช็กก่อนกด</span></li>
+        <li><b>อยากเปลี่ยน?</b><span id="helpTries">แก้ได้อีก 1 ครั้ง จากเครื่องเดิม เลือกธีมใหม่แล้วส่งอีกที</span></li>
+      </ol>
+      <div class="help-notes">
+        <p>ชื่อที่โหวตแล้วจะหายจากรายการ คนอื่นโหวตแทนไม่ได้</p>
+        <p>ไม่มีใครเห็นว่าคุณเลือกธีมไหน เห็นแค่ว่าโหวตแล้วหรือยัง</p>
+        <p>โหวตครบทุกคน หรือหมดเวลา → ธีมคะแนนสูงสุดชนะ ถ้าเสมอจะสุ่ม</p>
+        <p>กดชื่อผิด ให้กด "ไม่ใช่ฉัน" ก่อนส่ง ถ้าส่งไปแล้วให้แจ้ง Admin</p>
+      </div>
+      <button class="ann-ok help-ok" id="helpOk">เข้าใจแล้ว</button>
+    </div>
+  </div>
+
   <!-- หน้าต่างประกาศ -->
   <div class="ann-modal" id="annModal" role="dialog" aria-modal="true" aria-labelledby="annTitle">
     <div class="ann-card">
@@ -672,6 +740,7 @@
   let ROLE_MAX = {producer:1,director:1,script:1,runner:1,dop:1,camoperator:1,focuspuller:1,camop:1,gaffer:1,bestboy:1,sound:2,art:1,artprop:2,makeup:2};
   let roleCaps = {};   // ค่าที่ Admin ของหน้าลงตำแหน่งปรับไว้
   let roleCount = {};  // ตำแหน่ง → ลงแล้วกี่คน
+  let roleMembers = {}; // ตำแหน่ง → [รหัสนักศึกษา]
   let entriesLoaded = false;
   let votes = [];     // โหวตที่นับอยู่ (จริง หรือ ทดลอง ตามโหมด)
   let allVotes = [];  // โหวตทั้งหมดใน collection
@@ -925,7 +994,7 @@
   function pickVotes(){
     votes = allVotes.filter(v => !!v.trial === !!settings.trialMode &&
       ROSTER.some(p => p.id === v.id) && THEMES.some(t => t.key === v.theme));
-    render(); renderAdmin(); sync(); fillWho();
+    render(); renderAdmin(); sync(); fillWho(); renderRoles();
   }
 
   // ===== สถานะเปิด/ปิด =====
@@ -971,6 +1040,23 @@
     pickVotes(); fillTimes();
   }, err => console.error(err));
 
+  // ===== วิธีใช้ =====
+  function openHelp(){
+    const more = MAX_TRIES - 1;
+    $("helpTries").textContent = more > 0 ? `แก้ได้อีก ${more} ครั้ง จากเครื่องเดิม เลือกธีมใหม่แล้วส่งอีกที` : "โหวตได้ครั้งเดียว เช็กให้ดีก่อนส่ง";
+    $("helpModal").classList.add("show");
+  }
+  function closeHelp(){ $("helpModal").classList.remove("show"); try { localStorage.setItem("tv_help", "1"); } catch(e) {} }
+  $("helpBtn").onclick = openHelp;
+  $("helpOk").onclick = $("helpX").onclick = closeHelp;
+  $("helpModal").onclick = e => { if (e.target === $("helpModal")) closeHelp(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && $("helpModal").classList.contains("show")) closeHelp(); });
+  // เปิดให้อัตโนมัติครั้งแรกที่เข้า (ถ้าไม่มีหน้าต่างอื่นเปิดอยู่)
+  setTimeout(() => {
+    let seen = false; try { seen = !!localStorage.getItem("tv_help"); } catch(e) {}
+    if (!seen && !$("annModal").classList.contains("show") && !$("win").classList.contains("show")) openHelp();
+  }, 1200);
+
   // ===== ประกาศ =====
   // เด้งหน้าต่างขึ้นเองครั้งแรกที่เจอประกาศใหม่ หลังจากนั้นเหลือแถบเล็กให้กดอ่านซ้ำ
   const annKey = () => "tv_ann_" + (settings.announcedAt || settings.announcement.length + ":" + settings.announcement.slice(0, 20));
@@ -978,16 +1064,21 @@
     const txt = (settings.announcement || "").trim();
     $("annPill").style.display = txt ? "flex" : "none";
     if (!txt) { $("annModal").classList.remove("show"); return; }
-    $("annPreview").textContent = txt.split("\n")[0];
+    $("annPreview").textContent = txt;
     $("annBody").textContent = txt;
-    $("annTime").textContent = settings.announcedAt
+    $("annPillTime").textContent = $("annTime").textContent = settings.announcedAt
       ? "อัปเดต " + new Date(settings.announcedAt).toLocaleString("th-TH", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) + " น."
       : "";
     let seen = false; try { seen = !!localStorage.getItem(annKey()); } catch(e) {}
     $("annDot").classList.toggle("new", !seen);
-    if (!seen && !$("win").classList.contains("show")) openAnn();
+
   }
-  function openAnn(){ $("annModal").classList.add("show"); }
+  function openAnn(){
+    const on = !$("annPill").classList.contains("open");
+    $("annPill").classList.toggle("open", on);
+    $("annPill").setAttribute("aria-expanded", on);
+    if (on) { try { localStorage.setItem(annKey(), "1"); } catch(e) {} $("annDot").classList.remove("new"); }
+  }
   function closeAnn(){
     $("annModal").classList.remove("show");
     try { localStorage.setItem(annKey(), "1"); } catch(e) {}
@@ -1320,9 +1411,10 @@
   // ดึงตำแหน่งจาก Position System (ไม่นับที่ถูกลบ/ข้อมูลทดลอง)
   entriesRef.onSnapshot(snap => {
     rolesById = {};
-    roleCount = {};
+    roleCount = {}; roleMembers = {};
     snap.docs.map(d => d.data()).filter(e => !e.removed && !e.trial).forEach(e => {
       if (e.role) roleCount[e.role] = (roleCount[e.role] || 0) + 1;
+      if (e.role && e.studentId) (roleMembers[e.role] ||= []).push(e.studentId);
       if (e.studentId) (rolesById[e.studentId] ||= []).push(ROLE_NAMES[e.role] || e.role);
     });
     entriesLoaded = true; renderRoles();
@@ -1334,31 +1426,58 @@
     roleCaps = (snap.exists && snap.data().roleCaps) || {}; renderRoles();
   }, err => console.error(err));
 
-  // กล่องรายงาน: ตำแหน่งไหนยังไม่มีคนลง / ยังไม่ครบ
+  // กล่องรายงาน: แต่ละตำแหน่งโหวตแล้วกี่คน / ยังไม่โหวตกี่คน (ไม่บอกว่าใครเลือกอะไร)
   function renderRoles(){
     if (!entriesLoaded) return;
-    const ids = Object.keys(ROLE_NAMES);
-    const rows = ids.map(id => {
-      const max = Math.max(0, Number(roleCaps[id] ?? ROLE_MAX[id] ?? 1));
-      const got = roleCount[id] || 0;
-      return { id, name: ROLE_NAMES[id], max, got, left: Math.max(0, max - got) };
-    }).filter(r => r.max > 0);
-    const totalSeats = rows.reduce((a, r) => a + r.max, 0);
-    const filled = rows.reduce((a, r) => a + Math.min(r.got, r.max), 0);
-    const open = rows.filter(r => r.left > 0);
-    $("rbCount").textContent = `ลงแล้ว ${filled}/${totalSeats}`;
-    $("rbBar").style.width = totalSeats ? (filled / totalSeats * 100) + "%" : "0";
-    if (!open.length) {
-      const d = document.createElement("span"); d.className = "rb-done"; d.textContent = "✓ ลงครบทุกตำแหน่งแล้ว";
-      $("rbList").replaceChildren(d); return;
-    }
-    $("rbList").replaceChildren(...open.map(r => {
-      const c = document.createElement("span"); c.className = "rb-chip";
-      c.append(r.name);
-      if (r.max > 1) { const sm = document.createElement("small"); sm.textContent = `ขาด ${r.left}/${r.max}`; c.append(sm); }
-      return c;
-    }));
+    const inRoster = id => ROSTER.some(p => p.id === id);
+    const voted = id => votes.some(v => v.id === id);
+    const rows = Object.keys(ROLE_NAMES).map(id => {
+      const mem = [...new Set(roleMembers[id] || [])].filter(inRoster);
+      const yes = mem.filter(voted).length;
+      return { name: ROLE_NAMES[id], total: mem.length, yes, no: mem.length - yes };
+    }).filter(r => r.total > 0);
+    // คนที่ยังไม่ได้ลงตำแหน่ง
+    const noRole = ROSTER.filter(p => !(rolesById[p.id] || []).length);
+    if (noRole.length) { const yes = noRole.filter(p => voted(p.id)).length; rows.push({ name: "ยังไม่ลงตำแหน่ง", total: noRole.length, yes, no: noRole.length - yes, other: true }); }
+    rows.sort((a, b) => (a.other ? 1 : 0) - (b.other ? 1 : 0) || (b.no > 0) - (a.no > 0));
+    const allYes = votes.filter(v => inRoster(v.id)).length;
+    $("rbCount").textContent = `โหวตแล้ว ${allYes}/${ROSTER.length}`;
+    $("rbBar").style.width = ROSTER.length ? (allYes / ROSTER.length * 100) + "%" : "0";
+    if (!rows.length) { const e = document.createElement("span"); e.className = "rb-empty"; e.textContent = "ยังไม่มีใครลงตำแหน่ง"; $("rbList").replaceChildren(e); $("rbPager").replaceChildren(); rbRows = []; return; }
+    rbRows = rows.map(r => {
+      const d = document.createElement("div"); d.className = "rb-row" + (r.no ? "" : " done") + (r.other ? " other" : "");
+      const nm = document.createElement("span"); nm.className = "rb-nm"; nm.textContent = r.name;
+      const dots = document.createElement("span"); dots.className = "rb-dots";
+      if (r.total <= 5) for (let k = 0; k < r.total; k++) { const i = document.createElement("i"); if (k < r.yes) i.className = "on"; dots.append(i); }
+      else { dots.className = "rb-num"; dots.textContent = `${r.yes}/${r.total}`; }
+      const st = document.createElement("span"); st.className = "rb-st";
+      st.textContent = r.no ? `ยังไม่โหวต ${r.no}` : "ครบ ✓";
+      d.append(nm, dots, st); return d;
+    });
+    showRbPage(false);
   }
+  // แสดงทีละ 3 แถว แล้วเลื่อนเปลี่ยนไปเรื่อยๆ (กล่องสูงเท่าเดิมตลอด)
+  const RB_PER = 3;
+  let rbRows = [], rbPage = 0;
+  function showRbPage(animate){
+    const pages = Math.max(1, Math.ceil(rbRows.length / RB_PER));
+    if (rbPage >= pages) rbPage = 0;
+    const page = document.createElement("div"); page.className = "rb-page";
+    if (!animate) page.style.animation = "none";
+    page.append(...rbRows.slice(rbPage * RB_PER, rbPage * RB_PER + RB_PER));
+    const old = [...$("rbList").children];
+    if (animate) old.forEach(o => { o.classList.add("out"); setTimeout(() => o.remove(), 400); });
+    else old.forEach(o => o.remove());
+    $("rbList").append(page);
+    $("rbPager").replaceChildren(...(pages > 1 ? Array.from({ length: pages }, (_, k) => { const i = document.createElement("i"); if (k === rbPage) i.className = "on"; return i; }) : []));
+  }
+  setInterval(() => {
+    if (rbRows.length <= RB_PER || document.hidden) return;
+    rbPage = (rbPage + 1) % Math.ceil(rbRows.length / RB_PER);
+    showRbPage(true);
+  }, 3500);
+  // กดที่กล่องเพื่อข้ามไปหน้าถัดไป
+  $("rbList").onclick = () => { if (rbRows.length > RB_PER) { rbPage = (rbPage + 1) % Math.ceil(rbRows.length / RB_PER); showRbPage(true); } };
 
   // วาดผลโหวต
   function render(){
