@@ -618,12 +618,20 @@
   function fillWho(){
     const cur = $("who").value;
     $("who").length = 1; // เหลือแค่ "เลือกชื่อตัวเอง"
-    ROSTER.forEach(p => { const o = document.createElement("option"); o.value = p.id; o.textContent = p.name; $("who").appendChild(o); });
-    $("who").value = ROSTER.some(p => p.id === cur) ? cur : "";
+    // ชื่อที่โหวตแล้วไม่โชว์ในรายการเลือก (กันคนอื่นมาโหวตทับ)
+    const left = ROSTER.filter(p => !votes.some(v => v.id === p.id));
+    left.forEach(p => {
+      const o = document.createElement("option"); o.value = p.id; o.textContent = p.name;
+      $("who").appendChild(o);
+    });
+    $("who").options[0].textContent = left.length ? "เลือกชื่อตัวเอง" : "ทุกคนโหวตครบแล้ว";
+    $("who").disabled = !left.length;
+    $("who").value = ROSTER.some(p => p.id === cur && !votes.some(v => v.id === cur)) ? cur : "";
   }
   fillWho();
 
   $("who").onchange = () => {
+    if (votes.some(v => v.id === $("who").value)) { $("who").value = ""; setMsg("ชื่อนี้โหวตแล้ว", "err", false); return; }
     meId = $("who").value; picked = null;
     try { localStorage.setItem("tv_me_id", meId); } catch(e) {}
     $("who").value = "";
@@ -764,7 +772,7 @@
   function pickVotes(){
     votes = allVotes.filter(v => !!v.trial === !!settings.trialMode &&
       ROSTER.some(p => p.id === v.id) && THEMES.some(t => t.key === v.theme));
-    render(); renderAdmin(); sync();
+    render(); renderAdmin(); sync(); fillWho();
   }
 
   // ===== สถานะเปิด/ปิด =====
