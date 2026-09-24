@@ -58,6 +58,28 @@
   }
 
   .hero{padding:20px 0 24px;}
+  .hero-grid{display:grid;grid-template-columns:1fr;gap:18px;align-items:start;}
+  @media (min-width:700px){ .hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);} }
+  /* กล่องรายงานตำแหน่ง */
+  .roles-box{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px;
+    position:relative;overflow:hidden;isolation:isolate;}
+  .roles-box::before{content:"";position:absolute;z-index:-1;width:60%;aspect-ratio:1;right:-20%;top:-50%;border-radius:50%;
+    background:radial-gradient(circle,rgba(155,124,242,.25),transparent 65%);}
+  .rb-head{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .rb-title{font-family:'Kanit',sans-serif;font-weight:600;font-size:15px;}
+  .rb-count{font-size:12px;color:var(--soft);background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;
+    font-variant-numeric:tabular-nums;}
+  .rb-bar{height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;margin:10px 0 12px;}
+  .rb-bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--delusion),var(--love));transition:width .6s ease;}
+  .rb-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .rb-chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 9px 5px 8px;border-radius:9px;
+    background:var(--surface2);border:1px dashed rgba(255,122,107,.45);color:var(--ink);}
+  .rb-chip::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--err);}
+  .rb-chip small{color:var(--faint);font-size:11px;}
+  .rb-empty{font-size:13px;color:var(--faint);}
+  .rb-done{font-size:13px;color:var(--ok);display:flex;align-items:center;gap:6px;}
+  .rb-link{display:inline-block;margin-top:10px;font-size:12px;color:var(--soft);text-decoration:none;}
+  .rb-link:hover{color:var(--ink);}
   .gap{height:22px;}
   .hero h1{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(36px,9vw,52px);line-height:1.05;letter-spacing:-.01em;}
   .hero p{color:var(--soft);font-size:15px;margin-top:14px;max-width:460px;}
@@ -415,9 +437,23 @@
       <span class="ann-txt"><small>ประกาศ</small><span id="annPreview"></span></span>
       <span class="ann-go">อ่าน ›</span>
     </button>
-    <h1 id="title">โหวตธีม</h1>
-    <p id="subtitle">โหวตธีมที่ตัวเองชอบ</p>
-    <div class="status" id="status"><i></i><span id="statusText">กำลังโหลด…</span></div>
+    <div class="hero-grid">
+      <div>
+        <h1 id="title">โหวตธีม</h1>
+        <p id="subtitle">โหวตธีมที่ตัวเองชอบ</p>
+        <div class="status" id="status"><i></i><span id="statusText">กำลังโหลด…</span></div>
+      </div>
+      <!-- รายงานตำแหน่งที่ยังไม่มีคนลง (ดึงจากระบบลงตำแหน่ง index.html) -->
+      <div class="roles-box" id="rolesBox">
+        <div class="rb-head">
+          <span class="rb-title">ตำแหน่งที่ยังว่าง</span>
+          <span class="rb-count" id="rbCount">–</span>
+        </div>
+        <div class="rb-bar"><i id="rbBar"></i></div>
+        <div class="rb-list" id="rbList"><span class="rb-empty">กำลังโหลด…</span></div>
+        <a class="rb-link" href="index.html">ไปลงตำแหน่ง ›</a>
+      </div>
+    </div>
     <div class="trial" id="trialBar">โหมดทดลอง · โหวตตอนนี้ไม่นับจริง</div>
   </section>
 
@@ -632,6 +668,11 @@
     camoperator:'Camera Operator',focuspuller:'Focus Puller',camop:'Cam Assistant',gaffer:'Gaffer',
     bestboy:'Best Boy Electric',sound:'Sound',art:'Art Director',artprop:'Art/Prop',makeup:'Makeup & Costume'};
   let rolesById = {}; // รหัสนักศึกษา → [ตำแหน่ง]
+  // จำนวนคนที่ต้องมีต่อตำแหน่ง (สำรอง — ของจริงดึงจาก index.html + roleCaps ใน Firestore)
+  let ROLE_MAX = {producer:1,director:1,script:1,runner:1,dop:1,camoperator:1,focuspuller:1,camop:1,gaffer:1,bestboy:1,sound:2,art:1,artprop:2,makeup:2};
+  let roleCaps = {};   // ค่าที่ Admin ของหน้าลงตำแหน่งปรับไว้
+  let roleCount = {};  // ตำแหน่ง → ลงแล้วกี่คน
+  let entriesLoaded = false;
   let votes = [];     // โหวตที่นับอยู่ (จริง หรือ ทดลอง ตามโหมด)
   let allVotes = [];  // โหวตทั้งหมดใน collection
 
@@ -780,8 +821,11 @@
       const map = {};
       for (const m of rolesSrc.matchAll(/id\s*:\s*['"]([^'"]+)['"][^}]*?name\s*:\s*['"]([^'"]+)['"]/g)) map[m[1]] = m[2];
       if (Object.keys(map).length) ROLE_NAMES = map;
+      const mx = {};
+      for (const m of rolesSrc.matchAll(/\{[^}]*?id\s*:\s*['"]([^'"]+)['"][^}]*?max\s*:\s*(\d+)[^}]*\}/g)) mx[m[1]] = +m[2];
+      if (Object.keys(mx).length) ROLE_MAX = mx;
     }
-    applyConfig();
+    applyConfig(); renderRoles();
   }).catch(() => { /* เปิดไฟล์ในเครื่อง/โหลดไม่ได้ → ใช้รายชื่อสำรอง */ });
   const posText = id => (rolesById[id] || []).join(", ") || "-";
 
@@ -1276,11 +1320,45 @@
   // ดึงตำแหน่งจาก Position System (ไม่นับที่ถูกลบ/ข้อมูลทดลอง)
   entriesRef.onSnapshot(snap => {
     rolesById = {};
-    snap.docs.map(d => d.data()).filter(e => !e.removed && !e.trial && e.studentId).forEach(e => {
-      (rolesById[e.studentId] ||= []).push(ROLE_NAMES[e.role] || e.role);
+    roleCount = {};
+    snap.docs.map(d => d.data()).filter(e => !e.removed && !e.trial).forEach(e => {
+      if (e.role) roleCount[e.role] = (roleCount[e.role] || 0) + 1;
+      if (e.studentId) (rolesById[e.studentId] ||= []).push(ROLE_NAMES[e.role] || e.role);
     });
+    entriesLoaded = true; renderRoles();
     showMe(); sync(); render();
   }, err => console.error(err));
+
+  // ค่าที่นั่งต่อตำแหน่งที่ Admin หน้าลงตำแหน่งตั้งไว้ (อ่านอย่างเดียว)
+  fs.collection("fdm23067").doc("settings").onSnapshot(snap => {
+    roleCaps = (snap.exists && snap.data().roleCaps) || {}; renderRoles();
+  }, err => console.error(err));
+
+  // กล่องรายงาน: ตำแหน่งไหนยังไม่มีคนลง / ยังไม่ครบ
+  function renderRoles(){
+    if (!entriesLoaded) return;
+    const ids = Object.keys(ROLE_NAMES);
+    const rows = ids.map(id => {
+      const max = Math.max(0, Number(roleCaps[id] ?? ROLE_MAX[id] ?? 1));
+      const got = roleCount[id] || 0;
+      return { id, name: ROLE_NAMES[id], max, got, left: Math.max(0, max - got) };
+    }).filter(r => r.max > 0);
+    const totalSeats = rows.reduce((a, r) => a + r.max, 0);
+    const filled = rows.reduce((a, r) => a + Math.min(r.got, r.max), 0);
+    const open = rows.filter(r => r.left > 0);
+    $("rbCount").textContent = `ลงแล้ว ${filled}/${totalSeats}`;
+    $("rbBar").style.width = totalSeats ? (filled / totalSeats * 100) + "%" : "0";
+    if (!open.length) {
+      const d = document.createElement("span"); d.className = "rb-done"; d.textContent = "✓ ลงครบทุกตำแหน่งแล้ว";
+      $("rbList").replaceChildren(d); return;
+    }
+    $("rbList").replaceChildren(...open.map(r => {
+      const c = document.createElement("span"); c.className = "rb-chip";
+      c.append(r.name);
+      if (r.max > 1) { const sm = document.createElement("small"); sm.textContent = `ขาด ${r.left}/${r.max}`; c.append(sm); }
+      return c;
+    }));
+  }
 
   // วาดผลโหวต
   function render(){
