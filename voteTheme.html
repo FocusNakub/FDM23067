@@ -345,6 +345,7 @@
   .win-kicker{font-size:16px;color:var(--soft);}
   .win-word{font-family:'Kanit',sans-serif;font-weight:800;font-size:clamp(96px,32vw,190px);line-height:1;color:var(--c);
     margin:14px 0 6px;text-shadow:0 0 60px color-mix(in srgb,var(--c) 55%,transparent);animation:zoom .9s cubic-bezier(.2,1.6,.4,1) both .2s;}
+  .win-word.landed{animation:zoom .7s cubic-bezier(.2,1.6,.4,1) both;}
   .win-word.tie{font-size:clamp(56px,17vw,110px);}
   @keyframes zoom{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
   .win-sub{font-size:17px;color:var(--ink);animation:up .6s ease both .7s;}
@@ -907,7 +908,7 @@
     $("statusText").append(st.text);
     if (st.left != null) { const b = document.createElement("b"); b.textContent = " " + fmt(st.left); $("statusText").append(b); }
     $("trialBar").style.display = settings.trialMode ? "block" : "none";
-    if (lastOpen !== st.open) { lastOpen = st.open; sync(); } // เปิด/ปิดเองตามเวลา
+    if (lastOpen !== st.open) { lastOpen = st.open; sync(); render(); } // เปิด/ปิดเองตามเวลา + ประกาศผลเมื่อหมดเวลา
   }
   setInterval(tick, 1000);
 
@@ -955,23 +956,67 @@
 
   // ===== หน้าฉลองผู้ชนะ =====
   let winShownFor = ""; // กันโชว์ซ้ำตอนข้อมูลอัปเดต
-  function checkWinner(data, total){
+  let spinTimer = 0;
+  // ผลสุดท้าย: โหวตครบ หรือ หมดเวลาที่ตั้งไว้ → คะแนนสูงสุดชนะ ถ้าเสมอสุ่มมา 1
+  const timeUp = () => !!settings.end && Date.now() >= new Date(settings.end).getTime();
+  // สุ่มแบบที่ทุกเครื่องได้ผลเดียวกัน (ใช้เวลาปิด + คะแนน เป็นเมล็ดสุ่ม)
+  function seededPick(list, seedText){
+    let h = 2166136261;
+    for (const ch of seedText) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+    return list[(h >>> 0) % list.length];
+  }
+  function finalResult(data, total){
     const done = ROSTER.length > 0 && total >= ROSTER.length;
-    $("reopen").style.display = done ? "block" : "none";
-    const key = (settings.trialMode ? "t" : "r") + total + data.map(x => x.who.length).join("-");
-    if (done && winShownFor !== key) { winShownFor = key; showWinner(data, total); }
+    const ended = timeUp() && total > 0;
+    if (!done && !ended) return null;
+    const max = Math.max(...data.map(x => x.who.length));
+    const tops = data.filter(x => x.who.length === max && max > 0);
+    if (!tops.length) return null;
+    const seed = (settings.trialMode ? "t" : "r") + "|" + (settings.end || "all") + "|" + data.map(x => x.t.key + ":" + x.who.length).join(",");
+    const winner = tops.length > 1 ? seededPick(tops, seed) : tops[0];
+    return { winner, tops, max, total, random: tops.length > 1, reason: done ? "done" : "time" };
+  }
+  function checkWinner(data, total){
+    const fr = finalResult(data, total);
+    $("reopen").style.display = fr ? "block" : "none";
+    if (!fr) return;
+    const key = (settings.trialMode ? "t" : "r") + total + data.map(x => x.who.length).join("-") + fr.reason;
+    if (winShownFor !== key) { winShownFor = key; showWinner(data, total); }
   }
   function showWinner(data, total){
     data = data || THEMES.map(t => ({ t, who: votes.filter(v => v.theme === t.key) }));
     total = total ?? votes.length;
+    const fr = finalResult(data, total);
     const sorted = [...data].sort((a, b) => b.who.length - a.who.length);
     const max = sorted[0].who.length;
-    const tops = sorted.filter(x => x.who.length === max && max > 0);
+    const tops = fr ? [fr.winner] : sorted.filter(x => x.who.length === max && max > 0);
     const w = $("win");
     const main = tops[0] ? tops[0].t.key : "ink";
     w.style.setProperty("--c", `var(--${main})`);
     const word = $("winWord");
-    if (tops.length === 1) {
+    clearTimeout(spinTimer);
+    if (fr && fr.random) {
+      // เสมอ → หมุนวนชื่อที่เสมอก่อน แล้วค่อยหยุดที่ผลสุ่ม
+      const names = fr.tops.map(x => x.t);
+      word.className = "win-word"; $("winKicker").textContent = `เสมอกัน ${names.length} ธีม · กำลังสุ่ม…`;
+      $("winSub").textContent = `ได้ ${fr.max} เสียงเท่ากัน`;
+      let k = 0, step = 0, delay = 70;
+      const spin = () => {
+        const t = names[k++ % names.length];
+        word.textContent = t.th; w.style.setProperty("--c", `var(--${t.key})`);
+        step++; delay *= 1.12;
+        if (step < 22) spinTimer = setTimeout(spin, delay);
+        else {
+          word.textContent = fr.winner.t.th; w.style.setProperty("--c", `var(--${fr.winner.t.key})`);
+          word.classList.remove("landed"); void word.offsetWidth; word.classList.add("landed");
+          $("winKicker").textContent = "สุ่มแล้ว ธีมที่ชนะคือ";
+          $("winSub").innerHTML = ""; const b = document.createElement("b"); b.textContent = fr.max;
+          $("winSub").append(b, ` เสียง เท่ากับ ${names.filter(t => t.key !== fr.winner.t.key).map(t => t.th).join(", ")} · ชนะด้วยการสุ่ม`);
+          confetti([fr.winner.t.key]);
+        }
+      };
+      spin();
+    } else if (tops.length === 1) {
       word.className = "win-word"; word.textContent = tops[0].t.th;
       $("winKicker").textContent = "ธีมที่ชนะคือ";
       $("winSub").innerHTML = ""; const b = document.createElement("b"); b.textContent = max;
@@ -992,11 +1037,12 @@
       const sp = document.createElement("span"); sp.textContent = `${n} เสียง`;
       d.append(b, sp); return d;
     }));
-    $("winFoot").textContent = settings.trialMode ? "ผลจากโหมดทดลอง" : "โหวตครบทั้ง " + ROSTER.length + " คนแล้ว";
+    $("winFoot").textContent = (settings.trialMode ? "ผลจากโหมดทดลอง · " : "")
+      + (fr && fr.reason === "time" ? `หมดเวลาโหวต · โหวตไป ${total}/${ROSTER.length} คน` : `โหวตครบทั้ง ${ROSTER.length} คนแล้ว`);
     w.classList.add("show");
-    confetti(tops.map(x => x.t.key));
+    if (!(fr && fr.random)) confetti(tops.map(x => x.t.key));
   }
-  $("winClose").onclick = () => { $("win").classList.remove("show"); stopConfetti(); };
+  $("winClose").onclick = () => { $("win").classList.remove("show"); stopConfetti(); clearTimeout(spinTimer); };
   $("reopen").onclick = () => showWinner();
 
   // พลุกระดาษ (วาดเองบน canvas ไม่ใช้ไลบรารี)
@@ -1269,21 +1315,23 @@
     // หัวข้อด้านบน
     const hl = $("headline");
     hl.style.removeProperty("--c");
-    hl.textContent = !total ? "ผลโหวต" : leaders.length === 1 ? "ธีมที่นำอยู่" : `เสมอกัน ${leaders.length} ธีม`;
+    const fr = finalResult(data, total);
+    hl.textContent = fr ? "ผลสุดท้าย" : !total ? "ผลโหวต" : leaders.length === 1 ? "ธีมที่นำอยู่" : `เสมอกัน ${leaders.length} ธีม`;
+    const shown = fr ? [fr.winner] : leaders;
 
     // การ์ดธีมที่นำ (สร้างใหม่เฉพาะตอนผลเปลี่ยน จะได้เด้งตอนมีการเปลี่ยนแปลง)
-    const sig = total + "|" + leaders.map(x => x.t.key + x.who.length).join(",");
+    const sig = (fr ? "F" : "") + total + "|" + shown.map(x => x.t.key + x.who.length).join(",");
     if ($("leader").dataset.sig !== sig) {
       $("leader").dataset.sig = sig;
       if (!total) {
         const e = document.createElement("div"); e.className = "lead-empty"; e.textContent = "ยังไม่มีใครโหวต";
         $("leader").replaceChildren(e);
-      } else $("leader").replaceChildren(...leaders.map(x => {
+      } else $("leader").replaceChildren(...shown.map(x => {
         const n = x.who.length, pct = Math.round(n / total * 100);
         const c = document.createElement("div"); c.className = "lead-card"; c.style.setProperty("--c", `var(--${x.t.key})`);
         c.innerHTML = `<div class="ring" style="--p:${pct}"><span>${pct}%</span></div>
-          <div class="lt"><div class="lw"></div><div class="ln">${n} เสียง จาก ${total}</div></div>
-          <div class="lk">♛ ${leaders.length > 1 ? "นำร่วม" : "นำ"}</div>`;
+          <div class="lt"><div class="lw"></div><div class="ln">${n} เสียง จาก ${total}${fr && fr.random ? " · ชนะจากการสุ่ม" : ""}</div></div>
+          <div class="lk">♛ ${fr ? "ชนะ" : leaders.length > 1 ? "นำร่วม" : "นำ"}</div>`;
         c.querySelector(".lw").textContent = x.t.th;
         return c;
       }));
