@@ -73,6 +73,60 @@
   .field input,.field select{width:100%;background:none;border:none;outline:none;color:var(--ink);
     font:inherit;font-size:16px;padding:2px 0 4px;appearance:none;-webkit-appearance:none;}
   .field select{cursor:pointer;}
+  /* ===== ปุ่มเลือกชื่อ ===== */
+  .pick-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--ink);
+    padding:14px 16px 14px 14px;border-radius:18px;position:relative;overflow:hidden;isolation:isolate;
+    background:linear-gradient(120deg,rgba(155,124,242,.16),rgba(242,114,159,.10) 45%,var(--surface) 80%);
+    border:1px solid rgba(155,124,242,.35);transition:transform .2s,border-color .2s,box-shadow .2s;}
+  .pick-btn::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.07) 50%,transparent 70%);
+    transform:translateX(-100%);animation:shine 3.2s ease-in-out infinite;}
+  @keyframes shine{0%,60%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .pick-btn:hover{border-color:rgba(155,124,242,.7);box-shadow:0 14px 34px -16px rgba(155,124,242,.6);transform:translateY(-2px);}
+  .pick-btn:active{transform:scale(.985);}
+  .pick-btn:disabled{opacity:.5;cursor:default;} .pick-btn:disabled::after{display:none;}
+  .pick-av{width:44px;height:44px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Kanit',sans-serif;
+    font-size:20px;font-weight:700;color:#17110e;background:conic-gradient(from 200deg,var(--greed),var(--anger),var(--delusion),var(--love),var(--greed));
+    box-shadow:0 0 0 3px var(--surface),0 0 0 4px rgba(155,124,242,.4);}
+  .pick-t{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .pick-t b{font-weight:600;font-size:16px;}
+  .pick-t small{font-size:12px;color:var(--soft);}
+  .pick-go{font-size:26px;line-height:1;color:var(--soft);transition:transform .2s;}
+  .pick-btn:hover .pick-go{transform:translateX(3px);color:var(--ink);}
+
+  /* ===== หน้าต่างรายชื่อ (มือถือ = เลื่อนขึ้นจากล่าง) ===== */
+  .sheet{position:fixed;inset:0;z-index:16;display:none;align-items:flex-end;justify-content:center;
+    background:rgba(8,6,5,.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
+  .sheet.show{display:flex;animation:fadein .2s ease;}
+  .sheet-card{width:100%;max-width:520px;max-height:82vh;display:flex;flex-direction:column;background:var(--surface);
+    border:1px solid var(--line);border-bottom:none;border-radius:24px 24px 0 0;padding:8px 16px calc(16px + env(safe-area-inset-bottom));
+    animation:slideup .35s cubic-bezier(.2,1,.3,1);}
+  @keyframes slideup{from{transform:translateY(100%)}to{transform:none}}
+  .sheet-grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 10px;}
+  .sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .sheet-head h3{font-family:'Kanit',sans-serif;font-weight:600;font-size:20px;}
+  .sheet-head .ann-x{position:static;}
+  .search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:0 12px;margin-bottom:10px;}
+  .search:focus-within{border-color:var(--soft);}
+  .search span{font-size:13px;opacity:.6;}
+  .search input{flex:1;background:none;border:none;outline:none;color:var(--ink);font:inherit;font-size:16px;padding:11px 0;}
+  .plist{overflow:auto;display:flex;flex-direction:column;gap:6px;padding:2px;margin:0 -2px;}
+  .prow2{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;font:inherit;color:var(--ink);
+    background:var(--surface2);border:1px solid transparent;border-radius:14px;padding:9px 12px;transition:border-color .15s,background .15s,transform .1s;}
+  .prow2:hover{border-color:var(--line);background:#26211d;}
+  .prow2:active{transform:scale(.985);}
+  .prow2 .av{width:36px;height:36px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:'Kanit',sans-serif;
+    font-weight:700;font-size:15px;color:#17110e;background:var(--ac);}
+  .prow2 .nm{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .prow2 .nm b{font-weight:500;font-size:15px;overflow-wrap:anywhere;}
+  .prow2 .nm small{font-size:12px;color:var(--faint);}
+  .prow2 .ar{color:var(--faint);font-size:18px;}
+  .pempty{text-align:center;color:var(--faint);font-size:14px;padding:26px 0;}
+  @media (min-width:600px){
+    .sheet{align-items:center;padding:16px;}
+    .sheet-card{border-radius:22px;border-bottom:1px solid var(--line);animation:rise .35s cubic-bezier(.2,1.3,.4,1);}
+    .sheet-grab{display:none;}
+  }
+
   .me{display:none;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
   .avatar{width:40px;height:40px;border-radius:50%;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;
     font-family:'Kanit',sans-serif;font-weight:700;font-size:17px;flex:0 0 auto;}
@@ -368,10 +422,13 @@
 
   <!-- เลือกชื่อตัวเอง -->
   <div class="idbox" id="loginBox">
-    <div class="field">
-      <label for="who">ชื่อ</label>
-      <select id="who"><option value="">เลือกชื่อตัวเอง</option></select>
-    </div>
+    <!-- select เดิมซ่อนไว้ใช้เก็บค่า / ปุ่มด้านล่างคือหน้าตาที่คนเห็น -->
+    <select id="who" hidden><option value="">เลือกชื่อตัวเอง</option></select>
+    <button class="pick-btn" id="pickBtn">
+      <span class="pick-av">?</span>
+      <span class="pick-t"><b>แตะเพื่อเลือกชื่อตัวเอง</b><small id="pickLeft"></small></span>
+      <span class="pick-go">›</span>
+    </button>
   </div>
 
   <div class="me" id="meBox">
@@ -476,6 +533,19 @@
   </div>
 </aside>
 <footer>ทำโดย Focus Nakub<button id="adminBtn">Admin</button></footer>
+
+  <!-- หน้าต่างเลือกชื่อ -->
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-card">
+      <div class="sheet-grab"></div>
+      <div class="sheet-head">
+        <h3 id="sheetTitle">คุณคือใคร?</h3>
+        <button class="ann-x" id="sheetX" aria-label="ปิด">✕</button>
+      </div>
+      <div class="search"><span>🔍</span><input id="pickSearch" placeholder="พิมพ์ค้นหาชื่อ" autocomplete="off"></div>
+      <div class="plist" id="plist"></div>
+    </div>
+  </div>
 
   <!-- หน้าต่างประกาศ -->
   <div class="ann-modal" id="annModal" role="dialog" aria-modal="true" aria-labelledby="annTitle">
@@ -626,6 +696,10 @@
     });
     $("who").options[0].textContent = left.length ? "เลือกชื่อตัวเอง" : "ทุกคนโหวตครบแล้ว";
     $("who").disabled = !left.length;
+    $("pickBtn").disabled = !left.length;
+    $("pickBtn").querySelector("b").textContent = left.length ? "แตะเพื่อเลือกชื่อตัวเอง" : "ทุกคนโหวตครบแล้ว";
+    $("pickLeft").textContent = left.length ? `ยังไม่โหวตอีก ${left.length} คน` : "";
+    if ($("sheet").classList.contains("show")) renderPicker();
     $("who").value = ROSTER.some(p => p.id === cur && !votes.some(v => v.id === cur)) ? cur : "";
   }
   fillWho();
@@ -637,6 +711,40 @@
     $("who").value = "";
     setMsg("", "", false); sync(); render();
   };
+  // ===== หน้าต่างเลือกชื่อ =====
+  const AV_COLORS = ["#e8b43a", "#ef5b45", "#9b7cf2", "#f2729f", "#4fc3d9", "#7fd49b", "#ff9f43"];
+  const avColor = id => AV_COLORS[[...String(id)].reduce((a, c) => a + c.charCodeAt(0), 0) % AV_COLORS.length];
+  const leftPeople = () => ROSTER.filter(p => !votes.some(v => v.id === p.id));
+  function renderPicker(){
+    const q = $("pickSearch").value.trim().toLowerCase();
+    const list = leftPeople().filter(p => !q || p.name.toLowerCase().includes(q));
+    if (!list.length) {
+      const e = document.createElement("div"); e.className = "pempty";
+      e.textContent = leftPeople().length ? "ไม่เจอชื่อนี้" : "ทุกคนโหวตครบแล้ว";
+      $("plist").replaceChildren(e); return;
+    }
+    $("plist").replaceChildren(...list.map(p => {
+      const b = document.createElement("button"); b.className = "prow2";
+      const av = document.createElement("span"); av.className = "av"; av.style.setProperty("--ac", avColor(p.id));
+      av.textContent = p.name.trim().charAt(0);
+      const nm = document.createElement("span"); nm.className = "nm";
+      const n = document.createElement("b"); n.textContent = p.name;
+      const r = rolesById[p.id]; const sm = document.createElement("small"); sm.textContent = r && r.length ? r.join(", ") : "ยังไม่ได้ลงตำแหน่ง";
+      nm.append(n, sm);
+      const ar = document.createElement("span"); ar.className = "ar"; ar.textContent = "›";
+      b.append(av, nm, ar);
+      b.onclick = () => { closePicker(); fillWho(); $("who").value = p.id; $("who").onchange(); };
+      return b;
+    }));
+  }
+  function openPicker(){ $("pickSearch").value = ""; renderPicker(); $("sheet").classList.add("show"); }
+  function closePicker(){ $("sheet").classList.remove("show"); }
+  $("pickBtn").onclick = openPicker;
+  $("sheetX").onclick = closePicker;
+  $("sheet").onclick = e => { if (e.target === $("sheet")) closePicker(); };
+  $("pickSearch").oninput = renderPicker;
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closePicker(); });
+
   $("logout").onclick = () => {
     meId = ""; picked = null;
     try { localStorage.removeItem("tv_me_id"); } catch(e) {}
