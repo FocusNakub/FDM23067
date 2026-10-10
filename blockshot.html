@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blockshot 14–15 ต.ค. 2569</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,400;0,600;0,800;1,800&display=swap">
+<style>
+  :root{--bg:#F6F4EF;--ink:#1B1B1B;--mute:#6B6B66;--b:#2F5D8A;--o:#B5532F;--line:#E4E0D6}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:72px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Prompt',system-ui,sans-serif;padding-bottom:88px;line-height:1.5}
+  main{max-width:980px;margin:0 auto;padding:0 16px 32px}
+  button{font-family:inherit}
+  :focus-visible{outline:3px solid #1B1B1B;outline-offset:3px}
+
+  /* แถบข้อความวิ่ง + แถบความคืบหน้า */
+  .ticker{overflow:hidden;white-space:nowrap;background:#1B1B1B;color:#fff;font-size:13px;font-weight:600;letter-spacing:2px;padding:10px 0}
+  .ticker div{display:inline-block;animation:mq 34s linear infinite}
+  .ticker:hover div{animation-play-state:paused}
+  @keyframes mq{to{transform:translateX(-50%)}}
+  #prog{position:fixed;top:0;left:0;height:4px;width:100%;background:#1B1B1B;transform-origin:left;transform:scaleX(0);z-index:20}
+
+  /* เมนูติดบน */
+  .nav{position:sticky;top:0;z-index:15;background:rgba(246,244,239,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px}
+  .nl{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .nl::-webkit-scrollbar{display:none}
+  .nl a{white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px;padding:8px 14px;border-radius:10px;border:1.5px solid transparent}
+  .nl a:hover{border-color:#1B1B1B}
+  .nl a.on{background:#1B1B1B;color:#fff}
+  .nr{display:flex;align-items:center;gap:8px}
+  .cnt{font-size:13px;font-weight:800;white-space:nowrap}
+  .navbtn{font-weight:600;font-size:14px;padding:7px 14px;border-radius:10px;border:1.5px solid #1B1B1B;background:#fff;cursor:pointer;white-space:nowrap}
+
+  /* หัวหน้า */
+  .hero{padding:32px 0 8px;transform-origin:left top;will-change:transform,opacity}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:3px;color:var(--mute)}
+  h1{font-style:italic;font-size:clamp(44px,14.5vw,148px);margin:4px 0 8px;line-height:1;font-weight:800;letter-spacing:-2px}
+  .sub{font-size:19px;color:#3A3A37;margin:0 0 16px}
+  .pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:#1B1B1B;color:#fff;border-radius:8px;padding:6px 14px;font-size:14px;font-weight:600}
+  .pill.soft{background:#fff;color:#1B1B1B;border:1px solid var(--line)}
+
+  .warn{background:#FFF1D6;border:1px solid #E8C26A;padding:12px 16px;border-radius:12px;margin:16px 0;display:none}
+  .ann{background:#1B1B1B;color:#fff;padding:14px 18px;border-radius:12px;margin:16px 0;font-weight:600;display:none}
+  .gate{margin:16px 0;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;background:#fff;border:1.5px solid var(--line);display:flex;align-items:center;gap:10px}
+  .gate::before{content:"";width:10px;height:10px;border-radius:50%;background:#2E9E5B;flex:none}
+  .gate.wait{background:#FFF6DD;border-color:#E8C26A}
+  .gate.wait::before{background:#E0A526}
+  .gate.closed{background:#FDECEA;border-color:#E3A59E}
+  .gate.closed::before{background:#C0392B}
+
+  /* ขั้นตอน */
+  .step{display:flex;align-items:center;gap:12px;margin:32px 0 12px;scroll-margin-top:72px}
+  .step b{width:34px;height:34px;border-radius:50%;background:#1B1B1B;color:#fff;display:grid;place-items:center;font-size:16px;flex:none}
+  .step h2{margin:0;font-size:22px;line-height:1.3}
+  .step span{color:var(--mute);font-size:14px}
+
+  /* ชื่อ */
+  .tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .tools input{flex:1 1 180px;font:inherit;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);background:#fff}
+  .tabs{display:flex;gap:6px}
+  .tabs button{font-weight:600;font-size:14px;padding:8px 14px;border-radius:10px;border:1.5px solid #1B1B1B;background:#fff;cursor:pointer}
+  .tabs button.on{background:#1B1B1B;color:#fff}
+  .names{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+  .chip{font:inherit;text-align:left;background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 12px 8px 8px;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--ink);min-height:56px;transition:transform .15s,border-color .15s}
+  .chip:hover{transform:translateY(-2px)}
+  .chip .av{width:34px;height:34px;border-radius:50%;background:#EEEAE0;color:#3A3A37;display:grid;place-items:center;font-weight:800;flex:none}
+  .chip.d14 .av{background:var(--b);color:#fff}
+  .chip.d15 .av{background:var(--o);color:#fff}
+  .chip .tx{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .chip .nm{font-weight:600;font-size:15px;line-height:1.25}
+  .chip .st{font-size:12px;color:var(--mute)}
+  .chip.d14 .st{color:var(--b);font-weight:600}
+  .chip.d15 .st{color:var(--o);font-weight:600}
+  .chip.lk{opacity:.4;cursor:not-allowed}
+  .chip.lk:hover{transform:none}
+  .chip.me{border-color:#1B1B1B;background:#1B1B1B;color:#fff}
+  .chip.me .st{color:#d8d8d2}
+  .chip.me .av{background:#fff;color:#1B1B1B}
+  .none{color:var(--mute);padding:12px 4px}
+  .hint{margin:10px 0 0;color:var(--mute);font-size:14px}
+
+  /* การ์ดวัน */
+  .days{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .days.locked{opacity:.55}
+  .days.locked .go{pointer-events:none}
+  .card{--c:var(--b);background:#fff;border-radius:20px;padding:24px;border:1.5px solid var(--line)}
+  .card.d15{--c:var(--o)}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+  .day{font-size:13px;font-weight:600;color:var(--c)}
+  .date{font-size:76px;font-style:italic;font-weight:800;line-height:.95;color:var(--c)}
+  .left{font-size:12px;font-weight:600;letter-spacing:1px;color:var(--c);border:1.5px solid var(--c);border-radius:6px;padding:4px 10px;white-space:nowrap}
+  .info{margin-top:12px;font-size:15px;color:#3A3A37;line-height:1.5;display:none}
+  .info b{color:var(--c)}
+  .bar{height:6px;background:#EEEAE0;border-radius:99px;margin:16px 0;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--c);border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .seats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .seat{border-radius:12px;padding:10px 6px;text-align:center;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:14px;line-height:1.2;transition:transform .2s}
+  .seat .av{width:32px;height:32px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .seat.empty{border:2px dashed #DAD5C8;color:#B1ACA0}
+  .seat.me{background:color-mix(in srgb,var(--c) 14%,white);outline:2px solid var(--c);font-weight:600}
+  .seat:not(.empty):hover{transform:scale(1.08)}
+  .seat.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  .go{width:100%;font-weight:800;font-size:19px;padding:16px;border:0;border-radius:12px;color:#fff;background:var(--c);cursor:pointer;transition:transform .2s,letter-spacing .25s}
+  .go:hover:not(:disabled){letter-spacing:1.5px;transform:scaleX(1.02)}
+  .go:active{transform:scale(.97)}
+  .go{position:relative;overflow:hidden}
+  .go:not(:disabled):not(.cancel)::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:shim 3.2s ease-in-out infinite}
+  @keyframes shim{0%,55%{left:-60%}100%{left:130%}}
+  .card{position:relative}
+  .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--c) 14%,transparent),transparent 70%)}
+  .card:hover::before{opacity:1}
+  .go:disabled{background:#CFCBBF;cursor:not-allowed}
+  .go.cancel{background:#fff;color:var(--c);border:2px solid var(--c)}
+  .dots{display:none;justify-content:center;gap:8px;margin-top:-6px}
+  .dots button{width:10px;height:10px;border-radius:99px;border:0;background:#CFCBBF;padding:0;cursor:pointer;transition:width .25s,background .25s}
+  .dots button.on{width:26px;background:#1B1B1B}
+
+  .pending{margin-top:28px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:16px 20px;scroll-margin-top:72px}
+  .pending b{font-size:16px}
+  .pending p{margin:6px 0 0;color:var(--mute);font-size:15px}
+
+  .cta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:28px;padding:18px 24px;background:transparent;color:#1B1B1B;border:1.5px solid #DAD5C8;border-radius:16px;text-decoration:none;overflow:hidden;transition:padding .4s cubic-bezier(.2,.8,.2,1)}
+  .cta:hover{padding:26px 32px;border-color:#1B1B1B}
+  .cta b{font-size:clamp(17px,3.6vw,22px);font-weight:700;line-height:1.3}
+  .cta b small{display:block;font-size:14px;font-weight:400;color:#6B6B66;margin-top:2px}
+  .cta .ar{font-size:28px;line-height:1;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  .cta:hover .ar{transform:translate(8px,-8px) scale(1.2)}
+
+  /* Admin */
+  #admin{display:none;margin-top:28px;background:#fff;border:3px solid #1B1B1B;border-radius:16px;padding:20px}
+  #admin.on{display:block}
+  #admin h2{margin:0 0 4px;font-size:22px}
+  #admin h3{margin:16px 0 8px;font-size:16px}
+  #admin details{border-top:1px solid var(--line);padding:6px 0}
+  #admin summary{cursor:pointer;font-weight:800;font-size:17px;padding:10px 0}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .row select{font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc;background:#fff}
+  .form{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .form fieldset{border:1px solid var(--line);border-radius:12px;padding:12px;margin:0;display:flex;flex-direction:column;gap:8px}
+  .form legend{font-weight:800;padding:0 6px}
+  .form label{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:4px}
+  .form input,#annIn{font:inherit;padding:10px;border-radius:8px;border:1px solid #ccc;width:100%}
+  .lg{max-height:340px;overflow:auto;font-size:14px}
+  .lg .l{display:grid;grid-template-columns:92px 1fr auto;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);align-items:baseline}
+  .lg .t{color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
+  .lg .dv{font-size:11px;color:var(--mute);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  .lg .ad{color:var(--o);font-weight:600}
+  .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .btn{font-weight:600;padding:12px 18px;border-radius:10px;border:2px solid #1B1B1B;background:#1B1B1B;color:#fff;cursor:pointer;font-size:15px}
+  .btn.ghost{background:#fff;color:#1B1B1B}
+  .btn.danger{background:#fff;color:#B3261E;border-color:#B3261E}
+
+  footer{margin-top:28px;color:var(--mute);font-size:13px;text-align:center}
+  footer a{color:var(--mute);cursor:pointer;text-decoration:underline}
+
+  .dock{position:fixed;left:0;right:0;bottom:0;background:#1B1B1B;color:#fff;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:600;z-index:5}
+  .dock .q{display:flex;gap:8px}
+  .dock .q button{font-weight:800;border:2px solid #fff;background:transparent;color:#fff;border-radius:10px;padding:8px 18px;min-height:44px;cursor:pointer}
+  .dock .q button.on{background:#fff;color:#1B1B1B}
+  .dock .q button:disabled{opacity:.35;cursor:not-allowed}
+  #top{position:fixed;right:16px;bottom:84px;width:48px;height:48px;border-radius:12px;border:0;background:#1B1B1B;color:#fff;font-size:22px;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s;z-index:7}
+  #top.show{opacity:1;pointer-events:auto;transform:none}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,20px);background:#fff;border:2px solid #1B1B1B;border-radius:12px;padding:12px 18px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;max-width:90vw}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  #cur{position:fixed;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:80;transform:translate(-50%,-50%);transition:width .25s,height .25s;display:none}
+  #cur.big{width:64px;height:64px}
+
+  /* ===== ป๊อปอัพสอนใช้งาน ===== */
+  .tour{position:fixed;inset:0;background:rgba(27,27,27,.58);display:grid;place-items:center;padding:16px;z-index:60}
+  .tour[hidden]{display:none}
+  .tour-box{background:#fff;border-radius:20px;width:min(440px,100%);padding:16px 20px 20px;animation:boxin .35s cubic-bezier(.2,.9,.3,1.1)}
+  @keyframes boxin{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+  .tour-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:14px;font-weight:600;color:var(--mute)}
+  .tour-top button{font-weight:600;font-size:14px;border:0;background:none;color:#1B1B1B;text-decoration:underline;cursor:pointer;padding:6px}
+  .sl{display:none}
+  .sl.on{display:block;animation:slin .3s ease}
+  @keyframes slin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+  .sl h3{margin:0 0 4px;font-size:21px;line-height:1.3}
+  .sl p{margin:0;color:#3A3A37;font-size:15.5px}
+  .tour-foot{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:10px}
+  .tdots{display:flex;gap:6px}
+  .tdots i{width:8px;height:8px;border-radius:99px;background:#D8D4C8;transition:width .25s,background .25s}
+  .tdots i.on{width:22px;background:#1B1B1B}
+  .tour-foot .btns{display:flex;gap:8px}
+
+  .stage{position:relative;height:190px;background:var(--bg);border-radius:14px;overflow:hidden;margin-bottom:16px}
+  .fing{position:absolute;width:30px;height:30px;border-radius:50%;background:rgba(27,27,27,.9);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translate(-50%,-50%);left:50%;top:60%;z-index:3;pointer-events:none}
+  .fing::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid #1B1B1B;opacity:0}
+  /* ฉาก 1: แตะชื่อ */
+  .mchips{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px}
+  .mchips span{background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:600;font-size:14px}
+  .mchips .t{background:#1B1B1B;color:#fff;border-color:#1B1B1B}
+  .s1 .fing{left:50%;top:54%;animation:f1 3.8s ease-in-out infinite}
+  .s1 .fing::after{animation:rip 3.8s infinite}
+  .s1 .t{animation:c1 3.8s infinite}
+  @keyframes f1{0%{left:90%;top:118%;opacity:0}8%{opacity:1}34%{left:50%;top:54%;transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(.78)}46%{transform:translate(-50%,-50%) scale(1)}86%{left:50%;top:54%;opacity:1}100%{left:50%;top:54%;opacity:0}}
+  @keyframes c1{0%,38%{background:#fff;color:#1B1B1B;border-color:#E4E0D6}42%,88%{background:#1B1B1B;color:#fff;border-color:#1B1B1B}100%{background:#fff;color:#1B1B1B;border-color:#E4E0D6}}
+  @keyframes rip{0%,38%{opacity:0;transform:scale(1)}40%{opacity:.5}60%{opacity:0;transform:scale(2.4)}100%{opacity:0}}
+  /* ฉาก 2: กดวัน */
+  .mcard{position:absolute;left:50%;top:50%;width:230px;transform:translate(-50%,-50%);background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px}
+  .mcard b{display:block;font-style:italic;font-weight:800;font-size:22px;color:var(--b);line-height:1.1;margin-bottom:8px}
+  .mseats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+  .mseats u{display:block;height:22px;border-radius:7px;border:2px solid #DAD5C8;text-decoration:none}
+  .mseats u.on{background:#C7D8E8;border-color:#C7D8E8}
+  .mseats u.me{background:var(--b);border-color:var(--b)}
+  .mbtn{display:block;text-align:center;background:var(--b);color:#fff;font-weight:800;font-size:14px;padding:8px;border-radius:9px}
+  .s2 .fing{left:50%;top:76%;animation:f2 3.8s ease-in-out infinite}
+  .s2 .fing::after{animation:rip 3.8s infinite}
+  .s2 .mseats .me{animation:s2 3.8s infinite}
+  .s2 .mbtn{animation:b2 3.8s infinite}
+  @keyframes f2{0%{left:92%;top:118%;opacity:0}8%{opacity:1}34%{left:50%;top:76%;transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(.78)}46%{transform:translate(-50%,-50%) scale(1)}86%{left:50%;top:76%;opacity:1}100%{left:50%;top:76%;opacity:0}}
+  @keyframes s2{0%,40%{background:transparent;border-color:#DAD5C8;transform:scale(1)}44%{background:var(--b);border-color:var(--b);transform:scale(1.25)}50%,88%{background:var(--b);border-color:var(--b);transform:scale(1)}100%{background:transparent;border-color:#DAD5C8}}
+  @keyframes b2{0%,38%{transform:scale(1)}40%{transform:scale(.94)}46%,100%{transform:scale(1)}}
+  /* ฉาก 3: ย้าย/ยกเลิก */
+  .pair{position:absolute;inset:0;display:flex;gap:10px;padding:18px 14px}
+  .pair .mcard{position:static;transform:none;width:auto;flex:1}
+  .pair .mcard.o b{color:var(--o)}
+  .pair .mcard.o .mbtn{background:var(--o)}
+  .pair .mseats{grid-template-columns:repeat(3,1fr)}
+  .mcard.o .mseats u.me{background:var(--o);border-color:var(--o)}
+  .s3 .fing{left:75%;top:80%;animation:f3 3.8s ease-in-out infinite}
+  .s3 .fing::after{animation:rip 3.8s infinite}
+  .s3 .a .me{animation:s3a 3.8s infinite}
+  .s3 .o .me{animation:s3b 3.8s infinite}
+  @keyframes f3{0%{left:92%;top:118%;opacity:0}8%{opacity:1}34%{left:75%;top:80%;transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(.78)}46%{transform:translate(-50%,-50%) scale(1)}86%{left:75%;top:80%;opacity:1}100%{left:75%;top:80%;opacity:0}}
+  @keyframes s3a{0%,40%{background:var(--b);border-color:var(--b)}46%,88%{background:transparent;border-color:#DAD5C8}100%{background:var(--b);border-color:var(--b)}}
+  @keyframes s3b{0%,44%{background:transparent;border-color:#DAD5C8;transform:scale(1)}48%{background:var(--o);border-color:var(--o);transform:scale(1.25)}54%,88%{background:var(--o);border-color:var(--o);transform:scale(1)}100%{background:transparent;border-color:#DAD5C8}}
+  /* ฉาก 4: ลืมตำแหน่ง */
+  .mcta{position:absolute;left:7%;right:7%;top:50%;transform:translateY(-50%);background:#1B1B1B;color:#fff;border-radius:14px;padding:22px 20px;display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:17px}
+  .mcta span{font-size:26px;line-height:1}
+  .s4 .fing{left:50%;top:50%;animation:f4 3.8s ease-in-out infinite}
+  .s4 .fing::after{animation:rip 3.8s infinite}
+  .s4 .mcta{animation:c4 3.8s infinite}
+  .s4 .mcta span{animation:a4 3.8s infinite}
+  @keyframes f4{0%{left:90%;top:118%;opacity:0}8%{opacity:1}34%{left:62%;top:52%;transform:translate(-50%,-50%) scale(1)}40%{transform:translate(-50%,-50%) scale(.78)}46%{transform:translate(-50%,-50%) scale(1)}86%{left:62%;top:52%;opacity:1}100%{left:62%;top:52%;opacity:0}}
+  @keyframes c4{0%,38%{padding:22px 20px}46%,88%{padding:30px 24px}100%{padding:22px 20px}}
+  @keyframes a4{0%,38%{transform:none}46%,88%{transform:translate(5px,-5px) scale(1.2)}100%{transform:none}}
+
+  /* เลื่อนแล้วโผล่ (Scroll-Driven) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .step,.pending,.cta,footer{animation:sd-rise linear backwards;animation-timeline:view();animation-range:entry 0% entry 55%}
+      .card{animation:sd-pop linear backwards;animation-timeline:view();animation-range:entry 0% entry 70%}
+      .chip{animation:sd-slide linear backwards;animation-timeline:view();animation-range:entry 0% entry 80%}
+      .seat{animation:sd-seat linear backwards;animation-timeline:view();animation-range:entry 10% entry 90%}
+      @keyframes sd-rise{from{opacity:0;transform:translateY(48px)}to{opacity:1;transform:none}}
+      @keyframes sd-pop{from{opacity:0;transform:translateY(80px) scale(.92)}to{opacity:1;transform:none}}
+      @keyframes sd-slide{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+      @keyframes sd-seat{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+    }
+  }
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  /* จอกว้าง: การ์ดวันยืดขยายตอนชี้ */
+  @media (min-width:700px){
+    .days{grid-template-columns:1fr 1fr;transition:opacity .2s,grid-template-columns .55s cubic-bezier(.2,.8,.2,1)}
+    .days:has(.d14:hover),.days:has(.d14:focus-within){grid-template-columns:1.35fr 1fr}
+    .days:has(.d15:hover),.days:has(.d15:focus-within){grid-template-columns:1fr 1.35fr}
+  }
+  /* มือถือ */
+  @media (max-width:699px){
+    .days{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin:0 -16px;padding:4px 16px 20px;scrollbar-width:none;overscroll-behavior-x:contain}
+    .days::-webkit-scrollbar{display:none}
+    .days .card{flex:0 0 88%;scroll-snap-align:center;animation:none!important}
+    .days .seat{animation:none!important}
+    .dots{display:flex}
+  }
+  @media (max-width:600px){
+    .dock span#dock{min-width:0;font-size:14px;line-height:1.3}
+    .dock .q button{padding:8px 14px}
+    .chip{border-radius:12px}
+    .date{font-size:64px}
+    .card{padding:22px}
+    .navbtn{padding:7px 10px}
+  }
+  @media (hover:none){
+    .chip:hover{transform:none}
+    .go:hover:not(:disabled){letter-spacing:normal;transform:none}
+    .seat:not(.empty):hover{transform:none}
+    .cta:hover{padding:18px 24px}
+    .cta:hover .ar{transform:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .fing{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){.go::after{animation:none!important;display:none}}
+  /* พื้นหลังเส้นไหล (แนว Background Paths) */
+  .bgp{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+  .bgp path{fill:none;stroke-linecap:round;stroke-dasharray:.3 .7;animation:flow linear infinite}
+  .bgp .pb{stroke:var(--b)}
+  .bgp .po{stroke:var(--o)}
+  @keyframes flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-2}}
+  @media (prefers-reduced-motion:reduce){.bgp path{animation:none!important;stroke-dasharray:none}}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="cur"></div>
+<div class="ticker"><div>BLOCKSHOT / FDM23067 / 14–15 ต.ค. 2569 / เลือกวันถ่าย / BLOCKSHOT / FDM23067 / 14–15 ต.ค. 2569 / เลือกวันถ่าย / BLOCKSHOT / FDM23067 / 14–15 ต.ค. 2569 / เลือกวันถ่าย / BLOCKSHOT / FDM23067 / 14–15 ต.ค. 2569 / เลือกวันถ่าย / </div></div>
+
+<nav class="nav" id="nav">
+  <div class="nl">
+    <a href="#sec-name" data-s="sec-name">ชื่อ</a>
+    <a href="#sec-days" data-s="sec-days">เลือกวัน</a>
+    <a href="#pending" data-s="pending">ใครยังไม่ลง</a>
+    <a href="./index.html">ลืมตำแหน่ง? ↗</a>
+  </div>
+  <div class="nr"><span class="cnt" id="cnt"></span><button class="navbtn" id="helpBtn">วิธีใช้</button></div>
+</nav>
+
+<main>
+  <svg class="bgp" id="bgp" viewBox="0 0 696 316" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <div class="hero">
+    <div class="eyebrow">FDM23067 · หนังสั้น 1 ซีน 2 นาที</div>
+    <h1>Blockshot</h1>
+    <p class="sub">เลือกว่าจะมาถ่ายวัน 14 หรือวัน 15</p>
+    <div class="pills">
+      <span class="pill">14–15 ต.ค. 2569</span>
+      <span class="pill soft" id="cd"></span>
+    </div>
+  </div>
+
+  <div class="warn" id="warn">ยังไม่ได้ใส่ค่า Firebase ในไฟล์ (หา FIREBASE_CONFIG ด้านล่างแล้ววางค่าของโปรเจกต์)</div>
+  <div class="ann" id="ann"></div>
+  <div class="gate" id="gate"></div>
+
+  <div class="step" id="sec-name"><b id="st1">1</b><div><h2>เลือกชื่อของคุณ</h2><span>แตะชื่อตัวเอง</span></div></div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="ค้นหาชื่อ" aria-label="ค้นหาชื่อ" autocomplete="off">
+    <div class="tabs" id="tabs">
+      <button data-f="all" class="on">ทั้งหมด</button>
+      <button data-f="todo">ยังไม่ลง</button>
+      <button data-f="done">ลงแล้ว</button>
+    </div>
+  </div>
+  <div class="names" id="names"></div>
+  <p class="hint" id="nameHint">เลือกผิดก็แตะชื่อใหม่ได้ จนกว่าจะลงวัน หลังลงแล้วเครื่องนี้จะล็อกเป็นชื่อคุณ</p>
+
+  <div class="step" id="sec-days"><b id="st2">2</b><div><h2>เลือกวันถ่าย</h2><span>กดแล้วได้ที่นั่งเลย ย้ายหรือยกเลิกทีหลังได้</span></div></div>
+  <div class="days locked" id="days">
+    <section class="card d14">
+      <div class="head"><div><div class="day">วันที่ 1</div><div class="date">14 ต.ค.</div></div><div class="left" id="l14"></div></div>
+      <div class="info" id="i14"></div>
+      <div class="bar"><i id="p14"></i></div>
+      <div class="seats" id="s14"></div>
+      <button class="go" id="b14"></button>
+    </section>
+    <section class="card d15">
+      <div class="head"><div><div class="day">วันที่ 2</div><div class="date">15 ต.ค.</div></div><div class="left" id="l15"></div></div>
+      <div class="info" id="i15"></div>
+      <div class="bar"><i id="p15"></i></div>
+      <div class="seats" id="s15"></div>
+      <button class="go" id="b15"></button>
+    </section>
+  </div>
+  <div class="dots" id="dots"><button aria-label="วันที่ 14" class="on"></button><button aria-label="วันที่ 15"></button></div>
+
+  <div class="pending" id="pending"></div>
+
+  <a class="cta" href="./index.html">
+    <b>ลืมว่าตัวเองได้ตำแหน่งอะไร?<small>เปิดดูได้ที่หน้าตำแหน่งกองถ่าย</small></b>
+    <span class="ar">↗</span>
+  </a>
+
+  <!-- ===== Admin ===== -->
+  <section id="admin">
+    <h2>Admin</h2>
+    <p class="hint" style="margin:0">ตั้งเวลา จัดคนลงวัน และแก้รายละเอียดได้ตรงนี้ แก้แล้วทุกคนเห็นทันที</p>
+
+    <details open><summary>เปิด–ปิดรับลงชื่อ</summary>
+    <div class="form">
+      <fieldset><legend>ตั้งเวลา (เวลาไทย)</legend>
+        <label>เปิดตอน<input id="openAt" type="datetime-local"></label>
+        <label>ปิดตอน<input id="closeAt" type="datetime-local"></label>
+        <label style="flex-direction:row;align-items:center;gap:8px"><input id="closedNow" type="checkbox" style="width:auto"> ปิดรับไว้ก่อน (ไม่สนเวลาที่ตั้ง)</label>
+        <button class="btn ghost" id="clearTime" type="button">ล้างเวลา</button>
+      </fieldset>
+    </div>
+    <p class="hint">เว้นว่างช่องไหนก็ได้ถ้าไม่อยากตั้ง แอดมินจัดคนลงวันได้ตลอดแม้ปิดรับแล้ว ตั้งเสร็จกด "บันทึกรายละเอียด" ด้านล่างถึงจะมีผล</p>
+    </details>
+
+    <details open><summary>จัดคนลงวัน</summary>
+    <div id="adminRows"></div>
+    </details>
+
+    <details><summary>ประวัติการใช้งาน (Log)</summary>
+    <p class="hint">บันทึกทุกครั้งที่มีคนลง ย้าย ยกเลิก และการแก้ของแอดมิน แท็กท้ายแถวคือรหัสเครื่อง ถ้าหลายชื่อมาจากรหัสเดียวกันแปลว่าใช้เครื่องเดียวกัน</p>
+    <div class="lg" id="logBox">ยังไม่มีประวัติ</div>
+    </details>
+
+    <details><summary>ประกาศและรายละเอียดแต่ละวัน</summary>
+    <h3>ประกาศ (แสดงบนหัวหน้าเว็บ)</h3>
+    <input id="annIn" placeholder="เช่น นัดรวมพล 06:30 อย่าลืมบัตรนักศึกษา">
+
+    <h3>รายละเอียดแต่ละวัน</h3>
+    <div class="form">
+      <fieldset><legend>14 ต.ค.</legend>
+        <label>เวลานัด<input id="time14" placeholder="เช่น 07:00"></label>
+        <label>สถานที่<input id="place14" placeholder="เช่น ตึก X ห้อง Y"></label>
+        <label>หมายเหตุ<input id="note14" placeholder="เช่น แต่งกายสุภาพ"></label>
+        <label>จำนวนที่นั่ง (1–18)<input id="cap14" type="number" min="1" max="18"></label>
+      </fieldset>
+      <fieldset><legend>15 ต.ค.</legend>
+        <label>เวลานัด<input id="time15" placeholder="เช่น 07:00"></label>
+        <label>สถานที่<input id="place15" placeholder="เช่น ตึก X ห้อง Y"></label>
+        <label>หมายเหตุ<input id="note15" placeholder="เช่น แต่งกายสุภาพ"></label>
+        <label>จำนวนที่นั่ง (1–18)<input id="cap15" type="number" min="1" max="18"></label>
+      </fieldset>
+    </div>
+    </details>
+    <div class="acts">
+      <button class="btn" id="saveMeta">บันทึกรายละเอียด</button>
+      <button class="btn danger" id="clearAll">ล้างการลงชื่อทั้งหมด</button>
+      <button class="btn ghost" id="unlock">ปลดล็อกเครื่องนี้</button>
+      <button class="btn ghost" id="logout">ออกจากโหมด Admin</button>
+    </div>
+  </section>
+
+  <footer>Blockshot · FDM23067 · <a id="share">แชร์ลิงก์</a> · <a id="adminLink">Admin</a>
+    <input id="adminKey" type="password" placeholder="Admin Key แล้วกด Enter" autocomplete="off" style="display:none;margin:12px auto 0;max-width:260px;font:inherit;padding:10px;border-radius:8px;border:1px solid #ccc;text-align:center">
+  </footer>
+</main>
+
+<div class="dock"><span id="dock">ยังไม่ได้เลือกชื่อ</span><div class="q"><button id="q14">14 ต.ค.</button><button id="q15">15 ต.ค.</button></div></div>
+<button id="top" aria-label="กลับขึ้นบน">↑</button>
+<div class="toast" id="toast"></div>
+
+<!-- ===== ป๊อปอัพสอนใช้งาน ===== -->
+<div class="tour" id="tour" hidden role="dialog" aria-modal="true" aria-label="วิธีใช้">
+  <div class="tour-box">
+    <div class="tour-top"><span id="tn">1 / 4</span><button id="tskip">ข้าม</button></div>
+
+    <section class="sl on">
+      <div class="stage s1">
+        <div class="mchips"><span>หิรัญ</span><span class="t">จันทิมา</span><span>ธัญพิสิษฐ์</span></div>
+        <i class="fing"></i>
+      </div>
+      <h3>แตะชื่อตัวเองก่อน</h3>
+      <p>หาชื่อในลิสต์แล้วจิ้มเลย ชื่อเยอะก็พิมพ์ค้นหาได้ เครื่องจะจำไว้ให้</p>
+    </section>
+
+    <section class="sl">
+      <div class="stage s2">
+        <div class="mcard"><b>14 ต.ค.</b>
+          <div class="mseats"><u class="on"></u><u class="on"></u><u class="me"></u><u></u><u></u><u></u></div>
+          <span class="mbtn">ลงวันที่ 14</span>
+        </div>
+        <i class="fing"></i>
+      </div>
+      <h3>แล้วกดวันที่จะมาถ่าย</h3>
+      <p>กดปุ่มใต้การ์ดวัน 14 หรือ 15 ชื่อจะขึ้นที่นั่งเลย ไม่ต้องกดยืนยันซ้ำ</p>
+    </section>
+
+    <section class="sl">
+      <div class="stage s3">
+        <div class="pair">
+          <div class="mcard a"><b>14 ต.ค.</b><div class="mseats"><u class="on"></u><u class="me"></u><u></u></div><span class="mbtn">ยกเลิก</span></div>
+          <div class="mcard o"><b>15 ต.ค.</b><div class="mseats"><u class="on"></u><u class="me"></u><u></u></div><span class="mbtn">ย้ายมาวันนี้</span></div>
+        </div>
+        <i class="fing"></i>
+      </div>
+      <h3>เปลี่ยนใจก็กดใหม่ได้</h3>
+      <p>กดอีกวันเพื่อย้าย กดวันเดิมซ้ำเพื่อยกเลิก วันไหนเต็มจะกดไม่ได้ ให้ทักแอดมิน</p>
+    </section>
+
+    <section class="sl">
+      <div class="stage s4">
+        <div class="mcta">ลืมตำแหน่ง? เปิดดู <span>↗</span></div>
+        <i class="fing"></i>
+      </div>
+      <h3>ลืมตำแหน่งตัวเอง?</h3>
+      <p>ตำแหน่งเลือกไปแล้วในอีกหน้า ถ้าจำไม่ได้ กดดูได้จากเมนูด้านบนหรือปุ่มท้ายหน้านี้</p>
+    </section>
+
+    <div class="tour-foot">
+      <div class="tdots"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="btns"><button class="btn ghost" id="tback">ย้อนกลับ</button><button class="btn" id="tnext">ต่อไป</button></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, onSnapshot, runTransaction, setDoc, deleteDoc, addDoc, query as fsQuery, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+// ===== ค่า Firebase ของโปรเจกต์ =====
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+  authDomain: "fdm13167.firebaseapp.com",
+  projectId: "fdm13167",
+  appId: "1:638048330365:web:961daeac412d5d6332c714"
+};
+
+// SHA-256 ของ Admin Key
+const ADMIN_HASH = "80679a277c0607818c8f49c9e74357a582f3d1b712cfaaf54bd4c79a72d82a50";
+
+// รายชื่อทีม 18 คน
+const ROSTER = [
+  "หิรัญ ดิษฐสกุล","จันทิมา จันทร์ช่วง","ธัญพิสิษฐ์ พูนพานิช","ศิริวัฒน์ เดชอุดม",
+  "ทีปกร จิณเสน","ธนพัฒน์ พรมวิชัย","พิยดา ด่วนดี","วริชยา ไชยสงค์","พีชานิกา ทองประศรี",
+  "กัณญาพัฒน์ จันทร์เกษมสุข","วิโรจน์ สวนสระแก้ว","ภูริพัฒน์ อนุโชติ","กมลพร พูลแก้ว",
+  "ณัฐวุฒิ ทับทอง","ณรงค์เดช แสนสิทธิ์","ขันเงิน สาครธนะศักดิ์","วัชรพล ดำสมอ","รวีโรจน์ เชื้อแฉ่ง"
+];
+const DAYS = [14, 15];
+const MAXCAP = 18;
+
+const $ = (id) => document.getElementById(id);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let me = "";
+let lockedName = ""; // เครื่องนี้ล็อกเป็นชื่อใคร (ล็อกหลังลงวันสำเร็จ)
+try { lockedName = localStorage.getItem("blockshot_lock") || ""; me = lockedName || localStorage.getItem("blockshot_me") || ""; } catch (e) {}
+
+let slots = {};      // id -> {name}
+let meta = {};       // doc "meta": ประกาศ รายละเอียด จำนวนที่นั่ง เวลาเปิด-ปิด
+let prevIds = new Set();
+let isAdmin = false;
+let db = null;
+const configured = !FIREBASE_CONFIG.apiKey.startsWith("YOUR_");
+if (!configured) $("warn").style.display = "block";
+else db = getFirestore(initializeApp(FIREBASE_CONFIG));
+
+const cap = (d) => Math.min(MAXCAP, Math.max(1, Number(meta["cap" + d]) || 9));
+const slotId = (d, i) => `d${d}-${i}`;
+const slotOf = (name) => Object.keys(slots).find((k) => slots[k].name === name);
+const dayOf = (name) => { const k = slotOf(name); return k ? Number(k.slice(1, 3)) : 0; };
+const first = (n) => n.split(" ")[0];
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+// นับถอยหลังถึงวันถ่าย (14 ต.ค. 2569 00:00 เวลาไทย = 13 ต.ค. 17:00 UTC)
+(function () {
+  const ms = Date.UTC(2026, 9, 13, 17, 0, 0) - Date.now();
+  $("cd").textContent = ms > 0 ? `อีก ${Math.ceil(ms / 864e5)} วันถึงวันถ่าย` : "ถึงวันถ่ายแล้ว";
+})();
+
+// ===== เวลาเปิด–ปิดรับลงชื่อ =====
+function gateState() {
+  if (meta.closed) return "closed";
+  const o = Number(meta.openAt) || 0, c = Number(meta.closeAt) || 0, t = Date.now();
+  if (o && t < o) return "wait";
+  if (c && t >= c) return "closed";
+  return "open";
+}
+let lastGate = "";
+const fmtT = (ms) => new Date(ms).toLocaleString("th-TH", { timeZone: "Asia/Bangkok", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const p2 = (n) => String(n).padStart(2, "0");
+function left(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000)), d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+  return (d ? d + " วัน " : "") + `${p2(h)}:${p2(m)}:${p2(s % 60)}`;
+}
+const toLocal = (ms) => ms ? new Date(Number(ms) + 7 * 3600e3).toISOString().slice(0, 16) : "";
+const parseLocal = (v) => { if (!v) return 0; const t = new Date(v + ":00+07:00").getTime(); return isNaN(t) ? 0 : t; };
+function renderGate() {
+  const g = gateState(), el = $("gate"), o = Number(meta.openAt) || 0, c = Number(meta.closeAt) || 0;
+  el.className = "gate " + g;
+  if (g === "wait") el.textContent = `ยังไม่เปิดให้ลงชื่อ จะเปิด ${fmtT(o)} (อีก ${left(o - Date.now())})`;
+  else if (g === "closed") el.textContent = "ปิดรับลงชื่อแล้ว ถ้าอยากย้ายวันให้ทักแอดมินนะ";
+  else if (c) el.textContent = `เปิดให้ลงชื่ออยู่ ปิด ${fmtT(c)} (เหลือ ${left(c - Date.now())})`;
+  else el.textContent = "เปิดให้ลงชื่ออยู่";
+}
+
+// ===== รายชื่อ =====
+let filter = "all", query = "";
+function renderNames() {
+  const box = $("names"); box.innerHTML = "";
+  const list = ROSTER.filter((n) =>
+    (!query || n.includes(query)) &&
+    (filter === "all" || (filter === "todo" ? !dayOf(n) : !!dayOf(n)))
+  );
+  if (!list.length) { const p = document.createElement("p"); p.className = "none"; p.textContent = "ไม่เจอชื่อนี้"; box.appendChild(p); }
+  list.forEach((n) => {
+    const d = dayOf(n);
+    const b = document.createElement("button");
+    // ล็อกเครื่อง: เครื่องที่ล็อกแล้วเลือกได้แค่ชื่อตัวเอง / ชื่อที่ลงวันแล้วคนอื่นแตะไม่ได้ (แอดมินข้ามได้)
+    const blocked = !isAdmin && ((lockedName && n !== lockedName) || (d && n !== lockedName));
+    b.className = "chip" + (d ? " d" + d : "") + (n === me ? " me" : "") + (blocked ? " lk" : "");
+    const av = document.createElement("span"); av.className = "av"; av.textContent = n.charAt(0);
+    const tx = document.createElement("span"); tx.className = "tx";
+    const a = document.createElement("span"); a.className = "nm"; a.textContent = n;
+    const s = document.createElement("span"); s.className = "st"; s.textContent = d ? `วันที่ ${d}` : "ยังไม่ลง";
+    tx.append(a, s); b.append(av, tx);
+    b.addEventListener("click", () => {
+      if (blocked) {
+        toast(lockedName && n !== lockedName ? `เครื่องนี้ล็อกเป็นของ ${first(lockedName)} แล้ว ขอแอดมินปลดล็อก` : "ชื่อนี้ลงวันแล้ว ถ้าเป็นคุณจริงให้ทักแอดมิน");
+        return;
+      }
+      me = n; if (!isAdmin) { try { localStorage.setItem("blockshot_me", n); } catch (e) {} }
+      render();
+      $("days").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    box.appendChild(b);
+  });
+}
+
+// ===== Admin: ตารางจัดคน + ฟอร์ม =====
+function renderAdmin() {
+  const box = $("adminRows"); box.innerHTML = "";
+  ROSTER.forEach((n) => {
+    const row = document.createElement("div"); row.className = "row";
+    const nm = document.createElement("span"); nm.textContent = n;
+    const sel = document.createElement("select");
+    [["0", "ยังไม่ลง"], ["14", "14 ต.ค."], ["15", "15 ต.ค."]].forEach(([v, t]) => {
+      const o = document.createElement("option"); o.value = v; o.textContent = t; sel.appendChild(o);
+    });
+    sel.value = String(dayOf(n));
+    sel.addEventListener("change", async () => {
+      try {
+        if (sel.value === "0") { await release(n); toast(`ถอด ${first(n)} ออกแล้ว`); logEv(n, "remove", 0, "admin"); }
+        else if (await place(n, Number(sel.value))) { toast(`จัด ${first(n)} ลงวันที่ ${sel.value} แล้ว`); logEv(n, "assign", Number(sel.value), "admin"); }
+      } catch (e) { toast("ไม่สำเร็จ: " + e.message); }
+      renderAdmin();
+    });
+    row.append(nm, sel); box.appendChild(row);
+  });
+}
+function fillForm() {
+  if ($("admin").contains(document.activeElement) && document.activeElement.tagName === "INPUT") return;
+  $("annIn").value = meta.announcement || "";
+  $("openAt").value = toLocal(meta.openAt);
+  $("closeAt").value = toLocal(meta.closeAt);
+  $("closedNow").checked = !!meta.closed;
+  DAYS.forEach((d) => {
+    $("time" + d).value = meta["time" + d] || "";
+    $("place" + d).value = meta["place" + d] || "";
+    $("note" + d).value = meta["note" + d] || "";
+    $("cap" + d).value = cap(d);
+  });
+}
+
+// ===== พื้นหลังเส้นไหล =====
+(function () {
+  const svg = $("bgp"), NS = "http://www.w3.org/2000/svg";
+  [1, -1].forEach((pos) => { // 2 ชุดสะท้อนกัน ชุดแรกสีน้ำเงิน ชุดสองสีส้ม
+    for (let i = 0; i < 28; i++) {
+      const k = i * 5 * pos, m = i * 6;
+      const d = `M${-380 + k} ${-189 - m}C${-380 + k} ${-189 - m} ${-312 + k} ${216 - m} ${152 + k} ${343 - m}C${616 + k} ${470 - m} ${684 + k} ${875 - m} ${684 + k} ${875 - m}`;
+      const el = document.createElementNS(NS, "path");
+      el.setAttribute("d", d); el.setAttribute("pathLength", "1");
+      el.setAttribute("class", pos > 0 ? "pb" : "po");
+      el.style.strokeWidth = (0.5 + i * 0.03).toFixed(2);
+      el.style.strokeOpacity = (0.06 + i * 0.006).toFixed(3);
+      el.style.animationDuration = (20 + (i * 7) % 11) + "s";
+      el.style.animationDelay = "-" + ((i * 3) % 20) + "s";
+      svg.appendChild(el);
+    }
+  });
+})();
+
+// ===== ตัวเลขวิ่ง (แนว Number Ticker) =====
+function ticker(el, to, fmt) {
+  const from = el._v == null ? to : el._v;
+  el._v = to;
+  if (from === to || reduce) { el.textContent = fmt(to); return; }
+  const t0 = performance.now(), dur = 700;
+  (function step(t) {
+    const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    el.textContent = fmt(Math.round(from + (to - from) * e));
+    if (k < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+// ===== วาดหน้า =====
+function seatEl(s, id, d, me_) {
+  const el = document.createElement("div");
+  el.className = "seat" + (s.name === me_ ? " me" : "") + (!prevIds.has(id) && prevIds.size && s.name === me_ ? " pop" : "");
+  const av = document.createElement("div"); av.className = "av"; av.textContent = s.name.charAt(0);
+  const t = document.createElement("div"); t.textContent = first(s.name); t.title = s.name;
+  el.append(av, t);
+  return el;
+}
+function render() {
+  renderNames();
+  const mine = slotOf(me);
+  $("days").classList.toggle("locked", !me);
+  const gs = gateState(); lastGate = gs; renderGate();
+
+  $("ann").textContent = meta.announcement || "";
+  $("ann").style.display = meta.announcement ? "block" : "none";
+
+  DAYS.forEach((d) => {
+    const box = $("s" + d); box.innerHTML = "";
+    const C = cap(d);
+    const ids = Object.keys(slots).filter((k) => k.startsWith(`d${d}-`));
+    const used = ids.length;
+    for (let i = 1; i <= C; i++) {
+      const id = slotId(d, i), s = slots[id];
+      if (s) box.appendChild(seatEl(s, id, d, me));
+      else { const el = document.createElement("div"); el.className = "seat empty"; el.textContent = "ว่าง"; box.appendChild(el); }
+    }
+    // ที่นั่งเกินจำนวนที่ตั้งไว้ (ถ้า Admin ลดที่นั่งทีหลัง) ยังแสดงให้เห็น
+    ids.filter((k) => Number(k.split("-")[1]) > C).forEach((k) => box.appendChild(seatEl(slots[k], k, d, me)));
+
+    $("p" + d).style.width = Math.min(100, used / C * 100) + "%";
+    $("l" + d).textContent = used >= C ? "เต็มแล้ว" : `เหลือ ${C - used} ที่`;
+
+    const parts = [];
+    if (meta["time" + d]) parts.push(`<b>เวลา</b> ${esc(meta["time" + d])}`);
+    if (meta["place" + d]) parts.push(`<b>สถานที่</b> ${esc(meta["place" + d])}`);
+    if (meta["note" + d]) parts.push(esc(meta["note" + d]));
+    $("i" + d).innerHTML = parts.join("<br>");
+    $("i" + d).style.display = parts.length ? "block" : "none";
+
+    const b = $("b" + d);
+    const onThis = mine && mine.startsWith(`d${d}-`);
+    b.className = "go" + (onThis ? " cancel" : "");
+    b.disabled = !configured || !me || gs !== "open" || (!onThis && used >= C);
+    b.textContent = gs === "wait" ? "ยังไม่เปิดลงชื่อ" : gs === "closed" ? "ปิดรับลงชื่อแล้ว" : !me ? "เลือกชื่อก่อน" : onThis ? `ยกเลิกวันที่ ${d}` : used >= C ? "เต็มแล้ว" : mine ? `ย้ายมาวันที่ ${d}` : `ลงวันที่ ${d}`;
+    const q = $("q" + d); q.className = onThis ? "on" : ""; q.disabled = b.disabled;
+  });
+
+  $("nameHint").textContent = lockedName && !isAdmin ? `เครื่องนี้ล็อกเป็นชื่อ ${first(lockedName)} แล้ว ถ้าลงผิดคนให้ทักแอดมิน` : "เลือกผิดก็แตะชื่อใหม่ได้ จนกว่าจะลงวัน หลังลงแล้วเครื่องนี้จะล็อกเป็นชื่อคุณ";
+  const md = dayOf(me);
+  ticker($("cnt"), ROSTER.filter((n) => dayOf(n)).length, (n) => `ลงแล้ว ${n}/${ROSTER.length}`);
+  $("st1").textContent = me ? "✓" : "1";
+  $("st2").textContent = md ? "✓" : "2";
+  $("dock").textContent = !me ? "ยังไม่ได้เลือกชื่อ" : md ? `${first(me)} ลงวันที่ ${md} แล้ว` : `${first(me)} ยังไม่ได้เลือกวัน`;
+
+  const todo = ROSTER.filter((n) => !dayOf(n));
+  $("pending").innerHTML = "";
+  const t = document.createElement("b");
+  t.textContent = todo.length ? `ยังไม่ลง ${todo.length} คน` : "ลงครบทุกคนแล้ว";
+  $("pending").appendChild(t);
+  if (todo.length) { const p = document.createElement("p"); p.textContent = todo.map(first).join(" · "); $("pending").appendChild(p); }
+
+  if (isAdmin) { renderAdmin(); fillForm(); }
+  prevIds = new Set(Object.keys(slots));
+}
+
+// ===== ประวัติการใช้งาน (Log) =====
+let devId = "";
+try { devId = localStorage.getItem("blockshot_dev") || ""; if (!devId) { devId = Math.random().toString(36).slice(2, 6).toUpperCase(); localStorage.setItem("blockshot_dev", devId); } } catch (e) { devId = "????"; }
+function logEv(who, act, day, by) { // บันทึกแล้วไม่รอผล ถ้าพังก็ไม่กระทบการลงชื่อ
+  if (!db) return;
+  addDoc(collection(db, "blockshot_log"), { who, act, day: day || 0, by: by || "self", dev: devId, ts: Date.now() }).catch(() => {});
+}
+const ACTTXT = { join: "ลงวันที่", move: "ย้ายไปวันที่", cancel: "ยกเลิกวันที่", assign: "ถูกจัดลงวันที่", remove: "ถูกถอดออกจากวันที่" };
+let unLog = null;
+function watchLog() {
+  if (!db || unLog) return;
+  unLog = onSnapshot(fsQuery(collection(db, "blockshot_log"), orderBy("ts", "desc"), limit(200)), (snap) => {
+    const box = $("logBox"); box.innerHTML = "";
+    if (snap.empty) { box.textContent = "ยังไม่มีประวัติ"; return; }
+    snap.forEach((x) => {
+      const v = x.data(), l = document.createElement("div"); l.className = "l";
+      const t = document.createElement("span"); t.className = "t";
+      t.textContent = new Date(v.ts).toLocaleString("th-TH", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "Asia/Bangkok" });
+      const m = document.createElement("span");
+      if (v.by === "admin") m.className = "ad";
+      m.textContent = v.act === "note" ? `แอดมิน: ${v.who}` : `${v.who} ${ACTTXT[v.act] || v.act}${v.day ? " " + v.day : ""}${v.by === "admin" && v.act !== "assign" && v.act !== "remove" ? " (โดยแอดมิน)" : ""}`;
+      const dv = document.createElement("span"); dv.className = "dv"; dv.textContent = v.dev || "-";
+      l.append(t, m, dv); box.appendChild(l);
+    });
+  }, () => { $("logBox").textContent = "อ่านประวัติไม่ได้ (เช็ก Firestore rules ของ blockshot_log)"; });
+}
+function stopLog() { if (unLog) { unLog(); unLog = null; } }
+
+// ===== จอง / ย้าย / ยกเลิก (transaction กันกดชนกัน) =====
+async function place(name, d) {
+  const old = slotOf(name);
+  let free = 0;
+  for (let i = 1; i <= cap(d); i++) { if (!slots[slotId(d, i)]) { free = i; break; } }
+  if (!free) { toast("วันนี้เต็มแล้ว"); return false; }
+  await runTransaction(db, async (tx) => {
+    const target = doc(db, "blockshot", slotId(d, free));
+    const t = await tx.get(target);
+    const oldRef = old ? doc(db, "blockshot", old) : null;
+    const o = oldRef ? await tx.get(oldRef) : null;
+    if (t.exists()) throw new Error("taken");
+    tx.set(target, { name, ts: Date.now() });
+    if (o && o.exists() && o.data().name === name) tx.delete(oldRef);
+  });
+  return true;
+}
+async function release(name) {
+  const old = slotOf(name); if (!old) return;
+  await runTransaction(db, async (tx) => {
+    const r = doc(db, "blockshot", old); const s = await tx.get(r);
+    if (s.exists() && s.data().name === name) tx.delete(r);
+  });
+}
+async function act(d) {
+  if (!me) return;
+  try {
+    const had = slotOf(me);
+    if ((had || "").startsWith(`d${d}-`)) { await release(me); toast(`ยกเลิกวันที่ ${d} แล้ว`); logEv(me, "cancel", d, isAdmin ? "admin" : "self"); }
+    else if (await place(me, d)) {
+      toast(`ลงวันที่ ${d} แล้ว`); logEv(me, had ? "move" : "join", d, isAdmin ? "admin" : "self");
+      if (!isAdmin) { lockedName = me; try { localStorage.setItem("blockshot_lock", me); } catch (e) {} render(); } // ลงสำเร็จ = ล็อกเครื่อง
+    }
+  } catch (e) {
+    toast(e.message === "taken" ? "มีคนเพิ่งจองที่นั่งนี้ ลองกดใหม่อีกครั้ง" : "บันทึกไม่สำเร็จ: " + e.message);
+  }
+}
+DAYS.forEach((d) => { $("b" + d).addEventListener("click", () => act(d)); $("q" + d).addEventListener("click", () => act(d)); });
+
+// ===== Admin =====
+async function sha256(s) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((x) => x.toString(16).padStart(2, "0")).join("");
+}
+$("adminLink").addEventListener("click", () => {
+  if (isAdmin) { $("admin").scrollIntoView({ behavior: "smooth" }); return; }
+  $("adminKey").style.display = "block"; $("adminKey").focus();
+});
+$("adminKey").addEventListener("keydown", async (e) => {
+  if (e.key !== "Enter") return;
+  const k = $("adminKey").value.trim(); $("adminKey").value = "";
+  if (!k) return;
+  if ((await sha256(k)) === ADMIN_HASH) {
+    isAdmin = true; $("adminKey").style.display = "none"; $("admin").classList.add("on"); render(); watchLog();
+    $("admin").scrollIntoView({ behavior: "smooth" }); toast("เข้าโหมด Admin แล้ว");
+  } else toast("Admin Key ไม่ถูกต้อง");
+});
+$("unlock").addEventListener("click", () => { // ปลดล็อกเฉพาะเครื่องที่แอดมินเปิดอยู่
+  lockedName = ""; try { localStorage.removeItem("blockshot_lock"); localStorage.removeItem("blockshot_me"); } catch (e) {}
+  me = ""; render(); toast("ปลดล็อกเครื่องนี้แล้ว"); logEv("ปลดล็อกเครื่องรหัส " + devId, "note", 0, "admin");
+});
+$("logout").addEventListener("click", () => { stopLog(); me = lockedName; isAdmin = false; $("admin").classList.remove("on"); toast("ออกจากโหมด Admin แล้ว"); });
+$("clearTime").addEventListener("click", () => { $("openAt").value = ""; $("closeAt").value = ""; $("closedNow").checked = false; toast("ล้างแล้ว อย่าลืมกดบันทึก"); });
+$("saveMeta").addEventListener("click", async () => {
+  const data = {
+    announcement: $("annIn").value.trim(),
+    openAt: parseLocal($("openAt").value), closeAt: parseLocal($("closeAt").value), closed: $("closedNow").checked,
+    ts: Date.now()
+  };
+  DAYS.forEach((d) => {
+    data["time" + d] = $("time" + d).value.trim();
+    data["place" + d] = $("place" + d).value.trim();
+    data["note" + d] = $("note" + d).value.trim();
+    data["cap" + d] = Math.min(MAXCAP, Math.max(1, Number($("cap" + d).value) || 9));
+  });
+  try { await setDoc(doc(db, "blockshot", "meta"), data); toast("บันทึกแล้ว"); logEv("บันทึกรายละเอียด/เวลาเปิดปิด", "note", 0, "admin"); }
+  catch (e) { toast("บันทึกไม่สำเร็จ: " + e.message); }
+});
+$("clearAll").addEventListener("click", async () => {
+  if (!confirm("ล้างการลงชื่อทั้งหมดของทั้งสองวัน? (รายละเอียดและประกาศจะยังอยู่)")) return;
+  try { await Promise.all(Object.keys(slots).map((k) => deleteDoc(doc(db, "blockshot", k)))); toast("ล้างการลงชื่อแล้ว"); logEv("ล้างการลงชื่อทั้งหมด", "note", 0, "admin"); }
+  catch (e) { toast("ไม่สำเร็จ: " + e.message); }
+});
+
+// ===== ค้นหา/กรอง เมนู ปัดการ์ด กลับขึ้นบน แชร์ =====
+$("q").addEventListener("input", () => { query = $("q").value.trim(); renderNames(); });
+$("tabs").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  filter = b.dataset.f;
+  [...$("tabs").children].forEach((x) => x.classList.toggle("on", x === b));
+  renderNames();
+});
+(function () { // ไฮไลต์หัวข้อที่กำลังดูอยู่ในเมนู
+  const links = [...document.querySelectorAll(".nl a[data-s]")];
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) links.forEach((a) => a.classList.toggle("on", a.dataset.s === e.target.id));
+  }), { rootMargin: "-35% 0px -55% 0px" });
+  links.forEach((a) => { const t = $(a.dataset.s); if (t) io.observe(t); });
+})();
+(function () { // มือถือ: จุดบอกการ์ดที่กำลังดู
+  const box = $("days"), dots = [...$("dots").children];
+  const step = () => box.firstElementChild.getBoundingClientRect().width + 12;
+  box.addEventListener("scroll", () => {
+    const i = Math.round(box.scrollLeft / step());
+    dots.forEach((d, k) => d.classList.toggle("on", k === i));
+  }, { passive: true });
+  dots.forEach((d, k) => d.addEventListener("click", () => box.scrollTo({ left: k * step(), behavior: "smooth" })));
+})();
+addEventListener("scroll", () => $("top").classList.toggle("show", scrollY > 600), { passive: true });
+$("top").addEventListener("click", () => scrollTo({ top: 0, behavior: "smooth" }));
+$("share").addEventListener("click", async () => {
+  try {
+    if (navigator.share) await navigator.share({ title: "Blockshot FDM23067", text: "เลือกวันถ่ายทำ 14–15 ต.ค.", url: location.href });
+    else { await navigator.clipboard.writeText(location.href); toast("คัดลอกลิงก์แล้ว"); }
+  } catch (e) { /* ยกเลิกการแชร์ */ }
+});
+
+// นับเวลาทุกวินาที: สถานะเปลี่ยนค่อยวาดใหม่ ไม่งั้นอัปเดตแค่ตัวเลขนับถอยหลัง
+setInterval(() => { if (gateState() !== lastGate) render(); else renderGate(); }, 1000);
+
+// ===== ป๊อปอัพสอนใช้งาน =====
+const sls = [...document.querySelectorAll(".sl")];
+const tdots = [...document.querySelectorAll(".tdots i")];
+let ti = 0;
+function tourShow(i) {
+  ti = i;
+  sls.forEach((s, k) => s.classList.toggle("on", k === i));
+  tdots.forEach((d, k) => d.classList.toggle("on", k === i));
+  $("tn").textContent = `${i + 1} / ${sls.length}`;
+  $("tback").style.visibility = i ? "visible" : "hidden";
+  $("tnext").textContent = i === sls.length - 1 ? "เข้าใจแล้ว" : "ต่อไป";
+}
+function openTour() { $("tour").hidden = false; tourShow(0); document.body.style.overflow = "hidden"; $("tnext").focus(); }
+function closeTour() {
+  $("tour").hidden = true; document.body.style.overflow = "";
+}
+$("helpBtn").addEventListener("click", openTour);
+$("tskip").addEventListener("click", closeTour);
+$("tback").addEventListener("click", () => tourShow(Math.max(0, ti - 1)));
+$("tnext").addEventListener("click", () => { if (ti >= sls.length - 1) closeTour(); else tourShow(ti + 1); });
+$("tour").addEventListener("click", (e) => { if (e.target === $("tour")) closeTour(); });
+addEventListener("keydown", (e) => {
+  if ($("tour").hidden) return;
+  if (e.key === "Escape") closeTour();
+  else if (e.key === "ArrowRight") $("tnext").click();
+  else if (e.key === "ArrowLeft" && ti) tourShow(ti - 1);
+});
+setTimeout(openTour, 700); // เปิดป๊อปอัพวิธีใช้ทุกครั้งที่เข้าหน้า
+
+// ===== เอฟเฟกต์ตอนเลื่อน / เมาส์ =====
+if (!reduce) {
+  (function () { // แถบความคืบหน้า + หัวหน้าหดตอนเลื่อน
+    const prog = $("prog"), hero = document.querySelector(".hero");
+    let tick = false;
+    addEventListener("scroll", () => {
+      if (tick) return; tick = true;
+      requestAnimationFrame(() => {
+        const y = scrollY, h = document.documentElement.scrollHeight - innerHeight;
+        prog.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+        const k = Math.min(1, y / 420);
+        hero.style.transform = `translateY(${y * 0.25}px) scale(${1 - k * 0.12})`;
+        hero.style.opacity = String(1 - k * 0.8);
+        tick = false;
+      });
+    }, { passive: true });
+  })();
+  if (matchMedia("(pointer: fine)").matches) document.addEventListener("pointermove", (e) => { // แสงบนการ์ดตามเมาส์
+    const c = e.target.closest && e.target.closest(".card"); if (!c) return;
+    const r = c.getBoundingClientRect();
+    c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px");
+  });
+  if (matchMedia("(pointer: fine)").matches) (function () { // เคอร์เซอร์ตามเมาส์
+    const c = $("cur"); c.style.display = "block";
+    let x = 0, y = 0, cx = 0, cy = 0;
+    addEventListener("mousemove", (e) => {
+      x = e.clientX; y = e.clientY;
+      c.classList.toggle("big", !!e.target.closest("button,a,.chip,.seat,select,input,summary"));
+    });
+    (function loop() { cx += (x - cx) * 0.2; cy += (y - cy) * 0.2; c.style.left = cx + "px"; c.style.top = cy + "px"; requestAnimationFrame(loop); })();
+  })();
+  // เบราว์เซอร์ที่ไม่รองรับ Scroll-Driven Animation ใช้แบบจางเข้าตอนเลื่อนถึงแทน
+  if ("IntersectionObserver" in window && !(window.CSS && CSS.supports && CSS.supports("animation-timeline: view()"))) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: 0.12 });
+    document.querySelectorAll(".step,.card,.pending,.cta").forEach((el) => { el.classList.add("reveal"); io.observe(el); });
+  }
+}
+
+render();
+if (db) {
+  onSnapshot(collection(db, "blockshot"), (snap) => {
+    slots = {}; meta = {};
+    snap.forEach((x) => { if (x.id === "meta") meta = x.data(); else if (/^d(14|15)-\d+$/.test(x.id)) slots[x.id] = x.data(); });
+    render();
+  }, (e) => { $("warn").style.display = "block"; $("warn").textContent = "เชื่อม Firestore ไม่ได้: " + e.message; });
+}
+</script>
+</body>
+</html>
