@@ -144,6 +144,10 @@
   .form legend{font-weight:800;padding:0 6px}
   .form label{font-size:13px;color:var(--mute);display:flex;flex-direction:column;gap:4px}
   .form input,#annIn{font:inherit;padding:10px;border-radius:8px;border:1px solid #ccc;width:100%}
+  .tm{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#B5532F;color:#fff;text-align:center;font-weight:600;font-size:14px;padding:8px 12px;display:none}
+  body.test .tm{display:block}
+  body.test .dock{bottom:36px}
+  body.test .toast{bottom:130px}
   .lg{max-height:340px;overflow:auto;font-size:14px}
   .lg .l{display:grid;grid-template-columns:92px 1fr auto;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);align-items:baseline}
   .lg .t{color:var(--mute);font-size:12px;font-variant-numeric:tabular-nums}
@@ -373,6 +377,11 @@
     <h2>Admin</h2>
     <p class="hint" style="margin:0">ตั้งเวลา จัดคนลงวัน และแก้รายละเอียดได้ตรงนี้ แก้แล้วทุกคนเห็นทันที</p>
 
+    <details open><summary>โหมดทดสอบ</summary>
+    <p class="hint">เปิดแล้วลอง ลง ย้าย ยกเลิก ตั้งเวลา ได้เต็มที่ โดยไม่เขียนลงฐานข้อมูลจริงและไม่มี Log ปิดโหมดแล้วทุกอย่างกลับเป็นของจริง ใช้ได้เฉพาะในเครื่องคุณ คนอื่นไม่เห็น</p>
+    <div class="acts"><button class="btn" id="testBtn">เปิดโหมดทดสอบ</button></div>
+    </details>
+
     <details open><summary>เปิด–ปิดรับลงชื่อ</summary>
     <div class="form">
       <fieldset><legend>ตั้งเวลา (เวลาไทย)</legend>
@@ -390,8 +399,9 @@
     </details>
 
     <details><summary>ประวัติการใช้งาน (Log)</summary>
-    <p class="hint">บันทึกทุกครั้งที่มีคนลง ย้าย ยกเลิก และการแก้ของแอดมิน แท็กท้ายแถวคือรหัสเครื่อง ถ้าหลายชื่อมาจากรหัสเดียวกันแปลว่าใช้เครื่องเดียวกัน</p>
+    <p class="hint">บันทึกทุกครั้งที่มีคนลง ย้าย ยกเลิก และการแก้ของแอดมิน (ล้างได้ด้วยปุ่มด้านล่าง แต่จะเหลือบรรทัดบอกว่าเคยล้าง) แท็กท้ายแถวคือรหัสเครื่อง ถ้าหลายชื่อมาจากรหัสเดียวกันแปลว่าใช้เครื่องเดียวกัน</p>
     <div class="lg" id="logBox">ยังไม่มีประวัติ</div>
+    <div class="acts"><button class="btn danger" id="clearLog">ล้างประวัติทั้งหมด</button></div>
     </details>
 
     <details><summary>ประกาศและรายละเอียดแต่ละวัน</summary>
@@ -429,6 +439,7 @@
 
 <div class="dock"><span id="dock">ยังไม่ได้เลือกชื่อ</span><div class="q"><button id="q14">14 ต.ค.</button><button id="q15">15 ต.ค.</button></div></div>
 <button id="top" aria-label="กลับขึ้นบน">↑</button>
+<div class="tm" id="tm">โหมดทดสอบ ข้อมูลที่ลองไม่ถูกบันทึกจริง</div>
 <div class="toast" id="toast"></div>
 
 <!-- ===== ป๊อปอัพสอนใช้งาน ===== -->
@@ -487,7 +498,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, runTransaction, setDoc, deleteDoc, addDoc, query as fsQuery, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, onSnapshot, runTransaction, setDoc, deleteDoc, addDoc, getDocs, query as fsQuery, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 // ===== ค่า Firebase ของโปรเจกต์ =====
 const FIREBASE_CONFIG = {
@@ -736,11 +747,23 @@ function render() {
   prevIds = new Set(Object.keys(slots));
 }
 
+// ===== โหมดทดสอบ (ทำงานในเครื่องเท่านั้น ไม่เขียน Firestore) =====
+let testMode = false, real = { slots: {}, meta: {} };
+function setTest(on) {
+  if (on === testMode) return;
+  if (on) { real = { slots: JSON.parse(JSON.stringify(slots)), meta: JSON.parse(JSON.stringify(meta)) }; testMode = true; }
+  else { testMode = false; slots = real.slots; meta = real.meta; } // ออก: ทิ้งของที่ลอง กลับเป็นของจริงล่าสุด
+  document.body.classList.toggle("test", on);
+  $("testBtn").textContent = on ? "ปิดโหมดทดสอบ (ทิ้งสิ่งที่ลอง)" : "เปิดโหมดทดสอบ";
+  toast(on ? "เปิดโหมดทดสอบ ไม่บันทึกจริง" : "ปิดโหมดทดสอบแล้ว"); render();
+}
+$("testBtn").addEventListener("click", () => setTest(!testMode));
+
 // ===== ประวัติการใช้งาน (Log) =====
 let devId = "";
 try { devId = localStorage.getItem("blockshot_dev") || ""; if (!devId) { devId = Math.random().toString(36).slice(2, 6).toUpperCase(); localStorage.setItem("blockshot_dev", devId); } } catch (e) { devId = "????"; }
 function logEv(who, act, day, by) { // บันทึกแล้วไม่รอผล ถ้าพังก็ไม่กระทบการลงชื่อ
-  if (!db) return;
+  if (!db || testMode) return;
   addDoc(collection(db, "blockshot_log"), { who, act, day: day || 0, by: by || "self", dev: devId, ts: Date.now() }).catch(() => {});
 }
 const ACTTXT = { join: "ลงวันที่", move: "ย้ายไปวันที่", cancel: "ยกเลิกวันที่", assign: "ถูกจัดลงวันที่", remove: "ถูกถอดออกจากวันที่" };
@@ -762,6 +785,16 @@ function watchLog() {
     });
   }, () => { $("logBox").textContent = "อ่านประวัติไม่ได้ (เช็ก Firestore rules ของ blockshot_log)"; });
 }
+$("clearLog").addEventListener("click", async () => {
+  if (testMode) { toast("โหมดทดสอบไม่แตะประวัติจริง ปิดโหมดทดสอบก่อน"); return; }
+  if (!db || !confirm("ล้างประวัติทั้งหมด? กู้คืนไม่ได้")) return;
+  try {
+    const all = await getDocs(collection(db, "blockshot_log")); // ดึงทั้งหมด ไม่จำกัด 200
+    await Promise.all(all.docs.map((x) => deleteDoc(x.ref)));
+    toast(`ล้างประวัติแล้ว ${all.size} รายการ`);
+    logEv("ล้างประวัติ " + all.size + " รายการ", "note", 0, "admin"); // ทิ้งรอยไว้ว่าเคยล้าง
+  } catch (e) { toast("ล้างไม่สำเร็จ: " + e.message); }
+});
 function stopLog() { if (unLog) { unLog(); unLog = null; } }
 
 // ===== จอง / ย้าย / ยกเลิก (transaction กันกดชนกัน) =====
@@ -770,6 +803,7 @@ async function place(name, d) {
   let free = 0;
   for (let i = 1; i <= cap(d); i++) { if (!slots[slotId(d, i)]) { free = i; break; } }
   if (!free) { toast("วันนี้เต็มแล้ว"); return false; }
+  if (testMode) { if (old) delete slots[old]; slots[slotId(d, free)] = { name, ts: Date.now() }; render(); return true; }
   await runTransaction(db, async (tx) => {
     const target = doc(db, "blockshot", slotId(d, free));
     const t = await tx.get(target);
@@ -783,6 +817,7 @@ async function place(name, d) {
 }
 async function release(name) {
   const old = slotOf(name); if (!old) return;
+  if (testMode) { delete slots[old]; render(); return; }
   await runTransaction(db, async (tx) => {
     const r = doc(db, "blockshot", old); const s = await tx.get(r);
     if (s.exists() && s.data().name === name) tx.delete(r);
@@ -825,7 +860,7 @@ $("unlock").addEventListener("click", () => { // ปลดล็อกเฉพ�
   lockedName = ""; try { localStorage.removeItem("blockshot_lock"); localStorage.removeItem("blockshot_me"); } catch (e) {}
   me = ""; render(); toast("ปลดล็อกเครื่องนี้แล้ว"); logEv("ปลดล็อกเครื่องรหัส " + devId, "note", 0, "admin");
 });
-$("logout").addEventListener("click", () => { stopLog(); me = lockedName; isAdmin = false; $("admin").classList.remove("on"); toast("ออกจากโหมด Admin แล้ว"); });
+$("logout").addEventListener("click", () => { setTest(false); stopLog(); me = lockedName; isAdmin = false; $("admin").classList.remove("on"); toast("ออกจากโหมด Admin แล้ว"); });
 $("clearTime").addEventListener("click", () => { $("openAt").value = ""; $("closeAt").value = ""; $("closedNow").checked = false; toast("ล้างแล้ว อย่าลืมกดบันทึก"); });
 $("saveMeta").addEventListener("click", async () => {
   const data = {
@@ -839,11 +874,13 @@ $("saveMeta").addEventListener("click", async () => {
     data["note" + d] = $("note" + d).value.trim();
     data["cap" + d] = Math.min(MAXCAP, Math.max(1, Number($("cap" + d).value) || 9));
   });
+  if (testMode) { meta = data; render(); toast("บันทึก (ทดสอบ) แล้ว"); return; }
   try { await setDoc(doc(db, "blockshot", "meta"), data); toast("บันทึกแล้ว"); logEv("บันทึกรายละเอียด/เวลาเปิดปิด", "note", 0, "admin"); }
   catch (e) { toast("บันทึกไม่สำเร็จ: " + e.message); }
 });
 $("clearAll").addEventListener("click", async () => {
   if (!confirm("ล้างการลงชื่อทั้งหมดของทั้งสองวัน? (รายละเอียดและประกาศจะยังอยู่)")) return;
+  if (testMode) { slots = {}; render(); toast("ล้างแล้ว (ทดสอบ)"); return; }
   try { await Promise.all(Object.keys(slots).map((k) => deleteDoc(doc(db, "blockshot", k)))); toast("ล้างการลงชื่อแล้ว"); logEv("ล้างการลงชื่อทั้งหมด", "note", 0, "admin"); }
   catch (e) { toast("ไม่สำเร็จ: " + e.message); }
 });
@@ -955,8 +992,10 @@ if (!reduce) {
 render();
 if (db) {
   onSnapshot(collection(db, "blockshot"), (snap) => {
-    slots = {}; meta = {};
-    snap.forEach((x) => { if (x.id === "meta") meta = x.data(); else if (/^d(14|15)-\d+$/.test(x.id)) slots[x.id] = x.data(); });
+    const ns = {}; let nm = {};
+    snap.forEach((x) => { if (x.id === "meta") nm = x.data(); else if (/^d(14|15)-\d+$/.test(x.id)) ns[x.id] = x.data(); });
+    if (testMode) { real = { slots: ns, meta: nm }; return; } // โหมดทดสอบ: เก็บของจริงไว้เงียบๆ ไม่ทับของที่ลอง
+    slots = ns; meta = nm;
     render();
   }, (e) => { $("warn").style.display = "block"; $("warn").textContent = "เชื่อม Firestore ไม่ได้: " + e.message; });
 }
