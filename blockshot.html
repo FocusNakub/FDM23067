@@ -23,7 +23,7 @@
   #prog{position:fixed;top:0;left:0;height:4px;width:100%;background:#1B1B1B;transform-origin:left;transform:scaleX(0);z-index:20}
 
   /* เมนูติดบน */
-  .nav{position:sticky;top:0;z-index:15;background:rgba(246,244,239,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px}
+  .nav{position:sticky;top:0;z-index:15;background:rgba(246,244,239,.97);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px}
   .nl{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
   .nl::-webkit-scrollbar{display:none}
   .nl a{white-space:nowrap;text-decoration:none;color:var(--ink);font-weight:600;font-size:14px;padding:8px 14px;border-radius:10px;border:1.5px solid transparent}
@@ -170,8 +170,11 @@
   #top.show{opacity:1;pointer-events:auto;transform:none}
   .toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,20px);background:#fff;border:2px solid #1B1B1B;border-radius:12px;padding:12px 18px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;max-width:90vw}
   .toast.show{opacity:1;transform:translate(-50%,0)}
-  #cur{position:fixed;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:80;transform:translate(-50%,-50%);transition:width .25s,height .25s;display:none}
-  #cur.big{width:64px;height:64px}
+  #cur{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:80;display:none;will-change:transform}
+  #cur::before{content:"";position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:#1B1B1B;box-shadow:0 0 0 2px #fff;transition:transform .2s,background .2s}
+  #cur.big::before{transform:scale(3.4);background:rgba(27,27,27,.16);box-shadow:0 0 0 1.5px #1B1B1B}
+  html.hc,html.hc *{cursor:none!important}
+  html.hc input,html.hc textarea{cursor:text!important}
 
   /* ===== ป๊อปอัพสอนใช้งาน ===== */
   .tour{position:fixed;inset:0;background:rgba(27,27,27,.58);display:grid;place-items:center;padding:16px;z-index:60}
@@ -296,11 +299,13 @@
   @media (prefers-reduced-motion:reduce){.go::after{animation:none!important;display:none}}
   /* พื้นหลังเส้นไหล (แนว Background Paths) */
   .bgp{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
-  .bgp path{fill:none;stroke-linecap:round;stroke-dasharray:.3 .7;animation:flow linear infinite}
+  .bgp path{fill:none;stroke-linecap:round}
   .bgp .pb{stroke:var(--b)}
   .bgp .po{stroke:var(--o)}
-  @keyframes flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-2}}
-  @media (prefers-reduced-motion:reduce){.bgp path{animation:none!important;stroke-dasharray:none}}
+  .bgp{will-change:transform;animation:drift 38s ease-in-out infinite alternate}
+  .bgp2{animation-direction:alternate-reverse;animation-duration:46s}
+  @keyframes drift{from{transform:translate3d(-2.5%,1.5%,0) scale(1.08)}to{transform:translate3d(2.5%,-1.5%,0) scale(1.08)}}
+  @media (prefers-reduced-motion:reduce){.bgp{animation:none!important}}
 </style>
 </head>
 <body>
@@ -320,6 +325,7 @@
 
 <main>
   <svg class="bgp" id="bgp" viewBox="0 0 696 316" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <svg class="bgp bgp2" id="bgp2" viewBox="0 0 696 316" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
   <div class="hero">
     <div class="eyebrow">FDM23067 · หนังสั้น 1 ซีน 2 นาที</div>
     <h1>Blockshot</h1>
@@ -648,20 +654,18 @@ function fillForm() {
   });
 }
 
-// ===== พื้นหลังเส้นไหล =====
+// ===== พื้นหลังเส้นไหล (เส้นนิ่ง 2 ชั้น เลื่อนด้วย transform เบากว่าวิ่งทีละเส้น) =====
 (function () {
-  const svg = $("bgp"), NS = "http://www.w3.org/2000/svg";
-  [1, -1].forEach((pos) => { // 2 ชุดสะท้อนกัน ชุดแรกสีน้ำเงิน ชุดสองสีส้ม
-    for (let i = 0; i < 28; i++) {
-      const k = i * 5 * pos, m = i * 6;
+  const NS = "http://www.w3.org/2000/svg";
+  [1, -1].forEach((pos) => {
+    const svg = $(pos > 0 ? "bgp" : "bgp2");
+    for (let i = 0; i < 16; i++) {
+      const k = i * 8 * pos, m = i * 10;
       const d = `M${-380 + k} ${-189 - m}C${-380 + k} ${-189 - m} ${-312 + k} ${216 - m} ${152 + k} ${343 - m}C${616 + k} ${470 - m} ${684 + k} ${875 - m} ${684 + k} ${875 - m}`;
       const el = document.createElementNS(NS, "path");
-      el.setAttribute("d", d); el.setAttribute("pathLength", "1");
-      el.setAttribute("class", pos > 0 ? "pb" : "po");
-      el.style.strokeWidth = (0.5 + i * 0.03).toFixed(2);
-      el.style.strokeOpacity = (0.06 + i * 0.006).toFixed(3);
-      el.style.animationDuration = (20 + (i * 7) % 11) + "s";
-      el.style.animationDelay = "-" + ((i * 3) % 20) + "s";
+      el.setAttribute("d", d); el.setAttribute("class", pos > 0 ? "pb" : "po");
+      el.style.strokeWidth = (0.5 + i * 0.05).toFixed(2);
+      el.style.strokeOpacity = (0.07 + i * 0.01).toFixed(3);
       svg.appendChild(el);
     }
   });
@@ -973,14 +977,16 @@ if (!reduce) {
     const r = c.getBoundingClientRect();
     c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px");
   });
-  if (matchMedia("(pointer: fine)").matches) (function () { // เคอร์เซอร์ตามเมาส์
-    const c = $("cur"); c.style.display = "block";
-    let x = 0, y = 0, cx = 0, cy = 0;
-    addEventListener("mousemove", (e) => {
-      x = e.clientX; y = e.clientY;
-      c.classList.toggle("big", !!e.target.closest("button,a,.chip,.seat,select,input,summary"));
-    });
-    (function loop() { cx += (x - cx) * 0.2; cy += (y - cy) * 0.2; c.style.left = cx + "px"; c.style.top = cy + "px"; requestAnimationFrame(loop); })();
+  if (matchMedia("(pointer: fine)").matches) (function () { // จุดเคอร์เซอร์: ตามเมาส์ตรงๆ ไม่หน่วง ไม่ใช้ลูปเฟรม
+    const c = $("cur"); let big = false, shown = false;
+    document.documentElement.classList.add("hc");
+    addEventListener("pointermove", (e) => {
+      if (!shown) { c.style.display = "block"; shown = true; }
+      c.style.transform = `translate3d(${e.clientX}px,${e.clientY}px,0)`;
+      const b = !!(e.target.closest && e.target.closest("button,a,.chip,.seat,select,input,summary"));
+      if (b !== big) { big = b; c.classList.toggle("big", b); }
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => { c.style.display = "none"; shown = false; });
   })();
   // เบราว์เซอร์ที่ไม่รองรับ Scroll-Driven Animation ใช้แบบจางเข้าตอนเลื่อนถึงแทน
   if ("IntersectionObserver" in window && !(window.CSS && CSS.supports && CSS.supports("animation-timeline: view()"))) {
