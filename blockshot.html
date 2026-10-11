@@ -298,14 +298,8 @@
   }
   @media (prefers-reduced-motion:reduce){.go::after{animation:none!important;display:none}}
   /* พื้นหลังเส้นไหล (แนว Background Paths) */
-  .bgp{position:fixed;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
-  .bgp path{fill:none;stroke-linecap:round}
-  .bgp .pb{stroke:var(--b)}
-  .bgp .po{stroke:var(--o)}
-  .bgp{will-change:transform;animation:drift 38s ease-in-out infinite alternate}
-  .bgp2{animation-direction:alternate-reverse;animation-duration:46s}
-  @keyframes drift{from{transform:translate3d(-2.5%,1.5%,0) scale(1.08)}to{transform:translate3d(2.5%,-1.5%,0) scale(1.08)}}
-  @media (prefers-reduced-motion:reduce){.bgp{animation:none!important}}
+  .bgp{position:fixed;left:0;top:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+  .bgp{will-change:auto}
 </style>
 </head>
 <body>
@@ -324,8 +318,7 @@
 </nav>
 
 <main>
-  <svg class="bgp" id="bgp" viewBox="0 0 696 316" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
-  <svg class="bgp bgp2" id="bgp2" viewBox="0 0 696 316" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+  <canvas class="bgp" id="bgp" aria-hidden="true"></canvas>
   <div class="hero">
     <div class="eyebrow">FDM23067 · หนังสั้น 1 ซีน 2 นาที</div>
     <h1>Blockshot</h1>
@@ -654,21 +647,46 @@ function fillForm() {
   });
 }
 
-// ===== พื้นหลังเส้นไหล (เส้นนิ่ง 2 ชั้น เลื่อนด้วย transform เบากว่าวิ่งทีละเส้น) =====
+// ===== พื้นหลังเส้นไหล (วาดบน canvas ความละเอียดต่ำ จำกัด 30 เฟรม หยุดเองถ้าเครื่องช้า) =====
 (function () {
-  const NS = "http://www.w3.org/2000/svg";
+  const cv = $("bgp"), ctx = cv.getContext("2d");
+  const lines = [];
   [1, -1].forEach((pos) => {
-    const svg = $(pos > 0 ? "bgp" : "bgp2");
     for (let i = 0; i < 16; i++) {
       const k = i * 8 * pos, m = i * 10;
       const d = `M${-380 + k} ${-189 - m}C${-380 + k} ${-189 - m} ${-312 + k} ${216 - m} ${152 + k} ${343 - m}C${616 + k} ${470 - m} ${684 + k} ${875 - m} ${684 + k} ${875 - m}`;
-      const el = document.createElementNS(NS, "path");
-      el.setAttribute("d", d); el.setAttribute("class", pos > 0 ? "pb" : "po");
-      el.style.strokeWidth = (0.5 + i * 0.05).toFixed(2);
-      el.style.strokeOpacity = (0.07 + i * 0.01).toFixed(3);
-      svg.appendChild(el);
+      lines.push({ p: new Path2D(d), c: pos > 0 ? "47,93,138" : "181,83,47", w: 0.5 + i * 0.05, a: 0.07 + i * 0.01 + 0.03, sp: 14 + (i * 5) % 13, ph: i * 97 });
     }
   });
+  let W = 0, H = 0, sc = 1, ox = 0, oy = 0;
+  const Q = 0.6; // ความละเอียด 60% ของหน้าจอ เส้นบางๆ ดูไม่ต่าง แต่เบากว่ามาก
+  function size() {
+    W = cv.width = Math.round(innerWidth * Q); H = cv.height = Math.round(innerHeight * Q);
+    sc = Math.max(W / 696, H / 316); ox = (W - 696 * sc) / 2; oy = (H - 316 * sc) / 2;
+  }
+  function draw(t) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H);
+    ctx.setTransform(sc, 0, 0, sc, ox, oy);
+    ctx.lineCap = "round";
+    for (const l of lines) {
+      ctx.strokeStyle = `rgba(${l.c},${l.a})`; ctx.lineWidth = l.w * 1.4;
+      ctx.setLineDash([560, 440]); ctx.lineDashOffset = -(t * l.sp / 1000 + l.ph);
+      ctx.stroke(l.p);
+    }
+  }
+  size(); draw(0);
+  addEventListener("resize", () => { size(); draw(performance.now()); });
+  if (reduce) return;
+  let last = 0, slow = 0, run = true;
+  (function loop(t) {
+    if (!run) return;
+    requestAnimationFrame(loop);
+    if (document.hidden || t - last < 33) return; // ~30 เฟรม และหยุดตอนสลับแท็บ
+    last = t;
+    const a = performance.now(); draw(t); const dt = performance.now() - a;
+    slow = dt > 7 ? slow + 1 : Math.max(0, slow - 1);
+    if (slow > 20) run = false; // เครื่องช้าจริง ปล่อยเส้นนิ่งไว้ ไม่ให้หน่วงหน้า
+  })(0);
 })();
 
 // ===== ตัวเลขวิ่ง (แนว Number Ticker) =====
