@@ -187,6 +187,13 @@
   .sh-chips{display:flex;flex-wrap:wrap;gap:6px}
   .sh-chips span{font-size:13px;border:1.5px solid var(--line);border-radius:99px;padding:3px 11px;background:#FAF8F3}
   .sh-chips .ok{border-color:#BFE0CB;background:#EEF8F1;color:#1F6B3B;font-weight:600}
+  .pv{position:fixed;inset:0;z-index:110;background:rgba(27,27,27,.85);display:none;overflow:auto;padding:20px 12px;text-align:center}
+  .pv.on{display:block}
+  .pv .box{max-width:560px;margin:0 auto;background:#fff;border-radius:16px;padding:18px}
+  .pv img{max-width:100%;border:1px solid var(--line);border-radius:8px;display:block;margin:0 auto 12px}
+  .pv p{margin:0 0 12px;font-size:14px;color:#3A3A37}
+  .pv .acts{justify-content:center;margin:0}
+  .pv a.btn{text-decoration:none;display:inline-block}
   .sheet.cap{animation:none!important;border-radius:0}
   .sheet.cap .sh-pend{padding-bottom:28px}
   .sheet.cap .tm2{font-variant-numeric:normal}
@@ -214,7 +221,7 @@
   .dock .q button:disabled{opacity:.35;cursor:not-allowed}
   #top{position:fixed;right:16px;bottom:84px;width:48px;height:48px;border-radius:12px;border:0;background:#1B1B1B;color:#fff;font-size:22px;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .25s,transform .25s;z-index:7}
   #top.show{opacity:1;pointer-events:auto;transform:none}
-  .toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,20px);background:#fff;border:2px solid #1B1B1B;border-radius:12px;padding:12px 18px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;max-width:90vw}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,20px);background:#fff;border:2px solid #1B1B1B;border-radius:12px;padding:12px 18px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:130;max-width:90vw}
   .toast.show{opacity:1;transform:translate(-50%,0)}
   #cur{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none;z-index:80;display:none;will-change:transform}
   #cur::before{content:"";position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;background:#1B1B1B;box-shadow:0 0 0 2px #fff;transition:transform .2s,background .2s}
@@ -492,6 +499,7 @@
 <div class="sum" id="sum" role="dialog" aria-modal="true" aria-label="ใบสรุป">
   <div class="sheet" id="sheet"></div>
 </div>
+<div class="pv" id="pv"><div class="box" id="pvBox"></div></div>
 <div class="tm" id="tm">โหมดทดสอบ ข้อมูลที่ลองไม่ถูกบันทึกจริง</div>
 <div class="toast" id="toast"></div>
 
@@ -895,6 +903,15 @@ const loadJs = (src) => new Promise((ok, no) => {
   const x = document.createElement("script"); x.src = src; x.onload = ok; x.onerror = () => no(new Error("โหลดไลบรารีไม่ได้ เช็กอินเทอร์เน็ต"));
   document.head.appendChild(x);
 });
+function showPv(img, href, fname, msg) { // หน้าผลลัพธ์: ลิงก์จริงให้กดเอง ใช้ได้แม้เบราว์เซอร์ในแอปบล็อกการดาวน์โหลดอัตโนมัติ
+  const box = $("pvBox"); box.innerHTML = "";
+  const im = document.createElement("img"); im.src = img; im.alt = "ใบสรุป";
+  const p = document.createElement("p"); p.textContent = msg;
+  const row = document.createElement("div"); row.className = "acts";
+  const a = document.createElement("a"); a.className = "btn"; a.textContent = "ดาวน์โหลด " + fname.split(".").pop().toUpperCase(); a.href = href; a.download = fname; a.target = "_blank"; a.rel = "noopener";
+  const c = document.createElement("button"); c.className = "btn ghost"; c.textContent = "ปิด"; c.onclick = () => $("pv").classList.remove("on");
+  row.append(a, c); box.append(im, p, row); $("pv").classList.add("on");
+}
 async function saveSum(kind, btn) {
   const old = btn.textContent; btn.disabled = true; btn.textContent = "กำลังสร้าง...";
   try {
@@ -906,16 +923,17 @@ async function saveSum(kind, btn) {
     try { cv = await html2canvas(sheet, { scale: 2, backgroundColor: "#ffffff", useCORS: true, ignoreElements: (n) => n.classList && n.classList.contains("sbtns") }); }
     finally { sheet.classList.remove("cap"); }
     const name = "blockshot-summary-" + new Date().toISOString().slice(0, 10);
-    if (kind === "png") {
-      const a = document.createElement("a"); a.download = name + ".png"; a.href = cv.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove();
-    } else {
+    const png = cv.toDataURL("image/png");
+    let href, fname, msg;
+    if (kind === "png") { href = png; fname = name + ".png"; msg = "กดปุ่มดาวน์โหลด หรือกดค้างที่รูปแล้วเลือกบันทึกรูป"; }
+    else {
       const { jsPDF } = window.jspdf, pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
       const pw = 210, ph = 297, m = 10; let w = pw - m * 2, h = w * cv.height / cv.width;
       if (h > ph - m * 2) { h = ph - m * 2; w = h * cv.width / cv.height; } // สูงเกินหน้า ย่อให้พอดี
       pdf.addImage(cv.toDataURL("image/jpeg", 0.95), "JPEG", (pw - w) / 2, m, w, h);
-      pdf.save(name + ".pdf");
+      href = URL.createObjectURL(pdf.output("blob")); fname = name + ".pdf"; msg = "สร้าง PDF เสร็จแล้ว กดปุ่มด้านล่างเพื่อดาวน์โหลด";
     }
-    toast(kind === "pdf" ? "สร้าง PDF แล้ว" : "บันทึกรูปแล้ว");
+    showPv(png, href, fname, msg);
   } catch (e) { toast("ทำไม่สำเร็จ: " + e.message + " ลองกดพิมพ์แทน"); }
   btn.disabled = false; btn.textContent = old;
 }
