@@ -187,6 +187,10 @@
   .sh-chips{display:flex;flex-wrap:wrap;gap:6px}
   .sh-chips span{font-size:13px;border:1.5px solid var(--line);border-radius:99px;padding:3px 11px;background:#FAF8F3}
   .sh-chips .ok{border-color:#BFE0CB;background:#EEF8F1;color:#1F6B3B;font-weight:600}
+  .sheet.cap{animation:none!important;border-radius:0}
+  .sheet.cap .sh-pend{padding-bottom:28px}
+  .sheet.cap .tm2{font-variant-numeric:normal}
+  .sheet.cap .sh-perf::before,.sheet.cap .sh-perf::after{display:none}
   .sheet .sbtns{display:flex;gap:8px;flex-wrap:wrap;padding:20px 30px 26px}
   @media (max-width:640px){.sh-cols{grid-template-columns:1fr;padding:18px 18px 4px}.sh-top{padding:22px 18px 18px}.sh-stats{padding:18px 18px 4px}.sh-pend,.sheet .sbtns{padding-left:18px;padding-right:18px}.sh-top .when{text-align:left}.sh-stats b{font-size:28px}}
   @media print{body>*:not(#sum){display:none!important}.sum{position:static;background:none;padding:0;display:block!important}.sheet{max-width:none;border-radius:0;animation:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.sheet .sbtns,.sh-perf::before,.sh-perf::after{display:none}}
@@ -879,10 +883,41 @@ function renderSum() {
   pd.append(chips); box.append(pd);
   // ปุ่ม
   const b = el("div", "sbtns");
-  const cp = el("button", "btn", "คัดลอกเป็นข้อความ"), pr = el("button", "btn ghost", "พิมพ์ / บันทึก PDF"), cl = el("button", "btn ghost", "ปิด");
+  const cp = el("button", "btn ghost", "คัดลอกเป็นข้อความ"), pf = el("button", "btn", "ดาวน์โหลด PDF"), im = el("button", "btn ghost", "บันทึกเป็นรูป"), pr = el("button", "btn ghost", "พิมพ์"), cl = el("button", "btn ghost", "ปิด");
+  pf.onclick = () => saveSum("pdf", pf); im.onclick = () => saveSum("png", im);
   cp.onclick = async () => { try { await navigator.clipboard.writeText(sumText()); toast("คัดลอกแล้ว วางในไลน์ได้เลย"); } catch (e) { toast("คัดลอกไม่ได้ ลองกดพิมพ์แทน"); } };
   pr.onclick = () => window.print(); cl.onclick = closeSum;
-  b.append(cp, pr, cl); box.append(b);
+  b.append(pf, im, cp, pr, cl); box.append(b);
+}
+// ===== ดาวน์โหลดใบสรุปเป็น PDF / รูป (สร้างในเบราว์เซอร์ ไม่พึ่งหน้าต่างพิมพ์) =====
+const loadJs = (src) => new Promise((ok, no) => {
+  if ([...document.scripts].some((x) => x.src === src)) return ok();
+  const x = document.createElement("script"); x.src = src; x.onload = ok; x.onerror = () => no(new Error("โหลดไลบรารีไม่ได้ เช็กอินเทอร์เน็ต"));
+  document.head.appendChild(x);
+});
+async function saveSum(kind, btn) {
+  const old = btn.textContent; btn.disabled = true; btn.textContent = "กำลังสร้าง...";
+  try {
+    await loadJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+    if (kind === "pdf") await loadJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+    try { await document.fonts.ready; } catch (e) {}
+    const sheet = $("sheet"); sheet.classList.add("cap");
+    let cv;
+    try { cv = await html2canvas(sheet, { scale: 2, backgroundColor: "#ffffff", useCORS: true, ignoreElements: (n) => n.classList && n.classList.contains("sbtns") }); }
+    finally { sheet.classList.remove("cap"); }
+    const name = "blockshot-summary-" + new Date().toISOString().slice(0, 10);
+    if (kind === "png") {
+      const a = document.createElement("a"); a.download = name + ".png"; a.href = cv.toDataURL("image/png"); document.body.appendChild(a); a.click(); a.remove();
+    } else {
+      const { jsPDF } = window.jspdf, pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      const pw = 210, ph = 297, m = 10; let w = pw - m * 2, h = w * cv.height / cv.width;
+      if (h > ph - m * 2) { h = ph - m * 2; w = h * cv.width / cv.height; } // สูงเกินหน้า ย่อให้พอดี
+      pdf.addImage(cv.toDataURL("image/jpeg", 0.95), "JPEG", (pw - w) / 2, m, w, h);
+      pdf.save(name + ".pdf");
+    }
+    toast(kind === "pdf" ? "สร้าง PDF แล้ว" : "บันทึกรูปแล้ว");
+  } catch (e) { toast("ทำไม่สำเร็จ: " + e.message + " ลองกดพิมพ์แทน"); }
+  btn.disabled = false; btn.textContent = old;
 }
 function sumText() {
   const { days, todo } = sumData();
