@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="ตารางถ่ายทำ FDM23067 วันอาทิตย์ที่ 18 ต.ค. 69">
+<title>ตารางถ่ายทำ FDM23067</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@500;600;700&family=Noto+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<!-- Firebase SDK (compat) ใช้โปรเจกต์เดียวกับหน้าอื่นใน repo -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+
+  /* แนวคิด: call sheet ของกองถ่าย อ่านง่ายบนมือถือ เส้นเวลาแนวตั้ง จุดแดง REC บอกว่ากำลังถ่ายอยู่ตอนนี้ */
+  :root {
+    color-scheme: light;
+    --bg: #f1f4f5;
+    --surface: #ffffff;
+    --ink: #13181b;
+    --ink-2: #566168;
+    --line: #d3dade;
+    --accent: #d7352a;
+    --on-ink: #f1f4f5;
+    --on-accent: #ffffff;
+    --display: "Prompt", "Noto Sans Thai", sans-serif;
+    --body: "Noto Sans Thai", "Sarabun", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1315; --surface: #171d20; --ink: #eef2f3; --ink-2: #93a0a7;
+      --line: #2b353a; --accent: #ff5d50; --on-ink: #0f1315; --on-accent: #0f1315; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1315; --surface: #171d20; --ink: #eef2f3; --ink-2: #93a0a7;
+    --line: #2b353a; --accent: #ff5d50; --on-ink: #0f1315; --on-accent: #0f1315; color-scheme: dark;
+  }
+
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; padding-inline: 16px; padding-block: 24px 48px; }
+  .wrap { max-width: 720px; margin-inline: auto; display: grid; gap: 20px; }
+  h1, h2, p, ol, ul, dl, dd { margin: 0; padding: 0; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .bar { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 8vw, 3rem); line-height: 1.15; text-wrap: balance; margin-top: 4px; }
+  .sync { font-size: 13px; color: var(--ink-2); margin-top: -8px; }
+  .sync i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-2); margin-right: 6px; }
+  .sync.ok i { background: var(--ink); }
+  .sync.bad { color: var(--accent); }
+  .sync.bad i { background: var(--accent); }
+
+  .btn { border: 1px solid var(--line); background: var(--surface); padding: 4px 14px; cursor: pointer; font-size: 14px; }
+  .btn.solid { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .btn.danger { border-color: var(--accent); color: var(--accent); }
+  .btn.danger.armed { background: var(--accent); color: var(--on-accent); }
+  .pmbtn { font-family: var(--mono); font-weight: 600; flex: none; }
+
+  .notice { border: 1px dashed var(--accent); padding: 10px 14px; font-size: 14px; }
+  .notice b { color: var(--accent); }
+
+  .announce { border: 2px solid var(--ink); padding: 10px 14px; }
+  .announce .h { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; color: var(--accent); font-weight: 600; }
+  .announce p { font-family: var(--display); font-weight: 500; font-size: 1.05rem; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+
+  /* ส่วน PM */
+  .pmlogin, .pmpanel { border: 1px solid var(--line); background: var(--surface); padding: 12px 14px; display: grid; gap: 8px; }
+  .pmlogin { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+  .pmlogin label { grid-column: 1 / -1; font-size: 13px; color: var(--ink-2); }
+  .pmlogin #pmMsg { grid-column: 1 / -1; font-size: 13px; color: var(--accent); min-height: 1em; }
+  .pmpanel .h { font-size: 14px; }
+  .pmpanel label { font-size: 13px; color: var(--ink-2); }
+  .pmact { display: flex; flex-wrap: wrap; gap: 8px; }
+  input[type="password"], textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); padding: 8px 10px; font-size: 16px; }
+  textarea { resize: vertical; }
+
+  .days { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .day { text-align: left; background: var(--surface); border: 1px solid var(--line); padding: 10px 14px; cursor: pointer; display: grid; min-width: 0; }
+  .day .d { font-family: var(--display); font-weight: 600; font-size: 1.1rem; line-height: 1.3; }
+  .day .n { font-size: 13px; color: var(--ink-2); }
+  .day[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: var(--on-ink); }
+  .day[aria-selected="true"] .n { color: var(--on-ink); opacity: .75; }
+
+  /* ส่วนหัวของวัน: เวลา Call ตัวใหญ่สุด เพราะเป็นสิ่งแรกที่ทุกคนมองหา */
+  .hero { display: grid; gap: 14px; border-top: 2px solid var(--ink); padding-top: 14px; }
+  .callbig { display: grid; gap: 0; }
+  .callbig .k { font-family: var(--mono); font-size: 13px; letter-spacing: .1em; color: var(--accent); font-weight: 600; }
+  .callbig .v { font-family: var(--mono); font-weight: 600; font-size: clamp(3.2rem, 17vw, 5rem); line-height: 1; font-variant-numeric: tabular-nums; }
+  .callbig .s { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
+  .meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; }
+  .meta > div { padding: 4px 12px; border-left: 1px solid var(--line); }
+  .meta > div:first-child { border-left: 0; padding-left: 0; }
+  .meta dt { font-size: 12px; color: var(--ink-2); }
+  .meta dd { font-family: var(--mono); font-weight: 600; font-size: 1.35rem; font-variant-numeric: tabular-nums; }
+  .tcalls { grid-column: 1 / -1; }
+  .tcalls .lbl { font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
+  .tcalls ul { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); column-gap: 20px; }
+  .tcalls li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .tcalls li b { font-family: var(--mono); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .tcalls li.me { border-bottom: 2px solid var(--accent); font-weight: 600; }
+  @media (min-width: 640px) { .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+
+  .scene { font-size: 15px; }
+  .scene .b { display: inline-block; font-family: var(--mono); font-weight: 600; font-size: 13px; background: var(--ink); color: var(--on-ink); padding: 0 8px; margin-right: 6px; }
+  .loc { border: 1px solid var(--line); background: var(--surface); padding: 12px 14px; display: grid; gap: 6px; }
+  .loc .n { font-family: var(--display); font-weight: 600; font-size: 1.1rem; line-height: 1.4; }
+  .loc dl { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 2px 10px; font-size: 14px; }
+  .loc dt { color: var(--ink-2); }
+  .loc dd { overflow-wrap: anywhere; }
+  .loc a, .contacts a { color: var(--ink); text-underline-offset: 3px; font-weight: 500; }
+  .prep { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; font-size: 14px; }
+  .next { border-top: 1px solid var(--line); padding-top: 10px; font-size: 14px; color: var(--ink-2); }
+  .next b { color: var(--ink); font-weight: 600; }
+  .contacts { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; font-size: 14px; }
+  .contacts .lbl { color: var(--ink-2); font-size: 13px; }
+  .contacts div.r { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 10px; }
+  .contacts .m { color: var(--ink-2); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .filters .lbl { font-size: 13px; color: var(--ink-2); margin-right: 4px; }
+  .chip { border: 1px solid var(--line); background: var(--surface); padding: 3px 12px; font-size: 14px; cursor: pointer; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+
+  .timeline { list-style: none; display: grid; }
+  .row { display: grid; grid-template-columns: 4.4rem minmax(0, 1fr); column-gap: 14px; }
+  .t { font-family: var(--mono); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; padding-top: 2px; text-align: right; }
+  .t small { display: block; font-weight: 500; font-size: 12px; color: var(--ink-2); }
+  .body { position: relative; border-left: 2px solid var(--line); padding: 0 0 26px 20px; min-width: 0; }
+  .row:last-child .body { border-left-color: transparent; padding-bottom: 0; }
+  .body::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid var(--ink-2); }
+  .row.shoot .body::before, .row.done .body::before { background: var(--ink); border-color: var(--ink); }
+  .row.break .body::before { border-style: dashed; }
+  .row.now .body::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); }
+  .row.past, .row.done, .row.skip { opacity: .6; }
+  .row.skip .title { text-decoration: line-through; }
+
+  .kind { display: inline-block; font-size: 12px; line-height: 1.5; padding: 0 8px; border: 1px solid var(--line); color: var(--ink-2); margin-right: 6px; vertical-align: 2px; }
+  .row.shoot .kind { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .title { font-family: var(--display); font-weight: 600; font-size: 1.1rem; line-height: 1.4; }
+  .row.break .title { font-weight: 500; color: var(--ink-2); }
+  .note { color: var(--ink-2); font-size: 14px; margin-top: 2px; }
+  .teams { margin-top: 6px; font-size: 13px; color: var(--ink-2); }
+  .teams b { font-weight: 500; color: var(--ink); }
+
+  .rec { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--accent); letter-spacing: .06em; margin-bottom: 2px; }
+  .rec i { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: blink 1.2s ease-in-out infinite; }
+  .state { display: inline-block; font-family: var(--mono); font-size: 12px; font-weight: 600; letter-spacing: .04em; margin-bottom: 2px; color: var(--ink-2); }
+  @keyframes blink { 50% { opacity: .25; } }
+  @media (prefers-reduced-motion: reduce) { .rec i { animation: none; } }
+
+  /* ปุ่มปรับสถานะของ PM */
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+  .seg button { border: 1px solid var(--line); background: var(--surface); padding: 2px 12px; font-size: 13px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .seg button.rec-on[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+  .shots { list-style: none; margin-top: 10px; border-top: 1px solid var(--line); }
+  .shots li { display: grid; grid-template-columns: 2.6rem 2.4rem minmax(0, 1fr) auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; align-items: baseline; }
+  .shots .c { font-family: var(--mono); font-weight: 600; }
+  .shots .z { font-family: var(--mono); color: var(--ink-2); font-size: 13px; }
+  .shots li.done .d { color: var(--ink-2); text-decoration: line-through; }
+  .sc { font-size: 12px; padding: 0 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-2); line-height: 1.6; }
+  .shots li.done .sc { background: var(--ink); color: var(--on-ink); border-color: var(--ink); }
+  .shots li.retake .sc { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+  button.sc { cursor: pointer; }
+
+  .budget { border-top: 2px solid var(--ink); padding-top: 12px; font-size: 14px; color: var(--ink-2); }
+  .budget b { font-family: var(--mono); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .empty { color: var(--ink-2); padding: 12px 0; }
+  .toast { position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 480px; margin-inline: auto; background: var(--ink); color: var(--on-ink); padding: 10px 14px; font-size: 14px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="bar">
+    <div>
+      <p class="eyebrow">FDM23067 · SPU · หนังสั้น 1 ซีน · 2 นาที</p>
+      <h1>ตารางถ่ายทำ</h1>
+    </div>
+    <button class="btn pmbtn" id="pmBtn" type="button">PM</button>
+  </header>
+  <p class="sync" id="sync"></p>
+
+  <p class="notice" id="notice" hidden><b>ข้อมูลตัวอย่าง</b> เวลา ช็อต และสถานที่ในหน้านี้ยังเป็นค่าสมมติ ยังไม่ใช่ตารางจริง</p>
+
+  <section class="announce" id="announce" hidden>
+    <p class="h">ประกาศจาก PM</p>
+    <p id="announceText"></p>
+  </section>
+
+  <form class="pmlogin" id="pmLogin" hidden>
+    <label for="pmKey">รหัส PM</label>
+    <input id="pmKey" type="password" autocomplete="off">
+    <button class="btn solid" type="submit">เข้าโหมด PM</button>
+    <span id="pmMsg" role="alert"></span>
+  </form>
+
+  <section class="pmpanel" id="pmPanel" hidden>
+    <p class="h"><b>โหมด PM</b> แตะปุ่มในแต่ละบล็อกเพื่อปรับสถานะ ทุกคนเห็นทันที</p>
+    <label for="noteIn">ประกาศถึงทีม (ขึ้นบนสุดของหน้า)</label>
+    <textarea id="noteIn" rows="2" maxlength="300" placeholder="เช่น เลื่อนพักเที่ยงเป็น 12:30 ทุกคนรวมที่จุดเซ็ต"></textarea>
+    <div class="pmact">
+      <button class="btn solid" id="noteSave" type="button">ส่งประกาศ</button>
+      <button class="btn" id="noteClear" type="button">ล้างประกาศ</button>
+      <button class="btn danger" id="resetBtn" type="button">รีเซ็ตสถานะทั้งหมด</button>
+      <button class="btn" id="pmOut" type="button">ออกจากโหมด PM</button>
+    </div>
+  </section>
+
+  <nav class="days" id="days" role="tablist" aria-label="เลือกวันถ่ายทำ"></nav>
+  <section class="hero" id="hero"></section>
+  <p class="scene" id="scene"></p>
+  <section class="loc" id="loc"></section>
+  <div class="filters" id="filters" aria-label="กรองตามทีม"></div>
+  <p class="prep" id="prep" hidden></p>
+  <ol class="timeline" id="tl"></ol>
+  <p class="next" id="next" hidden></p>
+  <section class="contacts" id="contacts" hidden></section>
+  <p class="budget" id="budget"></p>
+</main>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+  // ===== แก้ข้อมูลตรงนี้ =====
+  const IS_SAMPLE = true; // ตั้งเป็น false เมื่อใส่ตารางจริงแล้ว (ซ่อนแถบ "ข้อมูลตัวอย่าง")
+  const PM_KEY = 'pm2569'; // รหัสเข้าโหมด PM เปลี่ยนได้ตามต้องการ
+  const FILM_SECONDS = 120; // ความยาวหนัง 2 นาที
+  const TEAMS = ['กำกับ', 'กล้อง+อาร์ต', 'ไฟ+เสียง', 'โปรดักชัน', 'นักแสดง'];
+  // ข้อมูลฉาก (ตัวอย่าง)
+  const SCENE = { no: '1', ie: 'INT.', tod: 'DAY', desc: '(ใส่เรื่องย่อของซีนสั้นๆ 1-2 บรรทัด)' };
+  // สิ่งที่แต่ละทีมต้องเตรียม (ตัวอย่าง) แสดงเมื่อกดเลือกทีม
+  const PREP = {
+    'กำกับ': 'สคริปต์ ช็อตลิสต์ และ storyboard ฉบับพิมพ์',
+    'กล้อง+อาร์ต': 'แบตสำรอง การ์ดหน่วยความจำ และพร็อพตามลิสต์',
+    'ไฟ+เสียง': 'ปลั๊กพ่วง ไมค์ และหูฟังมอนิเตอร์',
+    'โปรดักชัน': 'น้ำดื่ม ยาสามัญ และใบ call sheet ฉบับพิมพ์',
+    'นักแสดง': 'ท่องบทให้แม่น ใส่ชุดตามที่ตกลงกับอาร์ต'
+  };
+  // เบอร์ติดต่อหน้างาน (ใส่เบอร์จริงในช่อง tel ถ้าไม่ใส่จะขึ้นว่ายังไม่ใส่เบอร์)
+  const CONTACTS = [
+    { role: 'PM', name: '(ใส่ชื่อ)', tel: '' },
+    { role: 'ผู้กำกับ', name: '(ใส่ชื่อ)', tel: '' }
+  ];
+  const KIND = { call: 'Call', setup: 'เซ็ต', shoot: 'ถ่ายทำ', break: 'พัก', wrap: 'Wrap' };
+
+  // k = รหัสประจำบล็อก (ห้ามซ้ำ และอย่าเปลี่ยนหลังเริ่มใช้ เพราะสถานะที่ PM กดไว้ผูกกับรหัสนี้)
+  // teams: 'all' = ทุกทีม, หรือ array ชื่อทีม | shots: [รหัส, ขนาดภาพ, รายละเอียด]
+  const DAYS = [
+    {
+      id: '2026-10-18', date: 'อาทิตย์ 18 ต.ค. 69', name: 'วันถ่ายทำ',
+      teamCalls: { 'กำกับ': '10:00', 'กล้อง+อาร์ต': '10:00', 'ไฟ+เสียง': '10:00', 'โปรดักชัน': '09:30', 'นักแสดง': '11:30' },
+      loc: { name: 'โลเคชั่นหลัก', addr: '(ใส่ที่อยู่จริง)', map: '', park: '(ใส่จุดจอดรถ)', hospital: '(ใส่โรงพยาบาลใกล้สุด)' },
+      rows: [
+        { k: 'd1-call', s: '10:00', e: '10:30', type: 'call', title: 'Call time ทุกฝ่าย', note: 'เช็กชื่อ รับ call sheet และแบ่งงานขนอุปกรณ์', teams: 'all' },
+        { k: 'd1-set1', s: '10:30', e: '11:30', type: 'setup', title: 'เซ็ตอาร์ตและวางกล้อง', note: 'จัดฉาก วางไฟ ตรวจเสียงก่อนเรียกนักแสดง', teams: ['กล้อง+อาร์ต', 'ไฟ+เสียง', 'โปรดักชัน'] },
+        { k: 'd1-block', s: '11:30', e: '12:00', type: 'setup', title: 'Blocking และซ้อมนักแสดง', note: 'ซ้อมตำแหน่งยืนและทิศทางการเดิน', teams: ['กำกับ', 'นักแสดง', 'กล้อง+อาร์ต'] },
+        { k: 'd1-shoot1', s: '12:00', e: '13:30', type: 'shoot', title: 'ถ่ายทำ ช่วงที่ 1', teams: ['กำกับ', 'กล้อง+อาร์ต', 'ไฟ+เสียง', 'นักแสดง'],
+          shots: [['S1', 'WS', 'ภาพเปิดซีน (master)'], ['S2', 'MS', 'ตัวละครหลักเข้าฉาก'], ['S3', 'CU', 'สีหน้าตัวละครหลัก'], ['S4', 'OTS', 'บทสนทนา มุมที่ 1']] },
+        { k: 'd1-lunch', s: '13:30', e: '14:30', type: 'break', title: 'พักกลางวัน', teams: 'all' },
+        { k: 'd1-shoot2', s: '14:30', e: '16:00', type: 'shoot', title: 'ถ่ายทำ ช่วงที่ 2', teams: ['กำกับ', 'กล้อง+อาร์ต', 'ไฟ+เสียง', 'นักแสดง'],
+          shots: [['S5', 'OTS', 'บทสนทนา มุมที่ 2'], ['S6', 'CU', 'มือและวัตถุสำคัญ'], ['S7', 'MS', 'ปฏิกิริยาของตัวละครรอง'], ['S8', 'WS', 'ภาพกว้างจังหวะตึงที่สุด']] },
+        { k: 'd1-set2', s: '16:00', e: '16:30', type: 'setup', title: 'เปลี่ยนมุมกล้องและไฟ', note: 'จัดฉากให้ต่อเนื่องกับช่วงก่อนหน้า', teams: ['กล้อง+อาร์ต', 'ไฟ+เสียง', 'โปรดักชัน'] },
+        { k: 'd1-shoot3', s: '16:30', e: '18:00', type: 'shoot', title: 'ถ่ายทำ ช่วงที่ 3', teams: ['กำกับ', 'กล้อง+อาร์ต', 'ไฟ+เสียง', 'นักแสดง'],
+          shots: [['S9', 'WS', 'ภาพกว้างมุมใหม่'], ['S10', 'MS', 'ตัวละครหลักเคลื่อนไหว'], ['S11', 'CU', 'อารมณ์ช่วงกลางเรื่อง'], ['S12', 'OTS', 'บทสนทนา มุมที่ 3']] },
+        { k: 'd1-shoot4', s: '18:00', e: '19:30', type: 'shoot', title: 'ถ่ายทำ ช่วงที่ 4', teams: ['กำกับ', 'กล้อง+อาร์ต', 'ไฟ+เสียง', 'นักแสดง'],
+          shots: [['S13', 'CU', 'ช็อตไคลแมกซ์'], ['S14', 'MS', 'ตัวละครหลักตัดสินใจ'], ['S15', 'INS', 'Insert วัตถุสำคัญ'], ['S16', 'WS', 'ภาพปิดซีน']] },
+        { k: 'd1-wild', s: '19:30', e: '20:00', type: 'setup', title: 'บันทึกเสียงบรรยากาศ (wild track)', note: 'ทุกคนเงียบ อัดเสียงห้องเปล่า 1 นาที', teams: ['ไฟ+เสียง', 'โปรดักชัน'] },
+        { k: 'd1-wrap', s: '20:00', e: '21:00', type: 'wrap', title: 'เก็บฉาก คืนอุปกรณ์ และสำรองไฟล์', note: 'ก๊อปไฟล์ลงอย่างน้อย 2 ที่ก่อนกลับบ้าน', teams: 'all' }
+      ]
+    }
+  ];
+
+  // Firebase โปรเจกต์เดียวกับหน้าอื่นใน repo (กฎ Firestore อนุญาตเฉพาะ path ใต้ fdm23067)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+    authDomain: "fdm13167.firebaseapp.com",
+    projectId: "fdm13167",
+    storageBucket: "fdm13167.firebasestorage.app",
+    messagingSenderId: "638048330365",
+    appId: "1:638048330365:web:961daeac412d5d6332c714"
+  };
+  // ===== จบส่วนข้อมูล =====
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const toMin = (t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  const allShots = (d) => d.rows.flatMap((r) => r.shots || []);
+
+  // ---------- สถานะที่ PM ตั้ง (ซิงก์ผ่าน Firestore) ----------
+  // เอกสาร: fdm23067/settings/scheduleStatus/main
+  // { blocks: {รหัสบล็อก: 'now'|'done'|'skip'}, shots: {รหัสช็อต: 'done'|'retake'}, note, updatedAt }
+  let st = { blocks: {}, shots: {}, note: '' };
+  let updatedAt = null;
+  let synced = false;
+  let ref = null;
+  try {
+    firebase.initializeApp(firebaseConfig);
+    ref = firebase.firestore().collection('fdm23067').doc('settings').collection('scheduleStatus').doc('main');
+  } catch (err) { ref = null; }
+
+  let isPM = false;
+  try { isPM = sessionStorage.getItem('fdm23067SchedPM') === '1'; } catch (e) {}
+
+  function bangkokNow() {
+    const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Bangkok', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+    const g = (t) => p.find((x) => x.type === t).value;
+    return { date: g('year') + '-' + g('month') + '-' + g('day'), min: (Number(g('hour')) % 24) * 60 + Number(g('minute')) };
+  }
+  const hhmm = (dt) => new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit', hour12: false }).format(dt);
+
+  let dayIdx = 0;
+  let team = '';
+  const today = bangkokNow().date;
+  const todayIdx = DAYS.findIndex((d) => d.id === today);
+  if (todayIdx >= 0) dayIdx = todayIdx;
+
+  let toastTimer;
+  function toast(msg) {
+    $('toast').textContent = msg; $('toast').hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { $('toast').hidden = true; }, 4000);
+  }
+
+  // เขียนลง Firestore (merge ทับเฉพาะ field ที่ส่ง)
+  function write(patch, replace) {
+    if (!ref) { toast('เชื่อมต่อ Firebase ไม่ได้ บันทึกสถานะไม่ได้'); return; }
+    patch.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    ref.set(patch, replace ? undefined : { merge: true }).catch((e) => toast('บันทึกไม่สำเร็จ (' + (e.code || e.message) + ')'));
+  }
+  const DEL = () => firebase.firestore.FieldValue.delete();
+
+  function setBlock(k, v) { write({ blocks: { [k]: v === 'todo' ? DEL() : v } }); }
+  function cycleShot(code) {
+    const cur = st.shots[code] || '';
+    const next = cur === '' ? 'done' : cur === 'done' ? 'retake' : '';
+    write({ shots: { [code]: next ? next : DEL() } });
+  }
+
+  // ---------- วาดหน้า ----------
+  function renderSync() {
+    const el = $('sync');
+    if (!ref) { el.className = 'sync bad'; el.innerHTML = '<i></i>ออฟไลน์ ดูได้เฉพาะตาราง'; return; }
+    if (!synced) { el.className = 'sync'; el.innerHTML = '<i></i>กำลังเชื่อมต่อสถานะสด...'; return; }
+    el.className = 'sync ok';
+    el.innerHTML = '<i></i>ซิงก์สดกับ PM' + (updatedAt ? ' · อัปเดตล่าสุด ' + hhmm(updatedAt) + ' น.' : '');
+  }
+
+  function renderAnnounce() {
+    const n = (st.note || '').trim();
+    $('announce').hidden = !n;
+    $('announceText').textContent = n;
+  }
+
+  function renderPM() {
+    $('pmBtn').textContent = isPM ? 'PM ✓' : 'PM';
+    $('pmPanel').hidden = !isPM;
+    if (isPM) $('pmLogin').hidden = true;
+  }
+
+  function renderDays() {
+    $('days').hidden = DAYS.length < 2; // มีวันเดียวไม่ต้องแสดงแท็บ
+    $('days').innerHTML = DAYS.map((d, i) =>
+      '<button class="day" role="tab" id="tab' + i + '" aria-selected="' + (i === dayIdx) + '" data-i="' + i + '">' +
+      '<span class="d">' + esc(d.date) + '</span><span class="n">' + esc(d.name) + (d.id === today ? ' · วันนี้' : '') + '</span></button>'
+    ).join('');
+  }
+
+  function renderSummary() {
+    const d = DAYS[dayIdx];
+    const shots = allShots(d);
+    const done = shots.filter((x) => st.shots[x[0]] === 'done').length;
+    const calls = TEAMS.filter((t) => d.teamCalls && d.teamCalls[t]).map((t) =>
+      '<li class="' + (t === team ? 'me' : '') + '"><span>' + esc(t) + '</span><b>' + d.teamCalls[t] + '</b></li>').join('');
+    $('hero').innerHTML =
+      '<div class="callbig"><span class="k">CALL</span><span class="v">' + d.rows[0].s + '</span><span class="s">' + (DAYS.length > 1 ? esc(d.name) + ' จาก ' + DAYS.length + ' วัน' : esc(d.name)) + ' · ' + esc(d.date) + '</span></div>' +
+      '<dl class="meta"><div><dt>Wrap</dt><dd>' + d.rows[d.rows.length - 1].e + '</dd></div><div><dt>ถ่ายแล้ว</dt><dd>' + done + '/' + shots.length + '</dd></div></dl>' +
+      (calls ? '<div class="tcalls"><p class="lbl">เวลาเข้าของแต่ละทีม</p><ul>' + calls + '</ul></div>' : '');
+
+    $('scene').innerHTML = '<span class="b">ฉาก ' + esc(SCENE.no) + '</span>' + esc(SCENE.ie) + ' · ' + esc(SCENE.tod) + ' — ' + esc(SCENE.desc);
+
+    const L = d.loc || {};
+    const line = (k, v) => v ? '<dt>' + k + '</dt><dd>' + v + '</dd>' : '';
+    $('loc').innerHTML = '<p class="n">' + esc(L.name || '') + '</p><dl>' +
+      line('ที่อยู่', esc(L.addr || '') + (L.map ? ' <a href="' + esc(L.map) + '" target="_blank" rel="noopener">เปิดแผนที่</a>' : '')) +
+      line('ที่จอดรถ', esc(L.park || '')) + line('โรงพยาบาลใกล้สุด', esc(L.hospital || '')) + '</dl>';
+
+    const info = team ? '<b>' + esc(team) + '</b> เข้า ' + ((d.teamCalls && d.teamCalls[team]) || DAYS[dayIdx].rows[0].s) + ' น.' + (PREP[team] ? ' · เตรียม: ' + esc(PREP[team]) : '') : '';
+    $('prep').innerHTML = info; $('prep').hidden = !info;
+
+    const nx = DAYS[dayIdx + 1];
+    $('next').hidden = !nx;
+    if (nx) $('next').innerHTML = '<b>วันถัดไป</b> ' + esc(nx.name) + ' (' + esc(nx.date) + ') Call ' + nx.rows[0].s + ' น. · ถ่าย ' + allShots(nx).length + ' ช็อต';
+
+    $('contacts').hidden = !CONTACTS.length;
+    $('contacts').innerHTML = '<p class="lbl">ติดต่อหน้างาน</p>' + CONTACTS.map((c) =>
+      '<div class="r"><span class="m">' + esc(c.role) + '</span><span>' + esc(c.name) + ' ' + (c.tel ? '<a href="tel:' + esc(c.tel) + '">' + esc(c.tel) + '</a>' : '<span class="m">ยังไม่ใส่เบอร์</span>') + '</span></div>').join('');
+  }
+
+  function renderFilters() {
+    $('filters').innerHTML = '<span class="lbl">ดูของทีม</span>' + [''].concat(TEAMS).map((t) =>
+      '<button class="chip" aria-pressed="' + (t === team) + '" data-t="' + esc(t) + '">' + (t || 'ทั้งหมด') + '</button>'
+    ).join('');
+  }
+
+  // สถานะของบล็อก: ค่าที่ PM กดไว้มาก่อน ถ้า PM ยังไม่ได้กดอะไรเลยในวันนั้นจะใช้เวลาจริงตัดสินแทน
+  function blockStatus(d, r, now) {
+    if (st.blocks[r.k]) return st.blocks[r.k];
+    const pmDriving = d.rows.some((x) => st.blocks[x.k]);
+    if (!pmDriving && d.id === now.date) {
+      if (now.min >= toMin(r.e)) return 'past';
+      if (now.min >= toMin(r.s)) return 'now';
+    }
+    return '';
+  }
+
+  function renderTimeline() {
+    const d = DAYS[dayIdx];
+    const now = bangkokNow();
+    const rows = d.rows.filter((r) => !team || r.teams === 'all' || r.teams.includes(team));
+    if (!rows.length) { $('tl').innerHTML = '<li class="empty">ทีมนี้ไม่มีคิวในวันนี้</li>'; return; }
+    const SEG = [['todo', 'รอ'], ['now', 'กำลังถ่าย'], ['done', 'เสร็จ'], ['skip', 'เลื่อน']];
+    $('tl').innerHTML = rows.map((r) => {
+      const s = blockStatus(d, r, now);
+      const teams = r.teams === 'all' ? 'ทุกทีม' : r.teams.join(' · ');
+      const shots = r.shots ? '<ul class="shots">' + r.shots.map((x) => {
+        const v = st.shots[x[0]] || '';
+        const label = v === 'done' ? 'ถ่ายแล้ว' : v === 'retake' ? 'ถ่ายซ้ำ' : 'รอ';
+        const chip = isPM ? '<button type="button" class="sc" data-shot="' + esc(x[0]) + '" aria-label="สถานะช็อต ' + esc(x[0]) + ' ตอนนี้ ' + label + ' แตะเพื่อเปลี่ยน">' + label + '</button>' : '<span class="sc">' + label + '</span>';
+        return '<li class="' + v + '"><span class="c">' + esc(x[0]) + '</span><span class="z">' + esc(x[1]) + '</span><span class="d">' + esc(x[2]) + '</span>' + chip + '</li>';
+      }).join('') + '</ul>' : '';
+      const seg = isPM ? '<div class="seg" role="group" aria-label="สถานะของบล็อกนี้">' + SEG.map((o) => {
+        const on = (o[0] === 'todo' && !st.blocks[r.k]) || st.blocks[r.k] === o[0];
+        return '<button type="button" class="' + (o[0] === 'now' ? 'rec-on' : '') + '" aria-pressed="' + on + '" data-k="' + esc(r.k) + '" data-v="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') + '</div>' : '';
+      const badge = s === 'now' ? '<div class="rec"><i></i>REC · ตอนนี้</div>' : s === 'done' ? '<div class="state">เสร็จแล้ว</div>' : s === 'skip' ? '<div class="state">เลื่อน / ข้าม</div>' : '';
+      return '<li class="row ' + r.type + ' ' + s + '">' +
+        '<div class="t">' + r.s + '<small>' + r.e + '</small></div>' +
+        '<div class="body">' + badge +
+        '<div><span class="kind">' + KIND[r.type] + '</span><span class="title">' + esc(r.title) + '</span></div>' +
+        (r.note ? '<p class="note">' + esc(r.note) + '</p>' : '') +
+        (r.type !== 'break' ? '<p class="teams">ทีม: <b>' + esc(teams) + '</b></p>' : '') +
+        shots + seg + '</div></li>';
+    }).join('');
+  }
+
+  function renderBudget() {
+    const total = DAYS.reduce((n, d) => n + allShots(d).length, 0);
+    const done = DAYS.reduce((n, d) => n + allShots(d).filter((s) => st.shots[s[0]] === 'done').length, 0);
+    const avg = total ? (FILM_SECONDS / total).toFixed(1) : '-';
+    $('budget').innerHTML = 'ถ่ายแล้ว <b>' + done + '/' + total + '</b> ช็อต · ถ้าตัดให้ได้ <b>' + FILM_SECONDS / 60 + '</b> นาที จะเฉลี่ยช็อตละประมาณ <b>' + avg + '</b> วินาที';
+  }
+
+  function renderAll() {
+    renderSync(); renderAnnounce(); renderPM(); renderDays(); renderSummary(); renderFilters(); renderTimeline(); renderBudget();
+  }
+
+  // ---------- เหตุการณ์ ----------
+  $('days').addEventListener('click', (e) => {
+    const b = e.target.closest('.day'); if (!b) return;
+    dayIdx = Number(b.dataset.i); renderDays(); renderSummary(); renderTimeline();
+  });
+  $('filters').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    team = b.dataset.t; renderFilters(); renderSummary(); renderTimeline();
+  });
+  $('tl').addEventListener('click', (e) => {
+    if (!isPM) return;
+    const seg = e.target.closest('[data-k]');
+    if (seg) { setBlock(seg.dataset.k, seg.dataset.v); return; }
+    const sh = e.target.closest('[data-shot]');
+    if (sh) cycleShot(sh.dataset.shot);
+  });
+
+  $('pmBtn').addEventListener('click', () => {
+    if (isPM) return;
+    $('pmLogin').hidden = !$('pmLogin').hidden;
+    if (!$('pmLogin').hidden) $('pmKey').focus();
+  });
+  $('pmLogin').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if ($('pmKey').value === PM_KEY) {
+      isPM = true; try { sessionStorage.setItem('fdm23067SchedPM', '1'); } catch (x) {}
+      $('pmKey').value = ''; $('pmMsg').textContent = '';
+      $('noteIn').value = st.note || '';
+      renderPM(); renderTimeline();
+    } else { $('pmMsg').textContent = 'รหัสไม่ถูกต้อง'; }
+  });
+  $('pmOut').addEventListener('click', () => {
+    isPM = false; try { sessionStorage.removeItem('fdm23067SchedPM'); } catch (x) {}
+    renderPM(); renderTimeline();
+  });
+  $('noteSave').addEventListener('click', () => { write({ note: $('noteIn').value.trim() }); toast('ส่งประกาศแล้ว'); });
+  $('noteClear').addEventListener('click', () => { $('noteIn').value = ''; write({ note: '' }); });
+
+  // รีเซ็ตต้องกดสองครั้ง กันกดพลาด
+  let armTimer;
+  $('resetBtn').addEventListener('click', () => {
+    const b = $('resetBtn');
+    if (!b.classList.contains('armed')) {
+      b.classList.add('armed'); b.textContent = 'กดอีกครั้งเพื่อยืนยันรีเซ็ต';
+      armTimer = setTimeout(() => { b.classList.remove('armed'); b.textContent = 'รีเซ็ตสถานะทั้งหมด'; }, 4000);
+      return;
+    }
+    clearTimeout(armTimer); b.classList.remove('armed'); b.textContent = 'รีเซ็ตสถานะทั้งหมด';
+    write({ blocks: {}, shots: {}, note: '' }, true);
+    $('noteIn').value = '';
+  });
+
+  // ฟังสถานะสดจาก Firestore
+  if (ref) {
+    ref.onSnapshot((snap) => {
+      const data = snap.exists ? snap.data() : {};
+      st = { blocks: data.blocks || {}, shots: data.shots || {}, note: data.note || '' };
+      updatedAt = data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate() : null;
+      synced = true;
+      if (document.activeElement !== $('noteIn')) $('noteIn').value = st.note;
+      renderAll();
+    }, () => { synced = false; ref = null; renderAll(); toast('อ่านสถานะจาก Firebase ไม่ได้ แสดงเฉพาะตาราง'); });
+  }
+
+  $('notice').hidden = !IS_SAMPLE;
+  renderAll();
+  setInterval(renderTimeline, 30000); // อัปเดตสถานะ "ตอนนี้" ตามเวลาทุก 30 วินาที
+</script>
+</body>
+</html>
