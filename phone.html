@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ลงเบอร์โทร · FDM23067</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eceff3;--ink:#111a26;--muted:#5b6878;--blue:#2447d6;--blue2:#e4eafb;--line:#cbd3dc;--green:#1f9d57}
+*{box-sizing:border-box}
+body{margin:0;font-family:'IBM Plex Sans Thai','Anuphan',-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.wrap{max-width:520px;margin:auto;padding:18px}
+.slate{background:var(--ink);color:#fff;border-radius:6px;padding:0 20px 18px;overflow:hidden}
+.slate::before{content:"";display:block;height:16px;margin:0 -20px 14px;background:repeating-linear-gradient(-60deg,#fff 0 20px,var(--ink) 20px 40px)}
+.slate h1{margin:0;font-family:'Anuphan',sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em}
+.slate p{margin:4px 0 0;color:#aebbd0;font-size:14px}
+.card{background:#fff;border:1px solid var(--ink);border-radius:6px;padding:16px;margin-top:14px}
+label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin:0 0 6px}
+select,input{width:100%;padding:13px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+select:focus,input:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.field{margin-bottom:14px}
+button{width:100%;padding:14px;border:0;border-radius:6px;background:var(--blue);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.back{display:inline-block;margin-top:14px;color:var(--blue);font-weight:700;text-decoration:none}
+.progress{font-weight:700;margin-bottom:10px}.progress b{color:var(--blue)}
+.msg{margin-top:12px;padding:12px;border-radius:6px;font-weight:700;display:none}
+.msg.ok{display:block;background:#e6f6ec;color:#146c3a;border:1px solid #b7e2c8}
+.msg.err{display:block;background:#fdeceb;color:#a3231a;border:1px solid #f3c1bd}
+.list{margin-top:14px;font-size:14px}
+.list div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.list div:last-child{border-bottom:0}
+.tag{font-weight:700;white-space:nowrap}.tag.y{color:var(--green)}.tag.n{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="slate"><h1>ลงเบอร์โทร</h1><p>FDM23067 · สำหรับคนที่ลงตำแหน่งแล้ว ไม่ต้องลงใหม่</p></div>
+  <div class="card">
+    <div class="progress"><b id="done">0</b>/<span id="total">0</span> คนลงเบอร์แล้ว</div>
+    <div class="field"><label for="who">ชื่อของคุณ</label><select id="who"><option value="">กำลังโหลด...</option></select></div>
+    <div class="field"><label for="phone">เบอร์โทร</label><input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="เช่น 0891234567" autocomplete="tel"></div>
+    <button id="save" disabled>บันทึกเบอร์โทร</button>
+    <div class="msg" id="msg"></div>
+    <div class="list" id="list"></div>
+  </div>
+  <a class="back" href="./">← กลับไปหน้าลงตำแหน่ง</a>
+</div>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getFirestore, doc, collection, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+  authDomain: "fdm13167.firebaseapp.com",
+  projectId: "fdm13167",
+  storageBucket: "fdm13167.firebasestorage.app",
+  messagingSenderId: "638048330365",
+  appId: "1:638048330365:web:961daeac412d5d6332c714",
+  measurementId: "G-08XDS71QRF"
+};
+const ROSTER=[
+  {id:'68018544',name:'หิรัญ ดิษฐสกุล'},
+  {id:'68020620',name:'จันทิมา จันทร์ช่วง'},
+  {id:'68006622',name:'ธัญพิสิษฐ์ พูนพานิช'},
+  {id:'68018328',name:'ศิริวัฒน์ เดชอุดม'},
+  {id:'68036744',name:'ทีปกร จิณเสน'},
+  {id:'68038946',name:'ธนพัฒน์ พรมวิชัย'},
+  {id:'68022911',name:'พิยดา ด่วนดี'},
+  {id:'68015892',name:'วริชยา ไชยสงค์'},
+  {id:'68023745',name:'พีชานิกา ทองประศรี'},
+  {id:'68005278',name:'กัณญาพัฒน์ จันทร์เกษมสุข'},
+  {id:'68007970',name:'วิโรจน์ สวนสระแก้ว'},
+  {id:'68040382',name:'ภูริพัฒน์ อนุโชติ'},
+  {id:'68026555',name:'กมลพร พูลแก้ว'},
+  {id:'68028928',name:'ณัฐวุฒิ ทับทอง'},
+  {id:'68010119',name:'ณรงค์เดช แสนสิทธิ์'},
+  {id:'68010397',name:'ขันเงิน สาครธนะศักดิ์'},
+  {id:'68011018',name:'วัชรพล ดำสมอ'},
+  {id:'68104276',name:'รวีโรจน์ เชื้อแฉ่ง'},
+  {id:'68059069',name:'อังค์นิษา ดุลยเสนีย์'},
+];
+const db=getFirestore(initializeApp(firebaseConfig));
+let entries=[];
+const $=id=>document.getElementById(id);
+const who=$('who'),phone=$('phone'),save=$('save'),msg=$('msg');
+// รับชื่อจากลิงก์ เช่น phone.html?sid=68018544
+const wantSid=new URLSearchParams(location.search).get('sid')||'';
+function show(t,ok){msg.textContent=t;msg.className='msg '+(ok?'ok':'err')}
+function render(){
+  const signed=ROSTER.map(p=>({p,e:entries.find(e=>e.studentId===p.id)})).filter(x=>x.e);
+  const cur=who.value||wantSid;
+  who.innerHTML='<option value="">— เลือกชื่อ —</option>'+signed.map(x=>`<option value="${x.p.id}">${x.p.name}</option>`).join('');
+  who.value=signed.some(x=>x.p.id===cur)?cur:'';
+  $('done').textContent=signed.filter(x=>x.e.phone).length;
+  $('total').textContent=signed.length;
+  $('list').innerHTML=signed.map(x=>`<div><span>${x.p.name}</span><span class="tag ${x.e.phone?'y':'n'}">${x.e.phone?'✓ ลงแล้ว':'ยังไม่ลง'}</span></div>`).join('')||'<div><span>ยังไม่มีใครลงตำแหน่ง</span></div>';
+  syncPhone();check();
+}
+function syncPhone(){const e=entries.find(x=>x.studentId===who.value);if(e&&e.phone&&document.activeElement!==phone&&!phone.value)phone.value=e.phone}
+function check(){save.disabled=!(who.value&&/^0\d{8,9}$/.test(phone.value.trim()))}
+who.addEventListener('change',()=>{phone.value='';msg.className='msg';syncPhone();check()});
+phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'');check()});
+phone.addEventListener('keydown',e=>{if(e.key==='Enter'&&!save.disabled)save.click()});
+save.addEventListener('click',async()=>{
+  const e=entries.find(x=>x.studentId===who.value);
+  if(!e)return show('ไม่พบข้อมูลการลงตำแหน่งของชื่อนี้',false);
+  save.disabled=true;
+  try{await setDoc(doc(db,'fdm23067','settings','entries',e.id),{phone:phone.value.trim(),authCode:e.code},{merge:true});show('บันทึกเบอร์โทรแล้ว ขอบคุณครับ',true)}
+  catch(err){show('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง',false)}
+  check();
+});
+onSnapshot(collection(db,'fdm23067','settings','entries'),snap=>{entries=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>!e.removed);render()});
+</script>
+</body>
+</html>
