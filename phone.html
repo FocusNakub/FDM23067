@@ -21,6 +21,7 @@ select:focus,input:focus,button:focus-visible,a:focus-visible{outline:2px solid 
 .field{margin-bottom:14px}
 button{width:100%;padding:14px;border:0;border-radius:6px;background:var(--blue);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}
+.howto{background:#fff4cc}.howto ol{margin:6px 0 8px;padding-left:22px}.howto span{font-size:13px;color:var(--muted)}
 .back{display:inline-block;margin-top:14px;color:var(--blue);font-weight:700;text-decoration:none}
 .progress{font-weight:700;margin-bottom:10px}.progress b{color:var(--blue)}
 .msg{margin-top:12px;padding:12px;border-radius:6px;font-weight:700;display:none}
@@ -30,11 +31,55 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .list div{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
 .list div:last-child{border-bottom:0}
 .tag{font-weight:700;white-space:nowrap}.tag.y{color:var(--green)}.tag.n{color:var(--muted)}
+
+.dm{--dmc:#2447d6;width:300px;max-width:100%;margin:0 auto 12px;border:2px solid #111a26;border-radius:14px;background:#fff;overflow:hidden;font-family:inherit;color:#111a26}
+.dm-bar{background:#111a26;color:#fff;font-weight:800;font-size:14px;padding:8px 12px;display:flex;justify-content:space-between}
+.dm-cap{position:relative;height:38px;background:#fff4cc;border-bottom:1px solid #111a26;font-weight:700;font-size:13px}
+.dm-cap span{position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;opacity:0}
+.dm-cap .c1{animation:dmc1 10s infinite}.dm-cap .c2{animation:dmc2 10s infinite}.dm-cap .c3{animation:dmc3 10s infinite}
+.dm-scr{position:relative;height:262px;background:#eceff3}
+.dm-f{position:absolute;left:14px;right:14px;height:42px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:0 12px;display:flex;align-items:center;font-size:14px;overflow:hidden}
+.dm-lab{position:absolute;left:16px;font-size:10px;font-weight:700;color:#5b6878}
+.dm-f.n{top:24px}.dm-f.p{top:86px}
+.dm-ln{top:8px}.dm-lp{top:70px}
+.dm-ph{color:#9aa6b4;position:absolute}
+.dm-n1{animation:dmShowHide 10s infinite}
+.dm-n2{position:absolute;font-weight:700;opacity:0;animation:dmName 10s infinite}
+.dm-p1{animation:dmPh 10s infinite}
+.dm-type{position:absolute;font-variant-numeric:tabular-nums;font-weight:700;overflow:hidden;white-space:nowrap;width:0;animation:dmType 10s infinite steps(10,end)}
+.dm-f.n{animation:dmRing1 10s infinite}.dm-f.p{animation:dmRing2 10s infinite}
+.dm-btn{position:absolute;left:14px;right:14px;top:148px;height:42px;border-radius:6px;background:var(--dmc);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;animation:dmBtn 10s infinite}
+.dm-ok{position:absolute;left:14px;right:14px;top:202px;background:#e6f6ec;border:1px solid #b7e2c8;color:#146c3a;border-radius:6px;font-weight:700;font-size:13px;padding:8px 10px;opacity:0;animation:dmOk 10s infinite}
+.dm-hand{position:absolute;font-size:26px;left:0;top:0;opacity:0;animation:dmHand 10s infinite;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+@keyframes dmc1{0%,2%{opacity:0}5%,28%{opacity:1}32%,100%{opacity:0}}
+@keyframes dmc2{0%,30%{opacity:0}34%,54%{opacity:1}58%,100%{opacity:0}}
+@keyframes dmc3{0%,56%{opacity:0}60%,94%{opacity:1}98%,100%{opacity:0}}
+@keyframes dmShowHide{0%,18%{opacity:1}20%,100%{opacity:0}}
+@keyframes dmName{0%,18%{opacity:0}21%,96%{opacity:1}100%{opacity:0}}
+@keyframes dmPh{0%,36%{opacity:1}37%,100%{opacity:0}}
+@keyframes dmType{0%,36%{width:0}50%,96%{width:11ch}100%{width:0}}
+@keyframes dmRing1{0%,2%{box-shadow:none}6%,22%{box-shadow:0 0 0 3px #9db4ff}26%,100%{box-shadow:none}}
+@keyframes dmRing2{0%,30%{box-shadow:none}34%,52%{box-shadow:0 0 0 3px #9db4ff}56%,100%{box-shadow:none}}
+@keyframes dmBtn{0%,50%{opacity:.45;transform:none}54%,60%{opacity:1;transform:none}63%{opacity:1;transform:scale(.95)}67%,100%{opacity:1;transform:none}}
+@keyframes dmOk{0%,66%{opacity:0;transform:translateY(6px)}72%,94%{opacity:1;transform:none}98%,100%{opacity:0}}
+@keyframes dmHand{
+ 0%,3%{opacity:0;left:200px;top:70px}
+ 7%{opacity:1;left:150px;top:44px}
+ 18%{opacity:1;left:150px;top:44px}
+ 24%{opacity:1;left:180px;top:116px}
+ 50%{opacity:1;left:180px;top:116px}
+ 58%{opacity:1;left:190px;top:168px}
+ 64%{opacity:1;left:190px;top:170px}
+ 70%{opacity:1;left:190px;top:176px}
+ 76%,100%{opacity:0;left:190px;top:176px}}
+@media(prefers-reduced-motion:reduce){.dm *{animation:none!important}.dm-cap .c3,.dm-n2,.dm-ok{opacity:1!important}.dm-n1,.dm-p1,.dm-hand{opacity:0!important}.dm-type{width:11ch!important}.dm-cap .c1,.dm-cap .c2{display:none}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="slate"><h1>ลงเบอร์โทร</h1><p>FDM23067 · สำหรับคนที่ลงตำแหน่งแล้ว ไม่ต้องลงใหม่</p></div>
+  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง</li><li>พิมพ์เบอร์โทร 10 หลัก เช่น 0891234567</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดพิมพ์ทับใหม่ได้</span></div>
   <div class="card">
     <div class="progress"><b id="done">0</b>/<span id="total">0</span> คนลงเบอร์แล้ว</div>
     <div class="field"><label for="who">ชื่อของคุณ</label><select id="who"><option value="">กำลังโหลด...</option></select></div>
