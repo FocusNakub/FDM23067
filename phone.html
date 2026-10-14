@@ -21,6 +21,7 @@ select:focus,input:focus,button:focus-visible,a:focus-visible{outline:2px solid 
 .field{margin-bottom:14px}
 button{width:100%;padding:14px;border:0;border-radius:6px;background:var(--blue);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}
+.cur{background:#e6f0ff;border:1px solid var(--ink);border-radius:6px;padding:8px 12px;margin:0 0 12px;font-size:14px;display:none}.cur b{font-variant-numeric:tabular-nums}.cur button{background:none;border:0;color:#e5372b;text-decoration:underline;font-size:13px;padding:0;margin-left:8px;cursor:pointer;min-height:0;width:auto}.edit{background:#fff;color:var(--ink);border:1px solid var(--ink);border-radius:5px;font-size:12px;padding:2px 8px;margin-left:6px;cursor:pointer;min-height:0;width:auto}
 .howto{background:#fff4cc}.howto ol{margin:6px 0 8px;padding-left:22px}.howto span{font-size:13px;color:var(--muted)}
 .back{display:inline-block;margin-top:14px;color:var(--blue);font-weight:700;text-decoration:none}
 .progress{font-weight:700;margin-bottom:10px}.progress b{color:var(--blue)}
@@ -79,10 +80,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <div class="wrap">
   <div class="slate"><h1>ลงเบอร์โทร</h1><p>FDM23067 · สำหรับคนที่ลงตำแหน่งแล้ว ไม่ต้องลงใหม่</p></div>
-  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง</li><li>พิมพ์เบอร์โทร 10 หลัก เช่น 0891234567</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดพิมพ์ทับใหม่ได้</span></div>
+  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง + ใส่รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</li><li>พิมพ์เบอร์โทร 10 หลัก เช่น 0891234567</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดแก้ได้ ต้องใช้รหัสแก้ไขของตัวเอง · ลืมรหัสถามแอดมิน</span></div>
   <div class="card">
     <div class="progress"><b id="done">0</b>/<span id="total">0</span> คนลงเบอร์แล้ว</div>
     <div class="field"><label for="who">ชื่อของคุณ</label><select id="who"><option value="">กำลังโหลด...</option></select></div>
+    <div class="field"><label for="code">รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</label><input id="code" maxlength="4" placeholder="เช่น A7K2" autocomplete="off" style="text-transform:uppercase"></div>
+    <div class="cur" id="cur"></div>
     <div class="field"><label for="phone">เบอร์โทร</label><input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="เช่น 0891234567" autocomplete="tel"></div>
     <button id="save" disabled>บันทึกเบอร์โทร</button>
     <div class="msg" id="msg"></div>
@@ -126,7 +129,7 @@ const ROSTER=[
 const db=getFirestore(initializeApp(firebaseConfig));
 let entries=[];
 const $=id=>document.getElementById(id);
-const who=$('who'),phone=$('phone'),save=$('save'),msg=$('msg');
+const code=$('code'),who=$('who'),phone=$('phone'),save=$('save'),msg=$('msg');
 // รับชื่อจากลิงก์ เช่น phone.html?sid=68018544
 const wantSid=new URLSearchParams(location.search).get('sid')||'';
 function show(t,ok){msg.textContent=t;msg.className='msg '+(ok?'ok':'err')}
@@ -137,21 +140,42 @@ function render(){
   who.value=signed.some(x=>x.p.id===cur)?cur:'';
   $('done').textContent=signed.filter(x=>x.e.phone).length;
   $('total').textContent=signed.length;
-  $('list').innerHTML=signed.map(x=>`<div><span>${x.p.name}</span><span class="tag ${x.e.phone?'y':'n'}">${x.e.phone?'✓ ลงแล้ว':'ยังไม่ลง'}</span></div>`).join('')||'<div><span>ยังไม่มีใครลงตำแหน่ง</span></div>';
-  syncPhone();check();
+  $('list').innerHTML=signed.map(x=>`<div><span>${x.p.name}</span><span><span class="tag ${x.e.phone?'y':'n'}">${x.e.phone?'✓ ลงแล้ว':'ยังไม่ลง'}</span>${x.e.phone?`<button class="edit" data-sid="${x.p.id}">✏️ แก้</button>`:''}</span></div>`).join('')||'<div><span>ยังไม่มีใครลงตำแหน่ง</span></div>';
+  if(who.value&&!code.value)autoCode();syncPhone();check();
 }
-function syncPhone(){const e=entries.find(x=>x.studentId===who.value);if(e&&e.phone&&document.activeElement!==phone&&!phone.value)phone.value=e.phone}
-function check(){save.disabled=!(who.value&&/^0\d{8,9}$/.test(phone.value.trim()))}
-who.addEventListener('change',()=>{phone.value='';msg.className='msg';syncPhone();check()});
+function syncPhone(){const e=entries.find(x=>x.studentId===who.value);if(e&&e.phone&&okCode()&&document.activeElement!==phone&&!phone.value)phone.value=e.phone}
+function curE(){return entries.find(x=>x.studentId===who.value)}
+// รหัสแก้ไขต้องตรงกับของคนที่เลือก ถึงจะลง/แก้/ลบเบอร์ได้
+function okCode(){const e=curE();return !!(e&&e.code&&code.value.trim().toUpperCase()===String(e.code).toUpperCase())}
+function check(){const e=curE(),v=phone.value.trim(),cur=$('cur'),vc=okCode(),
+  ok=who.value&&/^0\d{8,9}$/.test(v),editing=!!(e&&e.phone);
+  if(e&&editing&&vc){cur.style.display='block';cur.innerHTML='📞 เบอร์ที่ลงไว้ตอนนี้: <b>'+e.phone+'</b> <button id="delPhone" type="button">ลบเบอร์</button><br><span class="small">ใส่เบอร์ใหม่ด้านล่างแล้วกด "บันทึกการแก้ไข" ได้เลย</span>'}
+  else if(e&&editing){cur.style.display='block';cur.innerHTML='🔒 ชื่อนี้ลงเบอร์ไว้แล้ว · ใส่รหัสแก้ไขของตัวเองเพื่อดู/แก้ไข'}
+  else{cur.style.display='none'}
+  save.textContent=editing?'บันทึกการแก้ไข':'บันทึกเบอร์โทร';
+  save.disabled=!(ok&&vc&&!(editing&&v===e.phone));
+  if(who.value&&code.value.length===4&&!vc){show('รหัสแก้ไขไม่ถูกต้อง',false)}else if(msg.textContent==='รหัสแก้ไขไม่ถูกต้อง'){msg.className='msg'}}
+// ถ้าเครื่องนี้เคยลงตำแหน่งไว้ ใส่รหัสให้อัตโนมัติ (เฉพาะชื่อของตัวเอง)
+function autoCode(){code.value='';try{const m=JSON.parse(localStorage.getItem('fdm23067_my_entry')||'null');if(m&&m.studentId===who.value&&m.code)code.value=m.code}catch(e){}}
+who.addEventListener('change',()=>{phone.value='';msg.className='msg';autoCode();syncPhone();check()});
+code.addEventListener('input',()=>{code.value=code.value.toUpperCase().replace(/[^A-Z0-9]/g,'');syncPhone();check()});
 phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'');check()});
 phone.addEventListener('keydown',e=>{if(e.key==='Enter'&&!save.disabled)save.click()});
 save.addEventListener('click',async()=>{
   const e=entries.find(x=>x.studentId===who.value);
   if(!e)return show('ไม่พบข้อมูลการลงตำแหน่งของชื่อนี้',false);
+  if(!okCode())return show('รหัสแก้ไขไม่ถูกต้อง',false);
   save.disabled=true;
-  try{await setDoc(doc(db,'fdm23067','settings','entries',e.id),{phone:phone.value.trim(),authCode:e.code},{merge:true});show('บันทึกเบอร์โทรแล้ว ขอบคุณครับ',true)}
+  const was=!!e.phone;try{await setDoc(doc(db,'fdm23067','settings','entries',e.id),{phone:phone.value.trim(),authCode:e.code},{merge:true});show(was?'แก้เบอร์โทรเรียบร้อยแล้ว':'บันทึกเบอร์โทรแล้ว ขอบคุณครับ',true)}
   catch(err){show('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง',false)}
   check();
+});
+// ปุ่ม ✏️ แก้ ในรายชื่อ / ปุ่มลบเบอร์ (ใช้ event delegation)
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('.edit');
+  if(b){who.value=b.dataset.sid;phone.value='';autoCode();syncPhone();check();window.scrollTo({top:0,behavior:'smooth'});(code.value?phone:code).focus();return}
+  if(ev.target.id==='delPhone'){const e=curE();if(!e||!okCode()||!confirm('ลบเบอร์โทรที่ลงไว้?'))return;
+    try{await setDoc(doc(db,'fdm23067','settings','entries',e.id),{phone:'',authCode:e.code},{merge:true});phone.value='';show('ลบเบอร์โทรแล้ว ลงใหม่ได้เลย',true)}catch(err){show('ลบไม่สำเร็จ ลองใหม่อีกครั้ง',false)}}
 });
 onSnapshot(collection(db,'fdm23067','settings','entries'),snap=>{entries=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>!e.removed);render()});
 </script>
