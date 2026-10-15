@@ -21,6 +21,7 @@ select:focus,input:focus,button:focus-visible,a:focus-visible{outline:2px solid 
 .field{margin-bottom:14px}
 button{width:100%;padding:14px;border:0;border-radius:6px;background:var(--blue);color:#fff;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
 button:disabled{opacity:.5;cursor:not-allowed}
+.seed{display:none;background:#fff4cc;border:2px solid var(--ink);border-radius:8px;padding:14px;margin:0 0 12px;text-align:center}.seed .num{font-size:28px;font-weight:800;letter-spacing:1px;margin:4px 0 10px;font-variant-numeric:tabular-nums}.seed button{width:100%;margin-top:8px}.seed .alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
 .cur{background:#e6f0ff;border:1px solid var(--ink);border-radius:6px;padding:8px 12px;margin:0 0 12px;font-size:14px;display:none}.cur b{font-variant-numeric:tabular-nums}.cur button{background:none;border:0;color:#e5372b;text-decoration:underline;font-size:13px;padding:0;margin-left:8px;cursor:pointer;min-height:0;width:auto}.edit{background:#fff;color:var(--ink);border:1px solid var(--ink);border-radius:5px;font-size:12px;padding:2px 8px;margin-left:6px;cursor:pointer;min-height:0;width:auto}
 .howto{background:#fff4cc}.howto ol{margin:6px 0 8px;padding-left:22px}.howto span{font-size:13px;color:var(--muted)}
 .back{display:inline-block;margin-top:14px;color:var(--blue);font-weight:700;text-decoration:none}
@@ -80,13 +81,14 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <body>
 <div class="wrap">
   <div class="slate"><h1>ลงเบอร์โทร</h1><p>FDM23067 · สำหรับคนที่ลงตำแหน่งแล้ว ไม่ต้องลงใหม่</p></div>
-  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง + ใส่รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</li><li>พิมพ์เบอร์โทร 10 หลัก เช่น 0891234567</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดแก้ได้ ต้องใช้รหัสแก้ไขของตัวเอง · ลืมรหัสถามแอดมิน</span></div>
+  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง + ใส่รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</li><li>มีเบอร์ขึ้นให้ → ถูกกด "ยืนยัน" / ผิดกด "แก้เบอร์" · ไม่มี → พิมพ์เบอร์ 10 หลัก</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดแก้ได้ ต้องใช้รหัสแก้ไขของตัวเอง · ลืมรหัสถามแอดมิน</span></div>
   <div class="card">
     <div class="progress"><b id="done">0</b>/<span id="total">0</span> คนลงเบอร์แล้ว</div>
     <div class="field"><label for="who">ชื่อของคุณ</label><select id="who"><option value="">กำลังโหลด...</option></select></div>
     <div class="field"><label for="code">รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</label><input id="code" maxlength="4" placeholder="เช่น A7K2" autocomplete="off" style="text-transform:uppercase"></div>
     <div class="cur" id="cur"></div>
-    <div class="field"><label for="phone">เบอร์โทร</label><input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="เช่น 0891234567" autocomplete="tel"></div>
+    <div class="seed" id="seed"></div>
+    <div class="field" id="phoneField"><label for="phone">เบอร์โทร</label><input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="เช่น 0891234567" autocomplete="tel"></div>
     <button id="save" disabled>บันทึกเบอร์โทร</button>
     <div class="msg" id="msg"></div>
     <div class="list" id="list"></div>
@@ -126,6 +128,9 @@ const ROSTER=[
   {id:'68104276',name:'รวีโรจน์ เชื้อแฉ่ง'},
   {id:'68059069',name:'อังค์นิษา ดุลยเสนีย์'},
 ];
+// เบอร์จากไฟล์ blb-crew (ซ่อนรหัสไว้ ไม่ใช่ข้อความเบอร์ตรงๆ) ใช้ให้เจ้าของตรวจว่าถูกไหม
+const SEED_RAW={"68020620": "6750858312", "68018544": "6430409073", "68006622": "6752734440", "68011018": "6417254147", "68005278": "6632698956", "68104276": "6432309697", "68018328": "6734084452", "68010119": "6769559420", "68010397": "6756420850"};
+const SEED={};for(const sid in SEED_RAW)SEED[sid]=[...SEED_RAW[sid]].map((c,i)=>(+c-+sid[i%8]+10)%10).join('');
 const db=getFirestore(initializeApp(firebaseConfig));
 let entries=[];
 const $=id=>document.getElementById(id);
@@ -147,17 +152,25 @@ function syncPhone(){const e=entries.find(x=>x.studentId===who.value);if(e&&e.ph
 function curE(){return entries.find(x=>x.studentId===who.value)}
 // รหัสแก้ไขต้องตรงกับของคนที่เลือก ถึงจะลง/แก้/ลบเบอร์ได้
 function okCode(){const e=curE();return !!(e&&e.code&&code.value.trim().toUpperCase()===String(e.code).toUpperCase())}
+let seedEditing=false;
+const fmt=n=>n.length===10?n.slice(0,3)+'-'+n.slice(3,6)+'-'+n.slice(6):n;
 function check(){const e=curE(),v=phone.value.trim(),cur=$('cur'),vc=okCode(),
-  ok=who.value&&/^0\d{8,9}$/.test(v),editing=!!(e&&e.phone);
+  ok=who.value&&/^0\d{8,9}$/.test(v),editing=!!(e&&e.phone),seed=SEED[who.value],
+  showSeed=!!(seed&&e&&!e.phone&&vc&&!seedEditing),seedBox=$('seed');
+  // มีเบอร์จากไฟล์: ให้ตรวจว่าถูกไหม ถูก=กดยืนยัน ผิด=กดแก้
+  if(showSeed){seedBox.style.display='block';seedBox.innerHTML='📞 เบอร์ที่มีในระบบของคุณ<div class="num">'+fmt(seed)+'</div><b>เบอร์นี้ถูกต้องไหม?</b><button id="seedYes" type="button">✓ ถูกต้อง ยืนยัน</button><button id="seedNo" type="button" class="alt">✏️ ไม่ถูก แก้เบอร์</button>'}
+  else seedBox.style.display='none';
+  $('phoneField').style.display=showSeed?'none':'';save.style.display=showSeed?'none':'';
   if(e&&editing&&vc){cur.style.display='block';cur.innerHTML='📞 เบอร์ที่ลงไว้ตอนนี้: <b>'+e.phone+'</b> <button id="delPhone" type="button">ลบเบอร์</button><br><span class="small">ใส่เบอร์ใหม่ด้านล่างแล้วกด "บันทึกการแก้ไข" ได้เลย</span>'}
   else if(e&&editing){cur.style.display='block';cur.innerHTML='🔒 ชื่อนี้ลงเบอร์ไว้แล้ว · ใส่รหัสแก้ไขของตัวเองเพื่อดู/แก้ไข'}
+  else if(seed&&e&&!vc){cur.style.display='block';cur.innerHTML='🔒 มีเบอร์ที่เตรียมไว้ให้ตรวจสอบแล้ว · ใส่รหัสแก้ไขของตัวเองเพื่อดู'}
   else{cur.style.display='none'}
-  save.textContent=editing?'บันทึกการแก้ไข':'บันทึกเบอร์โทร';
-  save.disabled=!(ok&&vc&&!(editing&&v===e.phone));
+  save.textContent=(editing||seedEditing)?'บันทึกการแก้ไข':'บันทึกเบอร์โทร';
+  save.disabled=!(ok&&vc&&!(editing&&v===e.phone)&&!(seedEditing&&v===seed));
   if(who.value&&code.value.length===4&&!vc){show('รหัสแก้ไขไม่ถูกต้อง',false)}else if(msg.textContent==='รหัสแก้ไขไม่ถูกต้อง'){msg.className='msg'}}
 // ถ้าเครื่องนี้เคยลงตำแหน่งไว้ ใส่รหัสให้อัตโนมัติ (เฉพาะชื่อของตัวเอง)
 function autoCode(){code.value='';try{const m=JSON.parse(localStorage.getItem('fdm23067_my_entry')||'null');if(m&&m.studentId===who.value&&m.code)code.value=m.code}catch(e){}}
-who.addEventListener('change',()=>{phone.value='';msg.className='msg';autoCode();syncPhone();check()});
+who.addEventListener('change',()=>{seedEditing=false;phone.value='';msg.className='msg';autoCode();syncPhone();check()});
 code.addEventListener('input',()=>{code.value=code.value.toUpperCase().replace(/[^A-Z0-9]/g,'');syncPhone();check()});
 phone.addEventListener('input',()=>{phone.value=phone.value.replace(/\D/g,'');check()});
 phone.addEventListener('keydown',e=>{if(e.key==='Enter'&&!save.disabled)save.click()});
@@ -172,6 +185,9 @@ save.addEventListener('click',async()=>{
 });
 // ปุ่ม ✏️ แก้ ในรายชื่อ / ปุ่มลบเบอร์ (ใช้ event delegation)
 document.addEventListener('click',async ev=>{
+  if(ev.target.id==='seedNo'){seedEditing=true;phone.value=SEED[who.value]||'';check();phone.focus();return}
+  if(ev.target.id==='seedYes'){const e=curE();if(!e||!okCode())return;ev.target.disabled=true;
+    try{await setDoc(doc(db,'fdm23067','settings','entries',e.id),{phone:SEED[who.value],authCode:e.code},{merge:true});show('ยืนยันเบอร์โทรเรียบร้อยแล้ว ขอบคุณครับ',true)}catch(err){ev.target.disabled=false;show('บันทึกไม่สำเร็จ ลองใหม่อีกครั้ง',false)}return}
   const b=ev.target.closest('.edit');
   if(b){who.value=b.dataset.sid;phone.value='';autoCode();syncPhone();check();window.scrollTo({top:0,behavior:'smooth'});(code.value?phone:code).focus();return}
   if(ev.target.id==='delPhone'){const e=curE();if(!e||!okCode()||!confirm('ลบเบอร์โทรที่ลงไว้?'))return;
