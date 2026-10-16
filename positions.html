@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FDM23067 Crew Position System</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSI1OCIgaGVpZ2h0PSI1OCIgcng9IjE0IiBmaWxsPSIjMTUzMDRhIi8+CjxjbGlwUGF0aCBpZD0iYyI+PHJlY3QgeD0iMyIgeT0iMyIgd2lkdGg9IjU4IiBoZWlnaHQ9IjIwIiByeD0iOCIvPjwvY2xpcFBhdGg+CjxnIGNsaXAtcGF0aD0idXJsKCNjKSI+CjxyZWN0IHg9IjMiIHk9IjMiIHdpZHRoPSI1OCIgaGVpZ2h0PSIyMCIgZmlsbD0iIzZmYThkYyIvPgo8cG9seWdvbiBwb2ludHM9IjYsMyAxNiwzIDgsMjMgLTIsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSIyNCwzIDM0LDMgMjYsMjMgMTYsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSI0MiwzIDUyLDMgNDQsMjMgMzQsMjMiIGZpbGw9IiNmZmYiLz4KPHBvbHlnb24gcG9pbnRzPSI2MCwzIDcwLDMgNjIsMjMgNTIsMjMiIGZpbGw9IiNmZmYiLz4KPC9nPgo8cmVjdCB4PSIzIiB5PSIyMyIgd2lkdGg9IjU4IiBoZWlnaHQ9IjM4IiByeD0iMCIgZmlsbD0ibm9uZSIvPgo8L3N2Zz4=">
+
+<!-- แชร์ลิงก์นี้ในไลน์/เฟซบุ๊กแล้วจะมีรูปตัวอย่างขึ้นใต้ลิงก์ (ต้องอัปโหลด og-image.png ไปที่ repo ก่อน ดูวิธีในแชท) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://focusnakub.github.io/FDM23067/">
+<meta property="og:title" content="FDM23067 · Crew Position System">
+<meta property="og:description" content="ระบบเลือกตำแหน่งกองถ่ายหนังสั้น 1 ซีน 2 นาที แบบเรียลไทม์ สำหรับทีม 18 คน ใครกดก่อนได้ก่อน">
+<meta property="og:image" content="https://focusnakub.github.io/FDM23067/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FDM23067 · Crew Position System">
+<meta name="twitter:description" content="ระบบเลือกตำแหน่งกองถ่ายหนังสั้น 1 ซีน 2 นาที แบบเรียลไทม์ สำหรับทีม 18 คน">
+<meta name="twitter:image" content="https://focusnakub.github.io/FDM23067/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;700;800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f7fd;--card:#fff;--ink:#173049;--muted:#6b859c;--pink:#6fa8dc;--pink2:#e3f1fb;
+  --green:#25b86a;--yellow:#f7b731;--red:#ff4d5f;--line:#cfe6f7;--dark:#15304a;
+  --shadow:0 16px 40px rgba(23,79,120,.10);--radius:22px;--accent:#6fa8dc;
+}
+*{box-sizing:border-box;min-width:0}
+html,body{overflow-x:hidden;max-width:100%}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;background:radial-gradient(circle at top left,var(--pink2),transparent 35%),var(--bg);color:var(--ink)}
+img,svg,video,canvas{max-width:100%;height:auto}
+.wrap{max-width:1200px;margin:auto;padding:22px;min-width:0}
+.site-footer{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:12px;font-weight:800;line-height:1.7}
+.site-footer .footer-title{font-size:14px;font-weight:950;color:var(--ink)}
+.top{display:flex;justify-content:space-between;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap;min-width:0}
+.brand{min-width:0}.brand h1{margin:0;font-size:clamp(24px,4vw,38px);letter-spacing:-.03em;overflow-wrap:anywhere}.brand p{margin:4px 0 0;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;min-width:0}
+.pill{border:1px solid var(--line);background:rgba(255,255,255,.72);border-radius:999px;padding:10px 14px;display:inline-flex;gap:8px;align-items:center;font-weight:800;box-shadow:var(--shadow)}
+.status-dot{width:10px;height:10px;border-radius:50%;background:var(--green)}
+button{border:0;border-radius:15px;padding:11px 14px;font-weight:900;cursor:pointer;background:var(--pink);color:white;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 30%,transparent);transition:.15s ease}
+button:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}
+button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}button.ghost{background:transparent;color:var(--pink);box-shadow:none;padding:7px 8px}button.danger{background:var(--red)}button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+.setup{background:#fff3cd;border-color:#ffd36b;color:#5e4300;font-weight:800;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;margin:14px 0}
+
+/* ===== แถบสถานะรวม: ความคืบหน้า + วิธีใช้ + ประกาศ (แทนที่ Live Info Board เดิม) ===== */
+.status-strip{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:12px 16px;margin:14px 0}
+.status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.status-progress{flex:1;min-width:220px;font-weight:800;font-size:14px}
+.status-progress b{font-size:18px;color:var(--pink)}
+.status-progress .progressbar{margin-top:6px;height:8px}
+.top-countdown{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--pink),#8fc6ea);color:#fff;border-radius:999px;padding:8px 16px;font-weight:800;font-size:13px;white-space:nowrap;box-shadow:0 8px 18px color-mix(in srgb,var(--pink) 35%,transparent)}
+.top-countdown b{font-size:16px;color:#fff;font-variant-numeric:tabular-nums}
+.status-announce{margin-top:10px;background:var(--dark);color:#fff;border-radius:12px;padding:9px 12px;font-size:13px;font-weight:700;overflow-wrap:anywhere}
+.final-warn-mini{display:inline-block;max-width:100%;background:var(--red);color:#fff;font-weight:800;font-size:12px;line-height:1.3;text-align:center;padding:3px 9px;border-radius:14px;margin:0 0 8px;animation:finalWarnBlink 1.1s ease-in-out infinite;overflow-wrap:anywhere}
+.trial-banner{background:var(--yellow);color:#5e4300;font-weight:900;text-align:center;padding:12px 16px;border-radius:16px;margin:14px 0;box-shadow:var(--shadow);overflow-wrap:anywhere}
+@keyframes finalWarnBlink{0%,100%{opacity:1}50%{opacity:.5}}
+
+.dept-grid{columns:2;column-gap:14px;min-width:0}
+.dept-block{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0;break-inside:avoid;display:inline-block;width:100%;margin:0 0 14px}
+.dept-heading{font-size:15px;font-weight:900;color:var(--ink);padding-bottom:10px;margin-bottom:14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.dept-heading .dept-count{margin-left:auto;font-size:12px;font-weight:800;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:18px;min-width:0;align-items:start}
+.content-area{min-width:0}
+.side{display:grid;gap:14px;min-width:0}
+#myProfileBox{margin:14px 0}.side #myProfileBox{margin:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;min-width:0}
+.dept-block .card{box-shadow:none;background:var(--bg)}
+.dept-block .card:hover{box-shadow:0 14px 30px rgba(23,79,120,.12)}
+.card{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;transition:.2s ease;min-width:0}.card:hover{transform:translateY(-3px);box-shadow:0 22px 46px rgba(23,79,120,.16)}.card.full:after{content:"เต็มแล้ว";position:absolute;right:-34px;top:18px;background:var(--red);color:#fff;transform:rotate(35deg);padding:6px 42px;font-size:12px;font-weight:950}.card.locked:after{content:"🔒 ล็อกไว้";background:var(--dark)}.role-title{display:flex;justify-content:space-between;gap:10px;align-items:start;min-width:0}.role-title h3{margin:0;font-size:18px;min-width:0;overflow-wrap:anywhere}.count{font-size:13px;color:var(--muted);font-weight:900;flex:0 0 auto}.slots{margin:13px 0;display:grid;gap:8px;min-width:0}.slot{background:#eef7fd;border:1px dashed var(--line);border-radius:14px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;min-width:0}.slot>div{min-width:0}.slot.taken{background:#f7fff9;border-style:solid;border-color:#bfeccf}.name{font-weight:950;overflow-wrap:anywhere;word-break:break-word}.small{font-size:12px;color:var(--muted);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
+.panel{background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:var(--radius);padding:16px;min-width:0}.panel h2{margin:0 0 12px;font-size:16px}.stat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;min-width:0}.stat div{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;min-width:0}.stat b{font-size:26px}.field{display:grid;gap:6px;margin:10px 0;min-width:0}.field label{font-size:13px;color:var(--muted);font-weight:900}input,select{width:100%;max-width:100%;padding:12px;border-radius:14px;border:1px solid var(--line);font-size:15px;background:#fff;color:var(--ink);min-width:0}
+.admin-box{display:none;min-width:0}.admin-on .admin-box{display:block}.admin-on #adminLogin{display:none}
+.panel.admin-box{max-height:440px;overflow-y:auto}.admin-box-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}.admin-box-head h2{margin:0}.admin-section{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:14px}.admin-section h3{margin:0 0 10px;font-size:14px;font-weight:900;display:flex;align-items:center;gap:6px;color:var(--ink)}.admin-section .table-scroll{background:#fff;border-radius:12px;padding:4px}#callSheetModal .modal-card{max-width:900px}.csb-page{font-family:Arial,Helvetica,sans-serif;color:#111}.csb-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:3px solid #111;padding-bottom:10px;margin-bottom:12px;flex-wrap:wrap}.csb-head h1{margin:0;font-size:19px;letter-spacing:.01em}.csb-head .csb-sub{font-size:12px;color:#555;margin-top:2px}.csb-day{font-weight:900;font-size:13px;background:#111;color:#fff;padding:6px 12px;border-radius:4px;white-space:nowrap}.csb-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid #111;margin-bottom:16px;border-radius:4px;overflow:hidden}.csb-info>div{border-right:1px solid #111;border-bottom:1px solid #111;padding:8px 10px}.csb-info>div:nth-last-child(-n+1){border-bottom:0}.csb-info label{display:block;font-size:10px;text-transform:uppercase;color:#666;font-weight:800;margin-bottom:3px;letter-spacing:.03em}.csb-info b{font-size:14px}.csb-dept-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:12px;table-layout:fixed}.csb-dept-table th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.02em}.csb-dept-table td{border-bottom:1px solid #ccc;padding:7px 8px;vertical-align:top;overflow-wrap:anywhere}.csb-role{font-weight:800;width:22%}.csb-name{color:#222;width:28%}.csb-fill{color:#bbb}.csb-foot{margin-top:10px;font-size:11px;color:#555;border-top:1px solid #111;padding-top:8px}.csb-callinfo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:640px){.csb-callinfo-grid{grid-template-columns:1fr}}
+#adminLogin{padding:12px}#adminLogin h2{font-size:15px;margin-bottom:4px}#adminLogin p{margin:0 0 8px}#adminLogin .field{margin:7px 0}
+.table-scroll{width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;min-width:340px;border-collapse:collapse;font-size:13px}.table td,.table th{border-bottom:1px solid #cfe6f7;padding:8px;text-align:left;overflow-wrap:anywhere;word-break:break-word}.table th{color:var(--muted)}.table td .admin-actions{flex-wrap:wrap}.table td .ghost{padding:6px 7px;font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(40,18,28,.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}.modal.show{display:flex}.modal-card{max-width:500px;width:100%;background:#fff;border-radius:28px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.22);max-height:90vh;overflow:auto}.modal-card h2{margin:0 0 10px}.code{font-size:38px;letter-spacing:.08em;font-weight:950;background:var(--dark);color:#fff;border-radius:18px;text-align:center;padding:18px;margin:12px 0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#15304a;color:#fff;padding:12px 16px;border-radius:999px;display:none;font-weight:900;z-index:50}.toast.show{display:block;animation:pop .2s ease}
+.schedule-status{background:#eef7fd;border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:12px}.countdown{font-size:22px;font-weight:950;color:var(--pink);margin-top:4px}.admin-actions{display:flex;gap:8px;flex-wrap:wrap}.time-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}.progressbar{height:12px;background:#dcedf9;border-radius:999px;overflow:hidden;margin-top:10px}.progressbar span{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#9cc9ec);border-radius:999px;width:0%}.mini-list{display:grid;gap:8px}.mini-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:#eef7fd;border:1px solid var(--line);border-radius:14px;padding:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--pink2);display:inline-grid;place-items:center;font-weight:950;color:color-mix(in srgb,var(--pink) 70%,#222)}.call-card{border:1px solid var(--line);background:#eef7fd;border-radius:16px;padding:12px;margin:8px 0}.muted-btn{font-size:13px;padding:8px 10px}
+@keyframes pop{from{transform:translateX(-50%) scale(.9);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+/* แท็บเล็ต/ไอแพด: พับไซด์บาร์ลงล่าง แต่ตำแหน่งยังจัด 2 คอลัมน์ (กว้างพอ) */
+@media(max-width:1023px){.grid{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
+/* มือถือ: ทุกอย่างจัดคอลัมน์เดียว กระชับขึ้น */
+@media(max-width:640px){
+  .wrap{padding:14px}
+  .cards{grid-template-columns:1fr}
+  .dept-grid{columns:1}
+  .status-row{flex-direction:column;align-items:stretch}
+  .status-row button{width:100%}
+  .brand h1{font-size:24px}
+  .top-actions{width:100%}
+  .top-actions button{flex:1}
+}
+@media print{body{background:#fff}.top,.status-strip,.side,.dept-grid,.trial-banner,.modal:not(#callSheetModal){display:none!important}#callSheetModal{position:static;display:block;background:#fff}.modal-card{box-shadow:none;max-width:100%;border-radius:0}}
+
+
+.phone-banner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#fff4cc;border:1px solid var(--ink);border-radius:6px;padding:10px 14px;margin:0 0 14px}.phone-banner .pb-text{display:flex;flex-direction:column;flex:1 1 180px}.phone-banner .pb-text span{font-size:12px;color:var(--muted);font-weight:700}.phone-banner input{flex:1 1 160px;max-width:240px}
+.btn-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;border-radius:6px;padding:11px 14px;font-weight:700;background:var(--pink);color:#fff;border:1px solid var(--pink);white-space:nowrap}.btn-link.secondary{background:#fff;color:var(--ink);border:1px solid var(--ink)}.btn-link.muted-btn{font-size:13px;padding:8px 10px}.top .btn-link{background:var(--pink);color:#fff}
+/* ===== REDESIGN v2: call-sheet / slate look ===== */
+:root{--bg:#eceff3;--card:#fff;--ink:#111a26;--muted:#5b6878;--pink:#2447d6;--pink2:#e4eafb;--line:#cbd3dc;--dark:#111a26;--shadow:none;--radius:6px;--accent:#2447d6;--red:#e5372b;--green:#1f9d57;--yellow:#f2b51d}
+body{font-family:'IBM Plex Sans Thai','Anuphan',-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,sans-serif;background:var(--bg);line-height:1.5}
+h1,h2,h3,.dept-heading,.countdown,.count,.code{font-family:'Anuphan','IBM Plex Sans Thai',sans-serif}
+button{border-radius:6px;box-shadow:none;font-family:inherit;font-weight:700}
+button:hover:not(:disabled){transform:none;filter:brightness(1.12)}
+button.secondary{background:#fff;color:var(--ink);border:1px solid var(--ink)}
+input,select{border-radius:6px;border:1px solid var(--line);font-family:inherit}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.panel,.status-strip,.modal-card{border-radius:6px;box-shadow:none;border:1px solid var(--line)}
+.modal-card{border-radius:10px;border-color:var(--ink)}
+/* slate header */
+.top{background:var(--dark);color:#fff;border-radius:6px;padding:0 20px 18px;gap:14px;overflow:hidden;margin-bottom:14px}
+.top::before{content:"";display:block;flex:0 0 100%;width:calc(100% + 40px);height:16px;margin:0 -20px 4px;background:repeating-linear-gradient(-60deg,#fff 0 20px,var(--dark) 20px 40px)}
+.brand h1{color:#fff;font-weight:800;font-size:clamp(28px,5vw,44px);letter-spacing:-.02em;line-height:1.1}
+.brand p{color:#aebbd0}
+.top .pill{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.3);box-shadow:none;border-radius:6px}
+.top button{background:var(--pink);color:#fff;border:1px solid var(--pink)}
+.top button.secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4)}
+.top .top-actions>a{border-radius:6px!important;box-shadow:none!important}
+/* status strip */
+.status-strip{border-color:var(--ink)}
+.status-progress b{color:var(--pink)}
+.progressbar{height:6px;background:var(--line);border-radius:0}
+.progressbar span{background:var(--pink);border-radius:0}
+.top-countdown{background:var(--pink);border-radius:6px;box-shadow:none}
+.status-announce{border-radius:4px;background:var(--dark)}
+.trial-banner{border-radius:6px;box-shadow:none}
+/* call-sheet department tables */
+.dept-grid{column-gap:16px}
+.dept-block{border:1px solid var(--ink);border-radius:6px;padding:0;overflow:hidden;box-shadow:none;margin-bottom:16px}
+.dept-heading{background:var(--dark);color:#fff;margin:0;padding:10px 14px;border:0;font-weight:700;font-size:15px}
+.dept-heading .dept-count{color:#aebfff}
+.dept-block .cards{display:block}
+.dept-block .card{background:#fff;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"warn warn" "title btn" "slots btn";column-gap:12px;row-gap:2px;overflow:visible;transform:none}
+.dept-block .card:last-child{border-bottom:0}
+.dept-block .card:hover{transform:none;box-shadow:none;background:#f7f9fc}
+.card .final-warn-mini{grid-area:warn;justify-self:start;border-radius:3px;font-size:11.5px;padding:2px 8px;margin:0 0 6px}
+.card .role-title{grid-area:title;justify-content:flex-start;gap:8px;align-items:center}
+.card .role-title h3{font-size:17px;font-weight:700}
+.card .count{background:var(--pink2);color:var(--pink);border-radius:3px;padding:1px 7px;font-size:12px}
+.card .slots{grid-area:slots;margin:4px 0 0;gap:2px}
+.card>button{grid-area:btn;align-self:center;padding:9px 16px;white-space:nowrap}
+.slot,.slot.taken{background:none;border:0;border-radius:0;padding:3px 0}
+.slot .name{font-weight:700}
+.card.full:after,.card.locked:after{position:absolute;right:14px;top:10px;left:auto;transform:none;padding:2px 8px;border-radius:3px;font-size:11px;background:var(--dark);color:#fff}
+.card.full:after{background:var(--red)}
+.card.locked:after{content:"🔒 ล็อกไว้"}
+.card.full,.card.locked{background:#fafbfc}
+/* side + misc */
+.mini-row,.stat div,.schedule-status,.call-card,.admin-section,.slot-edit{border-radius:6px}
+.schedule-status{background:var(--pink2);border-color:#c5d1f5}
+.countdown{color:var(--pink)}
+.admin-section{background:#f3f5f8}
+.code{border-radius:6px;background:var(--dark)}
+@media(max-width:640px){.top-actions .btn-link{flex:1 1 auto;text-align:center;white-space:nowrap}.top-actions button{flex:1 1 auto;white-space:nowrap}.top{padding:0 14px 16px}.top::before{width:calc(100% + 28px);margin:0 -14px 4px}.dept-block .card{grid-template-columns:1fr;grid-template-areas:"warn" "title" "slots" "btn"}.card>button{width:100%;margin-top:8px}}
+
+.tour-stage{position:relative;width:300px;max-width:100%;height:290px;margin:0 auto 10px;border:2px solid #111a26;border-radius:14px;background:#eceff3;overflow:hidden;touch-action:pan-y}
+.tp{position:absolute;inset:0;display:none;font-size:14px;color:#111a26}.tp.on{display:block}
+.tp .an,.tp .tf{animation-iteration-count:infinite;animation-fill-mode:both;animation-timing-function:ease-in-out;animation-duration:inherit}
+.tbar{position:absolute;left:0;right:0;top:0;height:34px;background:#111a26;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:space-between;padding:0 12px}
+.tlab{position:absolute;left:16px;font-size:10px;font-weight:700;color:#5b6878}
+.tfld{position:absolute;left:14px;right:14px;height:42px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:0 12px;display:flex;align-items:center;overflow:hidden}
+.tph{position:absolute;color:#9aa6b4}.tbold{position:absolute;font-weight:700;font-variant-numeric:tabular-nums}
+.n2{opacity:0}.ty{width:0;overflow:hidden;white-space:nowrap}
+.tbtn{position:absolute;left:14px;right:14px;height:42px;border-radius:6px;background:#2447d6;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.tok{position:absolute;left:14px;right:14px;background:#e6f6ec;border:1px solid #b7e2c8;color:#146c3a;border-radius:6px;font-weight:700;font-size:13px;padding:8px 10px;opacity:0}
+.th{position:absolute;font-size:26px;opacity:0;z-index:5;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));pointer-events:none;animation-iteration-count:infinite;animation-timing-function:ease-in-out}
+/* 1 */
+.tc{position:absolute;left:14px;right:14px;height:62px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:10px 12px}
+.tc b{display:block;font-size:15px}.tc small{color:#5b6878;font-size:11px}
+.tcb{position:absolute;right:10px;top:16px;background:#111a26;color:#fff;border-radius:5px;font-size:12px;font-weight:700;padding:7px 10px}
+.t1 .tc1{animation-name:s1c}.t1 .tcb1{animation-name:s1b}.t1 .tchk{animation-name:s1k}
+.tchk{position:absolute;right:10px;top:16px;background:#e6f6ec;color:#146c3a;border:1px solid #b7e2c8;border-radius:5px;font-size:12px;font-weight:700;padding:6px 10px;opacity:0}
+@keyframes s1c{0%,52%{border-color:#cbd3dc;box-shadow:none}56%,92%{border-color:#2447d6;box-shadow:0 0 0 3px #9db4ff}100%{border-color:#cbd3dc;box-shadow:none}}
+@keyframes s1b{0%,38%{opacity:1;transform:none}44%{transform:scale(.9);background:#2447d6}52%,92%{opacity:0}100%{opacity:1;transform:none}}
+@keyframes s1k{0%,52%{opacity:0}58%,92%{opacity:1}100%{opacity:0}}
+@keyframes s1Hd{0%{opacity:0;left:230px;top:200px}6%{opacity:1;left:230px;top:190px}36%{opacity:1;left:216px;top:34px}44%{opacity:1;left:216px;top:40px}52%{opacity:1;left:216px;top:34px}62%{opacity:0;left:216px;top:34px}100%{opacity:0;left:216px;top:34px}}
+.t1 .th{animation-name:s1Hd}
+@keyframes t2Nr{0%,8%{box-shadow:none}10%,22%{box-shadow:0 0 0 3px #9db4ff}26%,100%{box-shadow:none}}
+@keyframes t2Pr{0%,26%{box-shadow:none}28%,62%{box-shadow:0 0 0 3px #9db4ff}66%,100%{box-shadow:none}}
+@keyframes t2N1{0%,18%{opacity:1}20%,100%{opacity:0}}
+@keyframes t2N2{0%,18%{opacity:0}21%,97%{opacity:1}100%{opacity:0}}
+@keyframes t2P1{0%,29%{opacity:1}30%,100%{opacity:0}}
+@keyframes t2Ty{0%,30%{width:0}62%,97%{width:11ch}100%{width:0}}
+@keyframes t2Bt{0%,62%{opacity:.45;transform:none}68%,72%{opacity:1;transform:none}76%{transform:scale(.94)}80%,100%{opacity:1;transform:none}}
+@keyframes t2Ok{0%,78%{opacity:0;transform:translateY(6px)}84%,96%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes t2Hd{0%{opacity:0;left:220px;top:170px}4%{opacity:0;left:200px;top:110px}6%{opacity:1;left:175px;top:72px}20%{opacity:1;left:175px;top:72px}27%{opacity:1;left:175px;top:138px}62%{opacity:1;left:175px;top:138px}70%{opacity:1;left:175px;top:200px}76%{opacity:1;left:175px;top:204px}82%{opacity:0;left:175px;top:204px}100%{opacity:0;left:175px;top:204px}}
+.t2 .tf{animation-duration:8s}
+.t2 .tf1{animation-name:t2Nr}.t2 .tf2{animation-name:t2Pr}
+.t2 .n1{animation-name:t2N1}.t2 .n2{animation-name:t2N2}.t2 .p1{animation-name:t2P1}
+.t2 .ty{animation-name:t2Ty;animation-timing-function:steps(10,end)}
+.t2 .tbt{animation-name:t2Bt}.t2 .tok{animation-name:t2Ok}.t2 .th{animation-name:t2Hd}
+
+.t3 .tcode{position:absolute;left:30px;right:30px;top:50px;background:#fff;border:2px solid #111a26;border-radius:10px;text-align:center;padding:14px 8px}
+.tcode small{display:block;font-size:11px;font-weight:700;color:#5b6878;margin-bottom:6px}
+.tcode i{font-style:normal;display:inline-block;font-size:38px;font-weight:900;letter-spacing:4px;color:#2447d6;opacity:0}
+.t3 .c1{animation-name:s3a}.t3 .c2{animation-name:s3b}.t3 .c3{animation-name:s3c}.t3 .c4{animation-name:s3d}
+@keyframes s3a{0%,8%{opacity:0;transform:translateY(10px) scale(.6)}16%{opacity:1;transform:none}92%{opacity:1}100%{opacity:0}}
+@keyframes s3b{0%,14%{opacity:0;transform:translateY(10px) scale(.6)}22%{opacity:1;transform:none}92%{opacity:1}100%{opacity:0}}
+@keyframes s3c{0%,20%{opacity:0;transform:translateY(10px) scale(.6)}28%{opacity:1;transform:none}92%{opacity:1}100%{opacity:0}}
+@keyframes s3d{0%,26%{opacity:0;transform:translateY(10px) scale(.6)}34%{opacity:1;transform:none}92%{opacity:1}100%{opacity:0}}
+.tflash{position:absolute;inset:0;background:#fff;opacity:0;z-index:4;animation-name:s3f}
+@keyframes s3f{0%,50%{opacity:0}53%{opacity:.95}62%,100%{opacity:0}}
+.tcam{position:absolute;left:0;right:0;top:160px;text-align:center;font-weight:800;font-size:15px;opacity:0;animation-name:s3t}
+@keyframes s3t{0%,52%{opacity:0;transform:scale(.8)}60%,92%{opacity:1;transform:none}100%{opacity:0}}
+.tshot{position:absolute;right:16px;bottom:16px;width:56px;height:84px;background:#fff;border:2px solid #111a26;border-radius:6px;opacity:0;animation-name:s3s;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#2447d6;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+@keyframes s3s{0%,56%{opacity:0;transform:translateY(40px) scale(.6)}66%,92%{opacity:1;transform:rotate(-4deg)}100%{opacity:0}}
+@keyframes t4Nr{0%,31.92%{box-shadow:none}33.4%,42.28%{box-shadow:0 0 0 3px #9db4ff}45.24%,100%{box-shadow:none}}
+@keyframes t4Pr{0%,45.24%{box-shadow:none}46.72%,71.88%{box-shadow:0 0 0 3px #9db4ff}74.84%,100%{box-shadow:none}}
+@keyframes t4N1{0%,39.32%{opacity:1}40.8%,100%{opacity:0}}
+@keyframes t4N2{0%,39.32%{opacity:0}41.54%,97.78%{opacity:1}100%{opacity:0}}
+@keyframes t4P1{0%,47.46%{opacity:1}48.2%,100%{opacity:0}}
+@keyframes t4Ty{0%,48.2%{width:0}71.88%,97.78%{width:11ch}100%{width:0}}
+@keyframes t4Bt{0%,71.88%{opacity:.45;transform:none}76.32%,79.28%{opacity:1;transform:none}82.24%{transform:scale(.94)}85.2%,100%{opacity:1;transform:none}}
+@keyframes t4Ok{0%,83.72%{opacity:0;transform:translateY(6px)}88.16%,97.04%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes t4Hd{0%{opacity:0;left:230px;top:60px}4%{opacity:1;left:232px;top:10px}18%{opacity:1;left:232px;top:10px}21%{opacity:1;left:232px;top:16px}23%{opacity:0;left:232px;top:16px}28.96%{opacity:0;left:200px;top:110px}30.44%{opacity:1;left:175px;top:72px}40.8%{opacity:1;left:175px;top:72px}45.98%{opacity:1;left:175px;top:138px}71.88%{opacity:1;left:175px;top:138px}77.8%{opacity:1;left:175px;top:200px}82.24%{opacity:1;left:175px;top:204px}86.68%{opacity:0;left:175px;top:204px}100%{opacity:0;left:175px;top:204px}}
+.t4 .tf{animation-duration:10s}
+.t4 .tf1{animation-name:t4Nr}.t4 .tf2{animation-name:t4Pr}
+.t4 .n1{animation-name:t4N1}.t4 .n2{animation-name:t4N2}.t4 .p1{animation-name:t4P1}
+.t4 .ty{animation-name:t4Ty;animation-timing-function:steps(10,end)}
+.t4 .tbt{animation-name:t4Bt}.t4 .tok{animation-name:t4Ok}.t4 .th{animation-name:t4Hd}
+
+.t4 .la{position:absolute;inset:0;animation-name:s4a}.t4 .lb{position:absolute;inset:0;opacity:0;animation-name:s4b}
+@keyframes s4a{0%,21%{opacity:1}24%,100%{opacity:0}}
+@keyframes s4b{0%,22%{opacity:0}26%,97%{opacity:1}100%{opacity:0}}
+.tban{position:absolute;left:14px;right:14px;top:56px;background:#fff4cc;border:1px solid #111a26;border-radius:6px;padding:11px 12px;font-weight:700;font-size:13px;animation-name:s4n}
+@keyframes s4n{0%,16%{transform:none}19%{transform:scale(.96);background:#ffe48a}23%,100%{transform:none}}
+.tgh{position:absolute;left:14px;right:14px;height:48px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;opacity:.7}
+.tbar .tbp{animation:s4p 10s infinite;background:#fff4cc;color:#111a26;border-radius:5px;font-size:11px;padding:4px 8px}
+@keyframes s4p{0%,16%{transform:none;background:#fff4cc}19%{transform:scale(.92);background:#ffe48a}23%,100%{transform:none}}
+
+.tme{position:absolute;left:14px;right:14px;top:14px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:12px;height:92px}
+.tme small{color:#5b6878;font-size:11px}.tme b{display:block;font-size:15px;margin:2px 0 6px}
+.trole{position:relative;display:inline-block;height:24px;min-width:110px}
+.trole span{position:absolute;left:0;top:0;border-radius:5px;padding:3px 9px;font-weight:700;font-size:13px;white-space:nowrap}
+.r1{background:#e3e8ff;color:#2447d6;animation-name:s5a}.r2{background:#e6f6ec;color:#146c3a;opacity:0;animation-name:s5b}
+@keyframes s5a{0%,52%{opacity:1}56%,100%{opacity:0}}
+@keyframes s5b{0%,52%{opacity:0}58%,94%{opacity:1}100%{opacity:0}}
+.tmv{position:absolute;right:12px;top:30px;background:#111a26;color:#fff;border-radius:5px;font-size:12px;font-weight:700;padding:7px 10px;animation-name:s5m}
+@keyframes s5m{0%,18%{transform:none;background:#111a26}22%{transform:scale(.9);background:#2447d6}28%,100%{transform:none;background:#111a26}}
+.tcd{position:absolute;left:14px;right:14px;top:118px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;height:44px;padding:0 12px;display:flex;align-items:center;opacity:0;animation-name:s5c}
+@keyframes s5c{0%,28%{opacity:0;transform:translateY(8px)}33%,58%{opacity:1;transform:none}62%,100%{opacity:0}}
+.tcd small{color:#5b6878;font-size:11px;margin-right:8px}
+.tcd .ty{position:static;width:0;font-weight:800;letter-spacing:2px;color:#2447d6;animation-name:s5t;animation-timing-function:steps(4,end)}
+@keyframes s5t{0%,34%{width:0}46%,100%{width:4.6ch}}
+.tbd{position:absolute;left:14px;right:14px;top:178px;background:#fff4cc;border:1px solid #111a26;border-radius:6px;padding:9px 12px;font-weight:700;font-size:13px;opacity:0;animation-name:s5d}
+@keyframes s5d{0%,62%{opacity:0;transform:scale(.9)}68%,94%{opacity:1;transform:none}100%{opacity:0}}
+@keyframes s5Hd{0%{opacity:0;left:230px;top:120px}8%{opacity:1;left:230px;top:52px}20%{opacity:1;left:230px;top:52px}24%{opacity:1;left:230px;top:58px}30%{opacity:0;left:230px;top:58px}100%{opacity:0;left:230px;top:58px}}
+.t5 .th{animation-name:s5Hd}
+.t1,.t3,.t5{}
+.t1,.t1 .an,.t1 .th{animation-duration:6s}
+.t2,.t2 .an,.t2 .th{animation-duration:8s}
+.t3,.t3 .an,.t3 .th{animation-duration:6s}
+.t4,.t4 .an,.t4 .th{animation-duration:10s}
+.t5,.t5 .an,.t5 .th{animation-duration:8s}
+
+.tour-bar{height:3px;background:#dfe4ea;border-radius:2px;margin:0 auto 10px;width:300px;max-width:100%;overflow:hidden}
+.tour-bar i{display:block;height:100%;width:0;background:#2447d6}
+.tour-bar i.run{animation:tbar linear forwards}@keyframes tbar{to{width:100%}}
+.tour-txt{text-align:center;min-height:86px}.tour-txt h3{margin:0 0 4px;font-size:17px}.tour-txt p{margin:0;font-size:14px;line-height:1.5;color:#3a4756}
+.tour-dots{display:flex;gap:8px;justify-content:center;margin:10px 0}
+.tour-dots button{width:10px;height:10px;padding:0;border-radius:50%;border:1px solid #111a26;background:#fff;min-width:0}
+.tour-dots button.on{background:#2447d6;border-color:#2447d6;width:26px;border-radius:6px}
+.tour-nav{display:flex;gap:8px}.tour-nav button{flex:1}.tour-nav .ghost{background:#fff;color:#111a26;border:1px solid #111a26}
+.tour-nav button:disabled{opacity:.35}
+@media(prefers-reduced-motion:reduce){.tp *{animation:none!important}.tp .n2,.tp .tok,.tp .tchk,.tp .tcode i,.tp .tcd,.tp .tbd,.tp .r2{opacity:1!important}.tp .ty{width:11ch!important}.tp .n1,.tp .p1,.tp .th,.tp .r1,.tp .tcb1{opacity:0!important}.t5 .ty{width:4.6ch!important}.t4 .la{display:none}.t4 .lb{opacity:1!important}}
+
+
+/* ประกาศลงเบอร์โทร (ป๊อปอัพแรก) */
+#phoneAnnounce .modal-card{max-width:400px;text-align:center;border:2px solid #111a26;overflow:hidden;padding-top:0}
+#phoneAnnounce .ann-stripe{height:14px;margin:0 -22px 14px;background:repeating-linear-gradient(-60deg,#111a26 0 14px,#fff4cc 14px 28px)}
+#phoneAnnounce .ann-tag{display:inline-block;background:#e5372b;color:#fff;font-weight:800;font-size:12px;letter-spacing:.5px;padding:3px 10px;border-radius:4px;margin-bottom:8px}
+#phoneAnnounce .ann-ic{position:relative;width:78px;height:78px;margin:6px auto 10px;border-radius:50%;background:#2447d6;color:#fff;display:flex;align-items:center;justify-content:center;font-size:38px}
+#phoneAnnounce .ann-ic:before,#phoneAnnounce .ann-ic:after{content:'';position:absolute;inset:0;border-radius:50%;border:3px solid #2447d6;animation:annRing 1.8s ease-out infinite}
+#phoneAnnounce .ann-ic:after{animation-delay:.9s}
+#phoneAnnounce .ann-ic span{display:inline-block;animation:annShake 1.8s ease-in-out infinite}
+@keyframes annRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.7);opacity:0}}
+@keyframes annShake{0%,60%,100%{transform:rotate(0)}65%{transform:rotate(-14deg)}70%{transform:rotate(14deg)}75%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}85%{transform:rotate(0)}}
+#phoneAnnounce h2{margin:0 0 6px;font-size:22px;line-height:1.3}
+#phoneAnnounce .ann-p{margin:0 0 12px;font-size:15px;line-height:1.55;color:#3a4756}
+#phoneAnnounce .ann-box{background:#fff4cc;border:1px solid #111a26;border-radius:6px;padding:10px 12px;margin:0 0 14px;text-align:left;font-size:14px;line-height:1.7}
+#phoneAnnounce .ann-go{display:block;width:100%;padding:13px;border-radius:6px;background:#2447d6;color:#fff;font-weight:800;font-size:16px;text-decoration:none;border:0;cursor:pointer;margin-bottom:8px}
+#phoneAnnounce .ann-sub{display:flex;gap:8px}#phoneAnnounce .ann-sub button{flex:1;font-size:13px}
+@media(prefers-reduced-motion:reduce){#phoneAnnounce .ann-ic:before,#phoneAnnounce .ann-ic:after,#phoneAnnounce .ann-ic span{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="brand"><h1>FDM23067</h1><p>หนังสั้น 1 ซีน 2 นาที · Crew Position System</p></div>
+    <div class="top-actions">
+      <span class="pill"><span class="status-dot"></span><span id="openText">กำลังโหลด...</span></span>
+      <a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" title="กลุ่ม Discord ทีมงาน" style="display:inline-grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#5865F2;text-decoration:none;box-shadow:var(--shadow)"><svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.522 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"/></svg></a>
+      <a class="btn-link" href="./">หน้าหลัก</a><a class="btn-link" href="voteTheme.html">🗳️ โหวตธีม</a><a class="btn-link" href="phone.html">📞 ลงเบอร์โทร</a><button class="secondary" onclick="openQR()">📱 QR</button>
+      <button class="secondary" onclick="openAdmin()">⚙️ Management</button>
+    </div>
+  </header>
+
+  <div class="setup" id="setupWarn" style="display:none">⚠️ ยังไม่ได้ใส่ Firebase Config ในไฟล์ positions.html</div>
+
+
+  <section class="status-strip">
+    <div class="status-row">
+      <div class="status-progress"><b id="joined">0</b>/<span id="totalSlots">17</span> คนลงตำแหน่งแล้ว<div class="progressbar"><span id="progressFill"></span></div></div>
+      <div class="top-countdown" id="topCountdown" style="display:none"><span id="topCountdownLabel"></span><b id="topCountdownText">--:--:--</b></div>
+      <button class="secondary muted-btn" onclick="showRules()">ℹ️ วิธีใช้งาน</button>
+    </div>
+    <div class="status-announce" id="announceBar" style="display:none"><span id="announceText"></span></div>
+  </section>
+
+  <div class="trial-banner" id="trialBanner" style="display:none">🧪 ตอนนี้เป็น <b>โหมดทดลอง</b> — ข้อมูลที่ลงตอนนี้จะถูกล้างทิ้งก่อนเปิดใช้งานจริง ลองกดเล่นได้เต็มที่!</div>
+
+  <main class="grid">
+    <section class="content-area"><div class="dept-grid" id="roleCards"></div></section>
+    <aside class="side">
+      <div class="panel" id="myProfileBox" style="display:none"><h2>✅ ข้อมูลของฉัน</h2><div id="myProfileContent"></div></div>
+      <div class="panel"><h2>📊 สถานะ &amp; เมนูลัด</h2><div class="schedule-status"><div class="small" id="scheduleLabel">สถานะเวลา</div><div class="countdown" id="countdownText">--:--:--</div><div class="small" id="scheduleInfo">ยังไม่ได้ตั้งเวลา</div></div><div class="admin-actions" style="margin-top:12px"><button class="secondary muted-btn" onclick="openMembers()">👥 สมาชิกทั้งหมด</button><button class="secondary muted-btn" onclick="openCallSheet()">📄 Call Sheet</button><button class="secondary muted-btn" onclick="copyPageLink()">🔗 คัดลอกลิงก์</button><a class="btn-link secondary muted-btn" href="voteTheme.html">🗳️ โหวตธีม</a><a class="btn-link secondary muted-btn" href="phone.html">📞 ลงเบอร์โทร</a></div><hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><h3 style="margin:0 0 8px">🔔 Live Activity</h3><div id="activityFeed" class="mini-list"><div class="small">ยังไม่มีข้อมูล</div></div></div>
+
+      <div class="panel" id="adminLogin"><h2>👑 Admin</h2><p class="small">กรอก Admin Key เพื่อจัดการข้อมูล</p><div class="field"><label>Admin Key</label><input id="adminKey" type="password" placeholder="กรอกรหัสผู้ดูแล"></div><button onclick="loginAdmin()">เข้าสู่ระบบ</button></div>
+
+      <div class="panel admin-box"><div class="admin-box-head"><h2>⚙️ Admin Panel</h2><button class="ghost" onclick="logoutAdmin()">⬅️ ออกจากระบบ</button></div><div class="admin-actions"><button onclick="toggleOpen()" class="secondary">🔒 เปิด/ปิดลงตำแหน่ง</button><button onclick="exportCSV()" class="secondary">📥 CSV</button><button onclick="exportJSON()" class="secondary">📦 JSON</button><button onclick="resetAll()" class="danger">รีเซ็ตทั้งหมด</button></div>
+      <div class="admin-section"><h3>➕ เพิ่มคนลงตำแหน่งโดยตรง</h3><p class="small" style="margin:0 0 10px">สำหรับ Admin ใส่ให้เลย ไม่ต้องรอให้เจ้าตัวมากดเอง (เช่น ตำแหน่งที่ล็อกไว้)</p><div class="field"><label>เลือกชื่อ</label><select id="quickAddName"></select></div><div class="field"><label>เลือกตำแหน่ง</label><select id="quickAddRole"></select></div><div class="field"><label>เบอร์โทร (ถ้ามี)</label><input id="quickAddPhone" type="tel" placeholder="เบอร์โทร"></div><div class="admin-actions"><button onclick="adminQuickAdd()">เพิ่มเข้าตำแหน่ง</button></div></div>
+      <div class="admin-section"><h3>🧪 โหมดทดลอง</h3><p class="small" style="margin:0 0 10px">เปิดไว้ให้ทีมกดลองเลือกตำแหน่งเล่นๆ ก่อนของจริง ระบบจะแท็กข้อมูลที่ลงตอนนี้ไว้ ลบทิ้งทีหลังได้โดยไม่กระทบข้อมูลจริง</p><div class="admin-actions"><button onclick="toggleTrialMode()" id="trialToggleBtn" class="secondary">🧪 เปิด/ปิดโหมดทดลอง</button><button onclick="clearTrialData()" class="danger">🗑️ ล้างข้อมูลทดลองทั้งหมด</button></div></div>
+      <div class="admin-section"><h3>📢 ประกาศหน้าเว็บ</h3><div class="field"><label>ข้อความประกาศ</label><input id="announcementInput" placeholder="เช่น ขอให้ทุกคนลงตำแหน่งก่อน 20:00"></div><div class="admin-actions"><button onclick="saveAnnouncement()">Publish</button><button onclick="clearAnnouncement()" class="secondary">ล้างประกาศ</button></div></div>
+      <div class="admin-section"><h3>👥 จำนวนช่องตำแหน่ง</h3><div id="roleAdminControls" class="time-grid"></div></div>
+      <div class="admin-section"><h3>⏰ ตั้งเวลาเปิด/ปิด</h3><div class="time-grid"><div class="field"><label>เวลาเปิดลงตำแหน่ง</label><input id="scheduleStart" type="datetime-local" oninput="markScheduleDirty()"></div><div class="field"><label>เวลาปิดลงตำแหน่ง</label><input id="scheduleEnd" type="datetime-local" oninput="markScheduleDirty()"></div><div class="admin-actions"><button onclick="saveSchedule()">บันทึกเวลา</button><button onclick="clearSchedule()" class="secondary">ล้างเวลา</button></div></div></div>
+      <div class="admin-section"><h3>📄 ข้อมูล Call Sheet</h3><div class="csb-callinfo-grid"><div class="field"><label>วันที่ถ่ายทำ</label><input id="csDate" type="date"></div><div class="field"><label>เวลา Call Time</label><input id="csCallTime" type="time"></div><div class="field"><label>เวลาเลิกกอง (โดยประมาณ)</label><input id="csWrapTime" type="time"></div><div class="field"><label>สถานที่ถ่ายทำ</label><input id="csLocation" placeholder="เช่น อาคาร SPU"></div></div><div class="field"><label>หมายเหตุ / อุปกรณ์ที่ต้องเตรียม</label><input id="csNotes" placeholder="เช่น นำกล้อง ขาตั้งกล้อง ไฟ LED"></div><div class="admin-actions"><button onclick="saveCallSheetInfo()">บันทึก Call Sheet</button></div></div><div class="admin-section"><h3>📋 รายชื่อ / รหัสแก้ไข</h3><div class="table-scroll"><table class="table"><thead><tr><th>ชื่อ</th><th>ตำแหน่ง</th><th></th></tr></thead><tbody id="adminTable"></tbody></table></div></div></div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-title">FDM23067 Crew Position System</div>
+    <div>Adapted from Final Project v5.0 · Designed &amp; Developed by Focus Nakub</div>
+    <div>Powered by Firebase Firestore • GitHub Pages</div>
+    <div>© 2026 Focus Nakub</div>
+  </footer>
+</div>
+
+<div class="modal" id="discordAskModal"><div class="modal-card"><h2>💬 เข้ากลุ่ม Discord ทีมงานหรือยัง?</h2><p>อย่าลืมเข้ากลุ่ม Discord เพื่อรับข่าวสาร/นัดหมายกองถ่ายนะครับ</p><a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;background:#5865F2;color:#fff;border-radius:15px;padding:11px 14px;font-weight:900;margin-bottom:10px">💬 เข้าร่วม Discord ทีมงาน</a><button class="secondary" onclick="closeModal('discordAskModal')">เข้าร่วมแล้ว / ปิด</button></div></div>
+
+<div class="modal" id="phoneAnnounce"><div class="modal-card"><div class="ann-stripe"></div><span class="ann-tag">📢 ประกาศสำคัญ</span><div class="ann-ic"><span>📞</span></div><h2>ทุกคนลงเบอร์โทรด้วยนะ!</h2><p class="ann-p">ทีมต้องใช้ติดต่อกันช่วงถ่ายทำ ใช้เวลาไม่ถึง 1 นาที</p><div class="ann-box"><b>ลงยังไง?</b><br>1. กด "ลงเบอร์โทรเลย" ด้านล่าง<br>2. เลือกชื่อตัวเอง + ใส่รหัสแก้ไข 4 ตัว + พิมพ์เบอร์ 10 หลัก<br>3. กดบันทึก เห็นแถบเขียวคือสำเร็จ<br><span class="small">ยังไม่ได้ลงตำแหน่ง? ลงตำแหน่งก่อน แล้วค่อยกลับมาลงเบอร์</span></div><a class="ann-go" href="phone.html">📞 ลงเบอร์โทรเลย</a><div class="ann-sub"><button class="secondary" onclick="annNext()">ปิด (ไว้ทีหลัง)</button></div></div></div>
+<div class="modal" id="rulesModal"><div class="modal-card" style="max-width:380px"><h2 style="margin:0 0 10px">📋 วิธีใช้งาน</h2><div class="tour-stage" id="trStage"><div class="tp t1"><div class="tbar"><span>เลือกตำแหน่ง</span><span>FDM23067</span></div><div class="tc tc1 an" style="top:44px"><b>ผู้กำกับ</b><small>ว่าง 1 ที่</small><span class="tcb tcb1 an">ลงตำแหน่งนี้</span><span class="tchk an">✓ เลือกแล้ว</span></div><div class="tc" style="top:116px"><b>ตากล้อง</b><small>ว่าง 2 ที่</small><span class="tcb">ลงตำแหน่งนี้</span></div><div class="tc" style="top:188px;opacity:.6"><b>ตัดต่อ</b><small>เต็มแล้ว</small><span class="tcb" style="background:#9aa6b4">เต็มแล้ว</span></div><div class="th">👆</div></div><div class="tp t2"><div class="tbar"><span>ยืนยันลงตำแหน่ง</span><span>FDM23067</span></div><div class="tlab" style="top:42px">ชื่อของคุณ</div><div class="tfld tf tf1" style="top:58px"><span class="tph n1 an">— เลือกชื่อ —</span><span class="n2 an tbold">ชื่อ นามสกุล</span></div><div class="tlab" style="top:106px">เบอร์โทร</div><div class="tfld tf tf2" style="top:122px"><span class="tph p1 an">เช่น 0891234567</span><span class="ty an tbold">0891234567</span></div><div class="tbtn tbt an" style="top:182px">ยืนยัน</div><div class="tok an" style="top:236px">✓ ลงตำแหน่งสำเร็จ</div><div class="th">👆</div></div><div class="tp t3"><div class="tbar"><span>รหัสแก้ไขของคุณ</span><span>FDM23067</span></div><div class="tcode"><small>เก็บรหัสนี้ไว้ใช้ตอนย้ายตำแหน่ง</small><i class="an c1">A</i><i class="an c2">7</i><i class="an c3">K</i><i class="an c4">2</i></div><div class="tcam an">📸 แคปหน้าจอเก็บไว้!</div><div class="tshot an">A7K2</div><div class="tflash an"></div></div><div class="tp t4"><div class="la an"><div class="tbar"><span>FDM23067</span><span class="tbp">📞 ลงเบอร์โทร</span></div><div class="tgh" style="top:112px"></div><div class="tgh" style="top:170px"></div></div><div class="lb an"><div class="tbar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="tlab" style="top:42px">ชื่อของคุณ</div><div class="tfld tf tf1" style="top:58px"><span class="tph n1 an">— เลือกชื่อ —</span><span class="n2 an tbold">ชื่อ นามสกุล</span></div><div class="tlab" style="top:106px">เบอร์โทร</div><div class="tfld tf tf2" style="top:122px"><span class="tph p1 an">เช่น 0891234567</span><span class="ty an tbold">0891234567</span></div><div class="tbtn tbt an" style="top:182px">บันทึกเบอร์โทร</div><div class="tok an" style="top:236px">✓ บันทึกเบอร์โทรแล้ว</div></div><div class="th">👆</div></div><div class="tp t5"><div class="tbar"><span>ข้อมูลของฉัน</span><span>FDM23067</span></div><div class="tme" style="top:44px"><small>ชื่อ นามสกุล</small><b>ตำแหน่งของฉัน</b><span class="trole"><span class="r1 an">ผู้กำกับ</span><span class="r2 an">ตากล้อง</span></span><span class="tmv an">ย้ายตำแหน่ง</span></div><div class="tcd an" style="top:150px"><small>รหัสแก้ไข</small><span class="ty an">A7K2</span></div><div class="tbd an" style="top:206px">ย้ายแล้ว 1/1 · ย้ายอีกไม่ได้นะ</div><div class="th">👆</div></div></div><div class="tour-bar"><i id="trBar"></i></div><div class="tour-txt"><h3 id="trTitle"></h3><p id="trDesc"></p></div><div class="tour-dots" id="trDots"></div><div class="tour-nav"><button class="ghost" id="trPrev">‹ ย้อนกลับ</button><button id="trNext">ถัดไป ›</button></div></div></div>
+
+<div class="modal" id="signupModal"><div class="modal-card"><h2 id="signupTitle">ลงตำแหน่ง</h2><p class="small" id="signupInfo"></p><div class="field"><label>เลือกชื่อของคุณ</label><select id="signupName"></select></div><div class="field"><label>เบอร์โทร</label><input id="signupPhone" type="tel" inputmode="numeric" placeholder="เช่น 0891234567" maxlength="10"></div><p class="small">ลงตำแหน่งไปแล้วแต่ยังไม่ได้ลงเบอร์? เลือกชื่อตัวเองที่มีเครื่องหมาย "ลงตำแหน่งแล้ว" แล้วกรอกเบอร์ กดยืนยันได้เลย ไม่ต้องลงตำแหน่งใหม่<br>หลังลงตำแหน่งใหม่ ระบบจะสร้างรหัสแก้ไข 4 ตัว กรุณาแคปหน้าจอไว้</p><div class="admin-actions"><button onclick="confirmSignup()">ยืนยันลงตำแหน่ง</button><button class="secondary" onclick="closeModal('signupModal')">ยกเลิก</button></div></div></div>
+
+<div class="modal" id="successModal"><div class="modal-card"><h2>🎉 ลงตำแหน่งสำเร็จ</h2><p id="successText"></p><div class="code" id="editCodeBox">D418</div><p class="small">📷 กรุณาแคปหน้าจอนี้ไว้ ใช้สำหรับแก้ไขข้อมูลภายหลัง</p><a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none;background:#5865F2;color:#fff;border-radius:15px;padding:11px 14px;font-weight:900;margin-bottom:10px">💬 เข้ากลุ่ม Discord ทีมงาน</a><button onclick="copyCode()">คัดลอกรหัส</button> <button class="secondary" onclick="closeSuccessThenAskDiscord()">ปิด</button></div></div>
+
+<div class="modal" id="editModal"><div class="modal-card"><h2>✏️ แก้ไขข้อมูล</h2><div class="field"><label>ชื่อ</label><input id="editName" placeholder="ชื่อที่ลงไว้"></div><div class="field"><label>รหัสแก้ไข</label><input id="editCode" placeholder="เช่น D418"></div><div class="field"><label>ย้ายไปตำแหน่ง</label><select id="editRole"></select></div><button onclick="submitEdit()">ยืนยันแก้ไข</button> <button class="secondary" onclick="closeModal('editModal')">ยกเลิก</button></div></div>
+
+<div class="modal" id="adminModal"><div class="modal-card"><h2>⚙️ Management</h2><p>กรอก Admin Key ที่คุณตั้งไว้เท่านั้น</p><div class="field"><label>Admin Key</label><input id="adminKey2" type="password"></div><button onclick="loginAdmin(true)">เข้าสู่ระบบ</button> <button class="secondary" onclick="closeModal('adminModal')">ปิด</button></div></div>
+
+<div class="modal" id="adminEditModal"><div class="modal-card"><h2>👑 แก้ไขโดย Admin</h2><input type="hidden" id="adminEditId"><div class="field"><label>ชื่อ</label><input id="adminEditName" placeholder="ชื่อ"></div><div class="field"><label>ตำแหน่ง</label><select id="adminEditRole"></select></div><div class="field"><label>เบอร์โทร</label><input id="adminEditPhone" type="tel" placeholder="เบอร์โทร"></div><div class="field"><label>รหัสแก้ไข</label><input id="adminEditCode" readonly></div><div class="admin-actions"><button onclick="saveAdminEdit()">💾 บันทึก</button><button onclick="copyAdminEditCode()" class="secondary">📋 Copy Code</button><button onclick="closeModal('adminEditModal')" class="secondary">ยกเลิก</button></div></div></div>
+
+<div class="modal" id="membersModal"><div class="modal-card"><h2>👥 สมาชิกทั้งหมด</h2><div class="field" style="margin:0 0 12px"><input id="membersSearch" placeholder="🔎 ค้นหาชื่อ..." oninput="renderMembersList()"></div><div id="membersList"></div><div style="margin-top:14px"><button class="secondary" onclick="closeModal('membersModal')">ปิด</button></div></div></div>
+<div class="modal" id="callSheetModal"><div class="modal-card"><div id="callSheetList"></div><div class="admin-actions" style="margin-top:14px"><button onclick="printCallSheet()">🖨️ Print / Save PDF</button><button class="secondary" onclick="closeModal('callSheetModal')">ปิด</button></div></div></div>
+<div class="modal" id="qrModal"><div class="modal-card"><h2>📱 QR Code</h2><p class="small">สแกนเพื่อเข้าเว็บเลือกตำแหน่ง</p><div style="text-align:center"><img id="qrImg" alt="QR Code" style="width:230px;height:230px;border:1px solid var(--line);border-radius:18px;padding:10px;background:#fff"></div><div class="admin-actions" style="margin-top:14px"><button onclick="copyPageLink()">คัดลอกลิงก์</button><button class="secondary" onclick="closeModal('qrModal')">ปิด</button></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+import { getFirestore, doc, collection, getDocs, onSnapshot, runTransaction, setDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVIKvqSf7iR7ctALe0A6pakakQsd_qYGw",
+  authDomain: "fdm13167.firebaseapp.com",
+  projectId: "fdm13167",
+  storageBucket: "fdm13167.firebasestorage.app",
+  messagingSenderId: "638048330365",
+  appId: "1:638048330365:web:961daeac412d5d6332c714",
+  measurementId: "G-08XDS71QRF"
+};
+const ADMIN_KEY = "Focus3256";
+
+const roles=[
+  {id:'producer',emoji:'🗂️',name:'Producer',max:1},
+  {id:'director',emoji:'🎬',name:'Director',max:1},
+  {id:'script',emoji:'📝',name:'Script Supervisor',max:1},
+  {id:'runner',emoji:'📋',name:'AD1',max:1},
+  {id:'dop',emoji:'📷',name:'DOP',max:1},
+  {id:'camoperator',emoji:'🎥',name:'Camera Operator',max:1},
+  {id:'focuspuller',emoji:'🎯',name:'Focus Puller',max:1},
+  {id:'camop',emoji:'🧰',name:'Cam Assistant',max:1},
+  {id:'gaffer',emoji:'💡',name:'Gaffer',max:1},
+  {id:'bestboy',emoji:'🔌',name:'Best Boy Electric',max:1},
+  {id:'sound',emoji:'🎤',name:'Sound',max:2},
+  {id:'art',emoji:'🎨',name:'Art Director',max:1},
+  {id:'artprop',emoji:'🪑',name:'Art/Prop',max:2},
+  {id:'makeup',emoji:'💄',name:'Makeup & Costume',max:2},
+];
+// จัดกลุ่มตำแหน่งเป็นหมวดหมู่แผนก สำหรับแสดงผลเป็นส่วนๆ
+const DEPARTMENTS=[
+  {name:'กำกับ / โปรดักชั่น',ids:['producer','director','script','runner']},
+  {name:'ฝ่ายกล้อง',ids:['dop','camoperator','focuspuller','camop']},
+  {name:'ไฟ / ไฟฟ้า',ids:['gaffer','bestboy']},
+  {name:'เสียง',ids:['sound']},
+  {name:'ศิลป์',ids:['art','artprop']},
+  {name:'แต่งหน้า / คอสตูม',ids:['makeup']},
+];
+const DEPT_ICON={'กำกับ / โปรดักชั่น':'🎬','ฝ่ายกล้อง':'📷','ไฟ / ไฟฟ้า':'💡','เสียง':'🎤','ศิลป์':'🎨','แต่งหน้า / คอสตูม':'💄'};
+// รายชื่อทีม 18 คน — ใช้รหัสนักศึกษาเป็นตัวอ้างอิงไม่ซ้ำ (กันคนเดียวลงหลายตำแหน่ง)
+const ROSTER=[
+  {id:'68018544',name:'หิรัญ ดิษฐสกุล'},
+  {id:'68020620',name:'จันทิมา จันทร์ช่วง'},
+  {id:'68006622',name:'ธัญพิสิษฐ์ พูนพานิช'},
+  {id:'68018328',name:'ศิริวัฒน์ เดชอุดม'},
+  {id:'68036744',name:'ทีปกร จิณเสน'},
+  {id:'68038946',name:'ธนพัฒน์ พรมวิชัย'},
+  {id:'68022911',name:'พิยดา ด่วนดี'},
+  {id:'68015892',name:'วริชยา ไชยสงค์'},
+  {id:'68023745',name:'พีชานิกา ทองประศรี'},
+  {id:'68005278',name:'กัณญาพัฒน์ จันทร์เกษมสุข'},
+  {id:'68007970',name:'วิโรจน์ สวนสระแก้ว'},
+  {id:'68040382',name:'ภูริพัฒน์ อนุโชติ'},
+  {id:'68026555',name:'กมลพร พูลแก้ว'},
+  {id:'68028928',name:'ณัฐวุฒิ ทับทอง'},
+  {id:'68010119',name:'ณรงค์เดช แสนสิทธิ์'},
+  {id:'68010397',name:'ขันเงิน สาครธนะศักดิ์'},
+  {id:'68011018',name:'วัชรพล ดำสมอ'},
+  {id:'68104276',name:'รวีโรจน์ เชื้อแฉ่ง'},
+  {id:'68059069',name:'อังค์นิษา ดุลยเสนีย์'},
+];
+// ตำแหน่งที่ล็อกไว้ให้คนใดคนหนึ่งโดยเฉพาะ ห้ามคนอื่นแย่ง/ห้ามย้ายออก (ยกเว้น Admin แก้ไขเอง)
+const LOCKED_ROLES={producer:'68018544',script:'68020620'};
+function lockedStudentId(roleId){return LOCKED_ROLES[roleId]||null}
+function lockedName(roleId){const sid=lockedStudentId(roleId);return sid?(ROSTER.find(p=>p.id===sid)?.name||''):''}
+let db=null,isAdmin=false,lastCode='',selectedRoleId='',liveIndex=0,liveSlideCount=1;
+let state={open:true,scheduleStart:'',scheduleEnd:'',announcement:'',roleCaps:{},entries:[],callSheet:{},trialMode:false};
+const entryCol=()=>collection(db,'fdm23067','settings','entries');
+const entryDoc=(id)=>doc(db,'fdm23067','settings','entries',id);
+const settingsDoc=()=>doc(db,'fdm23067','settings');
+const isConfigured=()=>!firebaseConfig.apiKey.includes('PASTE_')&&!firebaseConfig.projectId.includes('PASTE_');
+if(!isConfigured()){document.getElementById('setupWarn').style.display='block'}else{const app=initializeApp(firebaseConfig);db=getFirestore(app);initOnline();}
+
+async function initOnline(){
+  onSnapshot(settingsDoc(),snap=>{const data=snap.exists()?snap.data():{};state.open=data.open!==false;const oldStart=state.scheduleStart||'',oldEnd=state.scheduleEnd||'';state.scheduleStart=data.scheduleStart||'';state.scheduleEnd=data.scheduleEnd||'';state.announcement=data.announcement||'';state.roleCaps=data.roleCaps||{};state.callSheet=data.callSheet||{};state.trialMode=!!data.trialMode;syncScheduleInputs(oldStart!==state.scheduleStart||oldEnd!==state.scheduleEnd);syncAnnouncementInput();syncCallSheetInputs();render();});
+  onSnapshot(entryCol(),snap=>{state.entries=snap.docs.map(d=>({id:d.id,...d.data()})).filter(e=>!e.removed);render();});
+}
+function norm(s){return(s||'').trim().toLowerCase()}function roleName(id){return roles.find(r=>r.id===id)?.name||id}function roleMax(id){const r=roles.find(x=>x.id===id);return Math.max(0,Number(state.roleCaps?.[id]??r.max))}function roleFree(id){return roleMax(id)-state.entries.filter(e=>e.role===id).length}
+function totalSlots(){return roles.reduce((sum,r)=>sum+roleMax(r.id),0)}function initials(name){return(name||'?').trim().slice(0,1).toUpperCase()||'?'}function entrySort(a,b){return(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0)}
+function makeCode(){const letters='ABCDEFGHJKLMNPQRSTUVWXYZ';let c;do{c=letters[Math.floor(Math.random()*letters.length)]+Math.floor(100+Math.random()*900)}while(state.entries.some(e=>e.code===c));return c}
+function getOpenStatus(){const now=Date.now(),start=state.scheduleStart?new Date(state.scheduleStart).getTime():null,end=state.scheduleEnd?new Date(state.scheduleEnd).getTime():null;if(!state.open){if(start&&now<start)return{open:false,label:'รอเปิดลงตำแหน่ง',count:formatDuration(start-now),info:'แอดมินปิดไว้ · จะเปิด: '+formatThaiDate(state.scheduleStart)};return{open:false,label:'ปิดลงตำแหน่ง',count:'ปิดอยู่',info:'แอดมินปิดลงตำแหน่งด้วยตนเอง'}}if(start&&now<start)return{open:false,label:'รอเปิดลงตำแหน่ง',count:formatDuration(start-now),info:'จะเปิด: '+formatThaiDate(state.scheduleStart)};if(end&&now>end)return{open:false,label:'ปิดลงตำแหน่ง',count:'หมดเวลา',info:'ปิดเมื่อ: '+formatThaiDate(state.scheduleEnd)};if(end&&now<=end)return{open:true,label:'เปิดลงตำแหน่ง',count:formatDuration(end-now),info:'เหลือเวลาถึง: '+formatThaiDate(state.scheduleEnd)};return{open:true,label:'เปิดลงตำแหน่ง',count:'เปิดอยู่',info:start?'เปิดเมื่อ: '+formatThaiDate(state.scheduleStart):'ยังไม่ได้ตั้งเวลาปิด'}}
+function effectiveOpen(){return getOpenStatus().open}function formatDuration(ms){ms=Math.max(0,ms);const h=String(Math.floor(ms/3600000)).padStart(2,'0'),m=String(Math.floor(ms%3600000/60000)).padStart(2,'0'),s=String(Math.floor(ms%60000/1000)).padStart(2,'0');return`${h}:${m}:${s}`}function formatThaiDate(v){if(!v)return'-';return new Date(v).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'})}
+let scheduleDirty=false;function syncScheduleInputs(force=false){const a=document.getElementById('scheduleStart'),b=document.getElementById('scheduleEnd');if(!a||!b)return;if(force&&!scheduleDirty){a.value=state.scheduleStart||'';b.value=state.scheduleEnd||''}}function markScheduleDirty(){scheduleDirty=true}
+function show(id){document.getElementById(id).classList.add('show')}function closeModal(id){document.getElementById(id).classList.remove('show')}function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+function closeSuccessThenAskDiscord(){closeModal('successModal');show('discordAskModal')}
+function render(){updateCountdown();renderLiveBanner();renderCards();renderSidePanels();renderAdmin();}
+function renderLiveBanner(){
+  const total=totalSlots(), joined=state.entries.length, pct=total?Math.min(100,Math.round(joined/total*100)):0;
+  document.getElementById('joined').textContent=joined;
+  document.getElementById('totalSlots').textContent=total;
+  document.getElementById('progressFill').style.width=pct+'%';
+  const bar=document.getElementById('announceBar'), txt=document.getElementById('announceText');
+  if(state.announcement){bar.style.display='block';txt.textContent='📢 '+state.announcement;}else{bar.style.display='none';}
+  const tb=document.getElementById('trialBanner');if(tb)tb.style.display=state.trialMode?'block':'none';
+}
+function renderCards(){
+  
+  const cardHTML=r=>{
+    const max=roleMax(r.id),entries=state.entries.filter(e=>e.role===r.id),full=entries.length>=max;const locked=!!lockedStudentId(r.id);
+    const slotsHTML=max===1
+      ? (entries[0]?`<div class="slot taken"><div><div class="name">${entries[0].name}</div><div class="small">เลือกเวลา ${entries[0].time||'-'}</div></div>✅</div>`
+                    :`<div class="slot"><div><div class="name">ว่าง</div><div class="small">รอคนกดเลือก</div></div>🟢</div>`)
+      : Array.from({length:max}).map((_,i)=>{const e=entries[i];return`<div class="slot ${e?'taken':''}"><div><div class="name">${e?e.name:'ว่าง'}</div><div class="small">${e?'เลือกเวลา '+(e.time||'-'):'รอคนกดเลือก'}</div></div>${e?'✅':'🟢'}</div>`}).join('');
+    return`<article class="card ${full?'full':''} ${locked?'locked':''}"><div class="final-warn-mini">⚠️ ครั้งสุดท้าย ไม่มีเปลี่ยนอีก</div><div class="role-title"><h3>${r.emoji} ${r.name} ${locked?'🔒':''}</h3><span class="count">${entries.length}/${max}</span></div><div class="slots">${slotsHTML}</div><button ${locked||full||!effectiveOpen()||!isConfigured()?'disabled':''} onclick="openSignup('${r.id}')">${locked?'🔒 ตำแหน่งถูกล็อกไว้':'ลงตำแหน่งนี้'}</button></article>`;
+  };
+  document.getElementById('roleCards').innerHTML=DEPARTMENTS.map(dept=>{
+    const deptRoles=dept.ids.map(id=>roles.find(r=>r.id===id)).filter(Boolean);
+    if(!deptRoles.length)return '';
+    const filled=deptRoles.reduce((s,r)=>s+state.entries.filter(e=>e.role===r.id).length,0);
+    const total=deptRoles.reduce((s,r)=>s+roleMax(r.id),0);
+    return `<div class="dept-block"><div class="dept-heading">${DEPT_ICON[dept.name]||'🎬'} ${dept.name}<span class="dept-count">${filled}/${total} คน</span></div><div class="cards">${deptRoles.map(cardHTML).join('')}</div></div>`;
+  }).join('');
+  const roleOptions=roles.map(r=>`<option value="${r.id}" ${lockedStudentId(r.id)||roleFree(r.id)<=0?'disabled':''}>${r.name} ${lockedStudentId(r.id)?'🔒 ล็อกไว้':(roleFree(r.id)>0?'ว่าง '+roleFree(r.id):'เต็ม')}</option>`).join('');
+  document.getElementById('editRole').innerHTML=roleOptions;
+  const adminEditRole=document.getElementById('adminEditRole');if(adminEditRole)adminEditRole.innerHTML=roles.map(r=>`<option value="${r.id}">${r.name}</option>`).join('');
+}
+function renderSidePanels(){renderMyProfile();renderActivity();}
+function renderMyProfile(){const pb=document.getElementById('phoneBanner');if(pb)pb.style.display='none';const saved=JSON.parse(localStorage.getItem('fdm23067_my_entry')||'null'),box=document.getElementById('myProfileBox'),cont=document.getElementById('myProfileContent');if(!saved){box.style.display='none';return}const live=state.entries.find(e=>e.id===saved.id)||(saved.studentId&&state.entries.find(e=>e.studentId===saved.studentId))||state.entries.find(e=>norm(e.name)===norm(saved.name)&&e.code===saved.code);if(!live){box.style.display='none';return}if(pb&&!live.phone){pb.style.display='flex';document.getElementById('phoneBannerLink').href='phone.html?sid='+encodeURIComponent(live.studentId||'');document.getElementById('phoneBannerName').textContent=live.name}box.style.display='block';cont.innerHTML=`<div class="mini-row"><span class="avatar">${initials(live.name)}</span><div style="flex:1"><div class="name">${live.name}</div><div class="small">${roleName(live.role)} · ${live.time||'-'}</div><div class="small">รหัสแก้ไข: <b>${live.code}</b></div><div class="small">📞 ${live.phone||'ยังไม่ได้ลงเบอร์โทร'}</div></div></div><div class="admin-actions" style="margin-top:10px"><a class="btn-link secondary muted-btn" href="phone.html?sid=${encodeURIComponent(live.studentId||'')}">📞 ${live.phone?'แก้':'ลง'}เบอร์โทร</a><button class="secondary muted-btn" onclick="fillMyEdit('${live.name}','${live.code}')">✏️ แก้ไข</button><button class="secondary muted-btn" onclick="copyText('${live.code}')">📋 Copy Code</button></div>`}
+function renderActivity(){const el=document.getElementById('activityFeed'),rows=[...state.entries].sort(entrySort).slice(-5).reverse();el.innerHTML=rows.length?rows.map(e=>`<div class="mini-row"><span class="avatar">${initials(e.name)}</span><div style="flex:1"><div class="name">${e.name}</div><div class="small">ลง ${roleName(e.role)} · ${e.time||'-'}</div></div></div>`).join(''):'<div class="small">ยังไม่มีข้อมูล</div>'}
+function renderAdmin(){const roleCtl=document.getElementById('roleAdminControls');if(roleCtl)roleCtl.innerHTML=roles.map(r=>{const max=roleMax(r.id),used=state.entries.filter(e=>e.role===r.id).length;return`<div class="slot"><div><div class="name">${r.emoji} ${r.name}</div><div class="small">ใช้แล้ว ${used}/${max}</div></div><div class="admin-actions"><button class="secondary" onclick="changeRoleCap('${r.id}',-1)" ${max<=used?'disabled':''}>-</button><button class="secondary" onclick="changeRoleCap('${r.id}',1)">+</button></div></div>`}).join('');
+  document.getElementById('adminTable').innerHTML=state.entries.map(e=>`<tr><td>${e.trial?'🧪 ':''}${e.name}<br><span class="small">รหัส: ${e.code}${e.phone?' · 📞 '+e.phone:''}</span></td><td>${roleName(e.role)}</td><td><button class="ghost" onclick="openAdminEdit('${e.id}')">แก้ไข</button><button class="ghost" onclick="copyText('${e.code}')">Copy</button><button class="ghost" onclick="adminDelete('${e.id}')">ลบ</button></td></tr>`).join('')||'<tr><td colspan="3" class="small">ยังไม่มีข้อมูล</td></tr>';
+  const trialBtn=document.getElementById('trialToggleBtn');if(trialBtn)trialBtn.textContent=state.trialMode?'🧪 ปิดโหมดทดลอง (กำลังเปิดอยู่)':'🧪 เปิดโหมดทดลอง';
+  const qaName=document.getElementById('quickAddName');
+  if(qaName){const taken=new Set(state.entries.map(e=>e.studentId).filter(Boolean));qaName.innerHTML=ROSTER.map(p=>`<option value="${p.id}" ${taken.has(p.id)?'disabled':''}>${p.name}${taken.has(p.id)?' (ลงแล้ว)':''}</option>`).join('')}
+  const qaRole=document.getElementById('quickAddRole');
+  if(qaRole){qaRole.innerHTML=roles.map(r=>`<option value="${r.id}" ${roleFree(r.id)<=0?'disabled':''}>${r.name} ${roleFree(r.id)>0?'ว่าง '+roleFree(r.id):'เต็ม'}</option>`).join('')}
+}
+function buildNameOptions(){const taken=new Set(state.entries.map(e=>e.studentId).filter(Boolean));return '<option value="">— เลือกชื่อ —</option>'+ROSTER.map(p=>`<option value="${p.id}" ${''}>${p.name}${taken.has(p.id)?' (ลงตำแหน่งแล้ว · ลงเบอร์ได้)':''}</option>`).join('')}
+function openSignup(roleId){selectedRoleId=roleId;const r=roles.find(x=>x.id===roleId);document.getElementById('signupTitle').textContent=`${r.emoji} ${r.name}`;document.getElementById('signupInfo').textContent=`เหลือ ${Math.max(0,roleFree(roleId))} ที่ จากทั้งหมด ${roleMax(roleId)} ที่`;document.getElementById('signupName').innerHTML=buildNameOptions();document.getElementById('signupPhone').value='';show('signupModal')}
+async function confirmSignup(){const studentId=document.getElementById('signupName').value;const phone=document.getElementById('signupPhone').value.trim();if(!selectedRoleId)return toast('กรุณาเลือกตำแหน่ง');if(!studentId)return toast('กรุณาเลือกชื่อก่อน');if(!phone)return toast('กรุณากรอกเบอร์โทร');if(!/^0\d{8,9}$/.test(phone))return toast('กรุณากรอกเบอร์โทรให้ถูกต้อง (เช่น 0891234567)');const existing=state.entries.find(e=>e.studentId===studentId);if(existing){try{await setDoc(entryDoc(existing.id),{phone,authCode:existing.code},{merge:true});closeModal('signupModal');toast('บันทึกเบอร์โทรแล้ว (ตำแหน่งเดิมของคุณคือ '+roleName(existing.role)+')')}catch(err){toast(err.message||'บันทึกไม่สำเร็จ')}return}const person=ROSTER.find(p=>p.id===studentId);await selectRole(selectedRoleId,person.name,studentId,phone)}
+async function selectRole(roleId,name,studentId,phone){if(!db)return toast('ยังไม่ได้ตั้งค่า Firebase');if(!effectiveOpen())return toast(getOpenStatus().label);if(!name)return toast('กรุณาเลือกชื่อก่อน');if(lockedStudentId(roleId)&&lockedStudentId(roleId)!==studentId)return toast('ตำแหน่งนี้ถูกล็อกไว้สำหรับ '+lockedName(roleId)+' แล้ว');const code=makeCode(),entryId=crypto.randomUUID();try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),entries=snaps.docs.map(d=>d.data()).filter(e=>!e.removed);if(studentId&&entries.some(e=>e.studentId===studentId))throw new Error('คุณเลือกตำแหน่งไปแล้ว');if(!studentId&&entries.some(e=>norm(e.name)===norm(name)))throw new Error('ชื่อนี้เลือกตำแหน่งไปแล้ว');if(entries.filter(e=>e.role===roleId).length>=roleMax(roleId))throw new Error('ตำแหน่งนี้เต็มแล้ว');tx.set(entryDoc(entryId),{name,studentId:studentId||null,phone:phone||'',role:roleId,code,edited:false,trial:!!state.trialMode,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),createdAt:serverTimestamp()})});lastCode=code;localStorage.setItem('fdm23067_my_entry',JSON.stringify({id:entryId,name,code,role:roleId,studentId}));closeModal('signupModal');document.getElementById('successText').innerHTML=(state.trialMode?'<b>🧪 นี่คือการลงตำแหน่งแบบทดลอง</b><br>':'')+`ชื่อ <b>${name}</b><br>ตำแหน่ง <b>${roleName(roleId)}</b><br>รหัสแก้ไขของคุณคือ`;document.getElementById('editCodeBox').textContent=code;show('successModal')}catch(e){toast(e.message||'เลือกไม่สำเร็จ')}}
+async function submitEdit(){const name=norm(document.getElementById('editName').value),code=document.getElementById('editCode').value.trim().toUpperCase(),newRole=document.getElementById('editRole').value;try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),docs=snaps.docs.map(d=>({id:d.id,...d.data()})).filter(x=>!x.removed),e=docs.find(x=>norm(x.name)===name&&x.code===code);if(!e)throw new Error('ชื่อหรือรหัสแก้ไขไม่ถูกต้อง');if(lockedStudentId(e.role)&&lockedStudentId(e.role)===e.studentId)throw new Error('ตำแหน่งนี้ถูกล็อกไว้ ไม่สามารถแก้ไขได้');if(lockedStudentId(newRole))throw new Error('ตำแหน่งนี้ถูกล็อกไว้ ไม่สามารถย้ายเข้าได้');if(e.edited)throw new Error('ใช้สิทธิ์แก้ไขไปแล้ว');if(newRole!==e.role&&docs.filter(x=>x.role===newRole).length>=roleMax(newRole))throw new Error('ตำแหน่งใหม่เต็มแล้ว');tx.update(entryDoc(e.id),{role:newRole,edited:true,authCode:code,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})})});closeModal('editModal');toast('แก้ไขสำเร็จ ใช้สิทธิ์แก้ไขครบแล้ว')}catch(e){toast(e.message||'แก้ไขไม่สำเร็จ')}}
+function fillMyEdit(name,code){document.getElementById('editName').value=name;document.getElementById('editCode').value=code;show('editModal')}
+function loginAdmin(fromModal=false){const key=(fromModal?document.getElementById('adminKey2').value:document.getElementById('adminKey').value).trim();if(key===ADMIN_KEY){isAdmin=true;document.body.classList.add('admin-on');closeModal('adminModal');toast('เข้าสู่ระบบ Admin แล้ว')}else toast('Admin Key ไม่ถูกต้อง')}function logoutAdmin(){isAdmin=false;document.body.classList.remove('admin-on');toast('ออกจากระบบ Admin แล้ว')}
+async function adminDelete(id){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');await setDoc(entryDoc(id),{removed:true,authCode:ADMIN_KEY},{merge:true});toast('ลบแล้ว')}async function resetAll(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');if(!confirm('รีเซ็ตทั้งหมด? (ตำแหน่งที่ล็อกไว้จะไม่ถูกลบ)'))return;const snaps=await getDocs(entryCol()),batch=writeBatch(db);snaps.forEach(d=>{const data=d.data();if(lockedStudentId(data.role)&&lockedStudentId(data.role)===data.studentId)return;batch.update(d.ref,{removed:true,authCode:ADMIN_KEY})});await batch.commit();toast('รีเซ็ตแล้ว (เก็บตำแหน่งที่ล็อกไว้)')}async function toggleOpen(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');await setDoc(settingsDoc(),{open:!state.open,authCode:ADMIN_KEY},{merge:true})}
+async function toggleTrialMode(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const next=!state.trialMode;await setDoc(settingsDoc(),{trialMode:next,authCode:ADMIN_KEY},{merge:true});toast(next?'เปิดโหมดทดลองแล้ว':'ปิดโหมดทดลองแล้ว')}
+async function clearTrialData(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');if(!confirm('ล้างข้อมูลทดลองทั้งหมด? (ไม่กระทบข้อมูลจริง)'))return;const snaps=await getDocs(entryCol()),batch=writeBatch(db);let count=0;snaps.forEach(d=>{const data=d.data();if(data.trial){batch.update(d.ref,{removed:true,authCode:ADMIN_KEY});count++}});if(count===0)return toast('ไม่มีข้อมูลทดลองให้ล้าง');await batch.commit();toast('ล้างข้อมูลทดลอง '+count+' รายการแล้ว')}
+async function adminQuickAdd(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const studentId=document.getElementById('quickAddName').value,roleId=document.getElementById('quickAddRole').value,phone=document.getElementById('quickAddPhone').value.trim();if(!studentId)return toast('กรุณาเลือกชื่อ');const person=ROSTER.find(p=>p.id===studentId);if(!person)return toast('ไม่พบชื่อนี้');const code=makeCode(),entryId=crypto.randomUUID();try{await runTransaction(db,async(tx)=>{const snaps=await getDocs(entryCol()),entries=snaps.docs.map(d=>d.data()).filter(e=>!e.removed);if(entries.some(e=>e.studentId===studentId))throw new Error('คนนี้เลือกตำแหน่งไปแล้ว');if(entries.filter(e=>e.role===roleId).length>=roleMax(roleId))throw new Error('ตำแหน่งนี้เต็มแล้ว');tx.set(entryDoc(entryId),{name:person.name,studentId,phone:phone||'',role:roleId,code,edited:false,trial:false,authCode:ADMIN_KEY,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'}),createdAt:serverTimestamp()})});document.getElementById('quickAddPhone').value='';toast('เพิ่ม '+person.name+' เข้าตำแหน่งแล้ว รหัสแก้ไข: '+code)}catch(e){toast(e.message||'เพิ่มไม่สำเร็จ')}}
+async function saveSchedule(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const scheduleStart=document.getElementById('scheduleStart').value,scheduleEnd=document.getElementById('scheduleEnd').value;if(scheduleStart&&scheduleEnd&&new Date(scheduleEnd)<=new Date(scheduleStart))return toast('เวลาปิดต้องอยู่หลังเวลาเปิด');state.scheduleStart=scheduleStart;state.scheduleEnd=scheduleEnd;scheduleDirty=false;render();await setDoc(settingsDoc(),{scheduleStart,scheduleEnd,authCode:ADMIN_KEY},{merge:true});toast('บันทึกเวลาแล้ว')}async function clearSchedule(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');state.scheduleStart='';state.scheduleEnd='';scheduleDirty=false;syncScheduleInputs(true);render();await setDoc(settingsDoc(),{scheduleStart:'',scheduleEnd:'',authCode:ADMIN_KEY},{merge:true});toast('ล้างเวลาแล้ว')}
+async function changeRoleCap(roleId,delta){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const current=roleMax(roleId),used=state.entries.filter(e=>e.role===roleId).length,next=Math.max(used,current+delta);state.roleCaps={...(state.roleCaps||{}),[roleId]:next};render();await setDoc(settingsDoc(),{roleCaps:state.roleCaps,authCode:ADMIN_KEY},{merge:true});toast('อัปเดตจำนวนช่องแล้ว')}
+function syncAnnouncementInput(){const el=document.getElementById('announcementInput');if(el&&document.activeElement!==el)el.value=state.announcement||''}function syncCallSheetInputs(){const cs=state.callSheet||{};const d=document.getElementById('csDate'),ct=document.getElementById('csCallTime'),wt=document.getElementById('csWrapTime'),loc=document.getElementById('csLocation'),nt=document.getElementById('csNotes');if(d&&document.activeElement!==d)d.value=cs.date||'';if(ct&&document.activeElement!==ct)ct.value=cs.callTime||'';if(wt&&document.activeElement!==wt)wt.value=cs.wrapTime||'';if(loc&&document.activeElement!==loc)loc.value=cs.location||'';if(nt&&document.activeElement!==nt)nt.value=cs.notes||'';}async function saveCallSheetInfo(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const callSheet={date:document.getElementById('csDate').value,callTime:document.getElementById('csCallTime').value,wrapTime:document.getElementById('csWrapTime').value,location:document.getElementById('csLocation').value.trim(),notes:document.getElementById('csNotes').value.trim()};state.callSheet=callSheet;render();await setDoc(settingsDoc(),{callSheet,authCode:ADMIN_KEY},{merge:true});toast('บันทึก Call Sheet แล้ว')}
+async function saveAnnouncement(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const announcement=document.getElementById('announcementInput').value.trim();state.announcement=announcement;render();await setDoc(settingsDoc(),{announcement,authCode:ADMIN_KEY},{merge:true});toast('เผยแพร่ประกาศแล้ว')}async function clearAnnouncement(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');state.announcement='';syncAnnouncementInput();render();await setDoc(settingsDoc(),{announcement:'',authCode:ADMIN_KEY},{merge:true});toast('ล้างประกาศแล้ว')}
+function openAdminEdit(id){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const e=state.entries.find(x=>x.id===id);if(!e)return toast('ไม่พบข้อมูล');document.getElementById('adminEditId').value=id;document.getElementById('adminEditName').value=e.name||'';document.getElementById('adminEditRole').value=e.role||roles[0].id;document.getElementById('adminEditPhone').value=e.phone||'';document.getElementById('adminEditCode').value=e.code||'';show('adminEditModal')}
+async function saveAdminEdit(){if(!isAdmin)return toast('ต้องเข้าสู่ระบบ Admin ก่อน');const id=document.getElementById('adminEditId').value,name=document.getElementById('adminEditName').value.trim(),role=document.getElementById('adminEditRole').value,phone=document.getElementById('adminEditPhone').value.trim();if(!name)return toast('กรุณากรอกชื่อ');const docs=state.entries.filter(e=>e.id!==id);if(docs.some(e=>norm(e.name)===norm(name)))return toast('ชื่อนี้มีอยู่แล้ว');const current=state.entries.find(e=>e.id===id);if(!current)return toast('ไม่พบข้อมูล');if(role!==current.role&&state.entries.filter(e=>e.role===role).length>=roleMax(role))return toast('ตำแหน่งใหม่เต็มแล้ว');await setDoc(entryDoc(id),{...current,name,role,phone,authCode:ADMIN_KEY,time:new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'})},{merge:true});closeModal('adminEditModal');toast('บันทึกข้อมูลแล้ว')}
+function buildMembersHTML(filter){
+  const q=(filter||'').trim().toLowerCase();
+  const joined=state.entries.length, total=totalSlots();
+  const deptHTML=DEPARTMENTS.map(dept=>{
+    const deptRoles=dept.ids.map(id=>roles.find(r=>r.id===id)).filter(Boolean);
+    if(!deptRoles.length)return '';
+    let rowsHTML='';
+    deptRoles.forEach(r=>{
+      const entries=state.entries.filter(e=>e.role===r.id);
+      const max=roleMax(r.id);
+      for(let i=0;i<max;i++){
+        const e=entries[i];
+        if(q&&!(e&&norm(e.name).includes(q)))continue;
+        rowsHTML+=`<div class="mini-row"><span class="avatar">${e?initials(e.name):'?'}</span><div style="flex:1"><div class="name">${e?e.name:'ว่าง'}</div><div class="small">${r.name}${max>1?' '+(i+1):''}${e?' · '+(e.time||'-'):''}</div></div></div>`;
+      }
+    });
+    if(!rowsHTML)return '';
+    const filled=deptRoles.reduce((s,r)=>s+state.entries.filter(e=>e.role===r.id).length,0);
+    const totalDept=deptRoles.reduce((s,r)=>s+roleMax(r.id),0);
+    return `<div class="dept-block" style="margin-bottom:14px"><div class="dept-heading">${DEPT_ICON[dept.name]||'🎬'} ${dept.name}<span class="dept-count">${filled}/${totalDept} คน</span></div><div class="mini-list">${rowsHTML}</div></div>`;
+  }).join('');
+  const summary=`<p class="small" style="margin:0 0 12px"><b>${joined}/${total}</b> คนลงตำแหน่งแล้ว</p>`;
+  return summary+(deptHTML.trim()?deptHTML:'<p class="small">ไม่พบชื่อที่ตรงกัน</p>');
+}
+function renderMembersList(){const el=document.getElementById('membersList');if(!el)return;const q=document.getElementById('membersSearch')?.value||'';el.innerHTML=buildMembersHTML(q)}
+
+function csbGroupRows(ids){const rows=[];ids.forEach(id=>{const r=roles.find(x=>x.id===id);if(!r)return;const max=roleMax(id),ent=state.entries.filter(e=>e.role===id);for(let i=0;i<max;i++)rows.push({label:r.name+(max>1?' '+(i+1):''),name:ent[i]?ent[i].name:''});});return rows}
+function formatThaiDateOnly(v){if(!v)return'-';return new Date(v+'T00:00:00').toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'})}
+function buildCallSheetHTML(){
+  const GROUPS=[
+    [{name:'กำกับ / โปรดักชั่น',ids:['producer','director','script','runner']},{name:'ไฟ / ไฟฟ้า',ids:['gaffer','bestboy']}],
+    [{name:'ฝ่ายกล้อง',ids:['dop','camoperator','focuspuller','camop']},{name:'เสียง',ids:['sound']}],
+    [{name:'ศิลป์',ids:['art','artprop']},{name:'แต่งหน้า / คอสตูม',ids:['makeup']}]
+  ];
+  const cs=state.callSheet||{};
+  const info=`<div class="csb-info"><div><label>วันที่ถ่ายทำ</label><b>${formatThaiDateOnly(cs.date)}</b></div><div><label>Call Time</label><b>${cs.callTime||'-'}</b></div><div><label>เลิกกอง (โดยประมาณ)</label><b>${cs.wrapTime||'-'}</b></div><div><label>สถานที่ถ่ายทำ</label><b>${cs.location||'-'}</b></div></div>`;
+  const groupsHTML=GROUPS.map(pair=>{
+    const[gA,gB]=pair,rowsA=csbGroupRows(gA.ids),rowsB=csbGroupRows(gB.ids),max=Math.max(rowsA.length,rowsB.length,1);
+    let body='';
+    for(let i=0;i<max;i++){const a=rowsA[i],b=rowsB[i];
+      body+=`<tr><td class="csb-role">${a?a.label:''}</td><td class="csb-name">${a?(a.name?a.name:'<span class=\"csb-fill\">ว่าง</span>'):''}</td><td class="csb-role">${b?b.label:''}</td><td class="csb-name">${b?(b.name?b.name:'<span class=\"csb-fill\">ว่าง</span>'):''}</td></tr>`;
+    }
+    return `<table class="csb-dept-table"><thead><tr><th colspan="2">${gA.name}</th><th colspan="2">${gB.name}</th></tr></thead><tbody>${body}</tbody></table>`;
+  }).join('');
+  const notes=cs.notes?`<div class="csb-foot"><b>หมายเหตุ:</b> ${cs.notes}</div>`:'';
+  return `<div class="csb-page"><div class="csb-head"><div><h1>FDM23067 — หนังสั้น 1 ซีน (2 นาที)</h1><div class="csb-sub">Sripatum University · FDM23067</div></div><div class="csb-day">CALL SHEET — Day 1/1</div></div>${info}${groupsHTML}${notes}</div>`;
+}
+function openMembers(){const s=document.getElementById('membersSearch');if(s)s.value='';renderMembersList();show('membersModal')}function openCallSheet(){document.getElementById('callSheetList').innerHTML=buildCallSheetHTML();show('callSheetModal')}function printCallSheet(){window.print()}
+function openQR(){const url=new URL('./',location.href).href;document.getElementById('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(url);show('qrModal')}
+function copyPageLink(){navigator.clipboard?.writeText(new URL('./',location.href).href);toast('คัดลอกลิงก์เว็บแล้ว')}function copyText(text){navigator.clipboard?.writeText(text);toast('คัดลอกแล้ว')}function copyAdminEditCode(){copyText(document.getElementById('adminEditCode').value)}function copyCode(){navigator.clipboard?.writeText(lastCode);toast('คัดลอกรหัสแล้ว')}
+function exportCSV(){const csv='name,studentId,phone,role,time,editCode\n'+state.entries.map(e=>`${e.name},${e.studentId||''},${e.phone||''},${roleName(e.role)},${e.time||''},${e.code}`).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='final-project-positions.csv';a.click()}
+function exportJSON(){const data={exportedAt:new Date().toISOString(),settings:{open:state.open,scheduleStart:state.scheduleStart,scheduleEnd:state.scheduleEnd,announcement:state.announcement,roleCaps:state.roleCaps},entries:state.entries};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));a.download='final-project-backup.json';a.click()}
+function openAdmin(){show('adminModal')}function openEdit(){show('editModal')}function showRules(){show('rulesModal')}function annNext(){closeModal('phoneAnnounce');show('rulesModal')}function annDone(){try{localStorage.setItem('fdm23067_phone_done','1')}catch(e){}annNext()}
+function updateCountdown(){const st=getOpenStatus(),openText=document.getElementById('openText'),dot=document.querySelector('.status-dot'),scheduleLabel=document.getElementById('scheduleLabel'),countdownText=document.getElementById('countdownText'),scheduleInfo=document.getElementById('scheduleInfo');if(openText)openText.textContent=st.label;if(dot)dot.style.background=st.open?'var(--green)':(state.open?'var(--yellow)':'var(--red)');if(scheduleLabel)scheduleLabel.textContent=st.label;if(countdownText)countdownText.textContent=st.count;if(scheduleInfo)scheduleInfo.textContent=st.info;
+  const tc=document.getElementById('topCountdown'),tcLabel=document.getElementById('topCountdownLabel'),tcText=document.getElementById('topCountdownText');
+  if(tc){const isCounting=st.count.includes(':');if(isCounting){tc.style.display='flex';tcLabel.textContent=st.open?'🟢 ปิดรับในอีก':'🟡 เปิดรับในอีก';tcText.textContent=st.count}else{tc.style.display='none'}}
+}
+function repositionProfile(){
+  const box=document.getElementById('myProfileBox'), aside=document.querySelector('.side'), strip=document.querySelector('.status-strip'), mainEl=document.querySelector('main.grid');
+  if(!box||!aside||!strip||!mainEl)return;
+  const isMobile=window.matchMedia('(max-width:1023px)').matches;
+  if(isMobile){ if(box.parentElement!==strip.parentElement || box.previousElementSibling!==strip) strip.insertAdjacentElement('afterend',box); }
+  else { if(aside.firstElementChild!==box) aside.insertAdjacentElement('afterbegin',box); }
+}
+window.addEventListener('resize',repositionProfile);
+Object.assign(window,{annNext,annDone,openSignup,confirmSignup,submitEdit,loginAdmin,adminDelete,resetAll,toggleOpen,saveSchedule,clearSchedule,exportCSV,exportJSON,openAdmin,openEdit,showRules,closeModal,copyCode,markScheduleDirty,changeRoleCap,saveAnnouncement,clearAnnouncement,openAdminEdit,saveAdminEdit,copyText,copyAdminEditCode,openMembers,openCallSheet,printCallSheet,copyPageLink,openQR,fillMyEdit,closeSuccessThenAskDiscord,logoutAdmin,saveCallSheetInfo,renderMembersList,toggleTrialMode,clearTrialData,adminQuickAdd});
+setInterval(updateCountdown,1000);repositionProfile();show('phoneAnnounce');render();
+</script>
+<script>
+/* ทัวร์สอนใช้งานแบบเคลื่อนไหว: เล่นอัตโนมัติ แตะจุด/ปุ่ม/ปัดซ้ายขวาเพื่อข้ามเองได้ */
+(function(){
+var STEPS=[
+{t:'1) เลือกตำแหน่ง',d:'กดปุ่ม "ลงตำแหน่งนี้" ที่ตำแหน่งที่อยากได้ ตำแหน่งที่เต็มแล้วกดไม่ได้ ใครกดก่อนได้ก่อน',ms:6000},
+{t:'2) เลือกชื่อ + ใส่เบอร์โทร',d:'เลือกชื่อตัวเอง พิมพ์เบอร์โทร 10 หลัก แล้วกดยืนยัน',ms:8000},
+{t:'3) เก็บรหัสแก้ไข',d:'จะได้รหัส 4 ตัว ใช้ตอนย้ายตำแหน่ง อย่าลืมแคปหน้าจอไว้',ms:6000},
+{t:'4) ลืมลงเบอร์? ลงทีหลังได้',d:'กดปุ่ม "📞 ลงเบอร์โทร" ที่หัวเว็บ → เลือกชื่อ → ใส่รหัสแก้ไข → พิมพ์เบอร์ → บันทึก (ไม่ต้องลงตำแหน่งใหม่)',ms:10000},
+{t:'5) ย้ายตำแหน่ง',d:'ย้ายได้ 1 ครั้ง ต้องใช้รหัสแก้ไข 4 ตัว · 1 คนมีได้ 1 ตำแหน่ง',ms:8000}];
+var m=document.getElementById('rulesModal');if(!m)return;
+var sc=[].slice.call(m.querySelectorAll('.tp')),dots=document.getElementById('trDots'),bar=document.getElementById('trBar'),
+ ti=document.getElementById('trTitle'),de=document.getElementById('trDesc'),pv=document.getElementById('trPrev'),nx=document.getElementById('trNext'),st=document.getElementById('trStage');
+var i=0,tm=null,auto=true;
+STEPS.forEach(function(s,k){var b=document.createElement('button');b.setAttribute('aria-label','ขั้นที่ '+(k+1));b.onclick=function(){auto=false;go(k)};dots.appendChild(b)});
+function go(n){i=Math.max(0,Math.min(STEPS.length-1,n));clearTimeout(tm);
+ sc.forEach(function(s,k){s.classList.toggle('on',k===i)});
+ [].forEach.call(dots.children,function(b,k){b.classList.toggle('on',k===i)});
+ ti.textContent=STEPS[i].t;de.textContent=STEPS[i].d;pv.disabled=i===0;
+ nx.textContent=i===STEPS.length-1?'เริ่มเลือกตำแหน่ง ✓':'ถัดไป ›';
+ bar.classList.remove('run');void bar.offsetWidth;
+ if(auto&&i<STEPS.length-1){bar.style.animationDuration=STEPS[i].ms+'ms';bar.classList.add('run');tm=setTimeout(function(){go(i+1)},STEPS[i].ms)}else{bar.style.width=auto?'0':'0'}}
+pv.onclick=function(){auto=false;go(i-1)};
+nx.onclick=function(){if(i===STEPS.length-1){window.closeModal&&closeModal('rulesModal')}else{auto=false;go(i+1)}};
+var x0=null;st.addEventListener('touchstart',function(e){x0=e.touches[0].clientX},{passive:true});
+st.addEventListener('touchend',function(e){if(x0==null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40){auto=false;go(i+(dx<0?1:-1))}});
+new MutationObserver(function(){if(m.classList.contains('show')){auto=true;go(0)}else{clearTimeout(tm)}}).observe(m,{attributes:true,attributeFilter:['class']});
+go(0);
+})();
+</script>
+</body>
+</html>
