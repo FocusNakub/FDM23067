@@ -23,6 +23,11 @@ button{width:100%;padding:14px;border:0;border-radius:6px;background:var(--blue)
 button:disabled{opacity:.5;cursor:not-allowed}
 .seed{display:none;background:#fff4cc;border:2px solid var(--ink);border-radius:8px;padding:14px;margin:0 0 12px;text-align:center}.seed .num{font-size:28px;font-weight:800;letter-spacing:1px;margin:4px 0 10px;font-variant-numeric:tabular-nums}.seed button{width:100%;margin-top:8px}.seed .alt{background:#fff;color:var(--ink);border:1px solid var(--ink)}
 .cur{background:#e6f0ff;border:1px solid var(--ink);border-radius:6px;padding:8px 12px;margin:0 0 12px;font-size:14px;display:none}.cur b{font-variant-numeric:tabular-nums}.cur button{background:none;border:0;color:#e5372b;text-decoration:underline;font-size:13px;padding:0;margin-left:8px;cursor:pointer;min-height:0;width:auto}.edit{background:#fff;color:var(--ink);border:1px solid var(--ink);border-radius:5px;font-size:12px;padding:2px 8px;margin-left:6px;cursor:pointer;min-height:0;width:auto}
+.howto .steps{list-style:none;margin:10px 0 12px;padding:0;counter-reset:st;display:grid;gap:8px}
+.steps li{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--ink);border-radius:8px;padding:10px 12px}
+.steps li::before{counter-increment:st;content:counter(st);flex:none;width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center}
+.steps strong{display:block;font-size:15px;color:var(--ink);margin-bottom:2px}
+.steps li span{font-size:14px;color:var(--muted);line-height:1.5}
 .howto{background:#fff4cc}.howto ol{margin:6px 0 8px;padding-left:22px}.howto span{font-size:13px;color:var(--muted)}
 .back{display:inline-block;margin-top:14px;color:var(--blue);font-weight:700;text-decoration:none}
 .progress{font-weight:700;margin-bottom:10px}.progress b{color:var(--blue)}
@@ -34,54 +39,59 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .list div:last-child{border-bottom:0}
 .tag{font-weight:700;white-space:nowrap}.tag.y{color:var(--green)}.tag.n{color:var(--muted)}
 
-.dm{--dmc:#2447d6;width:300px;max-width:100%;margin:0 auto 12px;border:2px solid #111a26;border-radius:14px;background:#fff;overflow:hidden;font-family:inherit;color:#111a26}
-.dm-bar{background:#111a26;color:#fff;font-weight:800;font-size:14px;padding:8px 12px;display:flex;justify-content:space-between}
-.dm-cap{position:relative;height:38px;background:#fff4cc;border-bottom:1px solid #111a26;font-weight:700;font-size:13px}
-.dm-cap span{position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;opacity:0}
-.dm-cap .c1{animation:dmc1 10s infinite}.dm-cap .c2{animation:dmc2 10s infinite}.dm-cap .c3{animation:dmc3 10s infinite}
-.dm-scr{position:relative;height:262px;background:#eceff3}
-.dm-f{position:absolute;left:14px;right:14px;height:42px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:0 12px;display:flex;align-items:center;font-size:14px;overflow:hidden}
-.dm-lab{position:absolute;left:16px;font-size:10px;font-weight:700;color:#5b6878}
-.dm-f.n{top:24px}.dm-f.p{top:86px}
-.dm-ln{top:8px}.dm-lp{top:70px}
-.dm-ph{color:#9aa6b4;position:absolute}
-.dm-n1{animation:dmShowHide 10s infinite}
-.dm-n2{position:absolute;font-weight:700;opacity:0;animation:dmName 10s infinite}
-.dm-p1{animation:dmPh 10s infinite}
-.dm-type{position:absolute;font-variant-numeric:tabular-nums;font-weight:700;overflow:hidden;white-space:nowrap;width:0;animation:dmType 10s infinite steps(10,end)}
-.dm-f.n{animation:dmRing1 10s infinite}.dm-f.p{animation:dmRing2 10s infinite}
-.dm-btn{position:absolute;left:14px;right:14px;top:148px;height:42px;border-radius:6px;background:var(--dmc);color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;animation:dmBtn 10s infinite}
-.dm-ok{position:absolute;left:14px;right:14px;top:202px;background:#e6f6ec;border:1px solid #b7e2c8;color:#146c3a;border-radius:6px;font-weight:700;font-size:13px;padding:8px 10px;opacity:0;animation:dmOk 10s infinite}
-.dm-hand{position:absolute;font-size:26px;left:0;top:0;opacity:0;animation:dmHand 10s infinite;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
-@keyframes dmc1{0%,2%{opacity:0}5%,28%{opacity:1}32%,100%{opacity:0}}
-@keyframes dmc2{0%,30%{opacity:0}34%,54%{opacity:1}58%,100%{opacity:0}}
-@keyframes dmc3{0%,56%{opacity:0}60%,94%{opacity:1}98%,100%{opacity:0}}
-@keyframes dmShowHide{0%,18%{opacity:1}20%,100%{opacity:0}}
-@keyframes dmName{0%,18%{opacity:0}21%,96%{opacity:1}100%{opacity:0}}
-@keyframes dmPh{0%,36%{opacity:1}37%,100%{opacity:0}}
-@keyframes dmType{0%,36%{width:0}50%,96%{width:11ch}100%{width:0}}
-@keyframes dmRing1{0%,2%{box-shadow:none}6%,22%{box-shadow:0 0 0 3px #9db4ff}26%,100%{box-shadow:none}}
-@keyframes dmRing2{0%,30%{box-shadow:none}34%,52%{box-shadow:0 0 0 3px #9db4ff}56%,100%{box-shadow:none}}
-@keyframes dmBtn{0%,50%{opacity:.45;transform:none}54%,60%{opacity:1;transform:none}63%{opacity:1;transform:scale(.95)}67%,100%{opacity:1;transform:none}}
-@keyframes dmOk{0%,66%{opacity:0;transform:translateY(6px)}72%,94%{opacity:1;transform:none}98%,100%{opacity:0}}
-@keyframes dmHand{
- 0%,3%{opacity:0;left:200px;top:70px}
- 7%{opacity:1;left:150px;top:44px}
- 18%{opacity:1;left:150px;top:44px}
- 24%{opacity:1;left:180px;top:116px}
- 50%{opacity:1;left:180px;top:116px}
- 58%{opacity:1;left:190px;top:168px}
- 64%{opacity:1;left:190px;top:170px}
- 70%{opacity:1;left:190px;top:176px}
- 76%,100%{opacity:0;left:190px;top:176px}}
-@media(prefers-reduced-motion:reduce){.dm *{animation:none!important}.dm-cap .c3,.dm-n2,.dm-ok{opacity:1!important}.dm-n1,.dm-p1,.dm-hand{opacity:0!important}.dm-type{width:11ch!important}.dm-cap .c1,.dm-cap .c2{display:none}}
+.dm{width:272px;max-width:100%;margin:4px auto 12px;border:2px solid var(--ink);border-radius:14px;background:#fff;overflow:hidden;color:var(--ink)}
+.dm-bar{background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:7px 12px}
+.dm-scr{position:relative;height:226px;background:#eceff3;padding:10px 12px}
+.dm-f{height:38px;margin-bottom:8px;background:#fff;border:1px solid #cbd3dc;border-radius:6px;padding:0 10px;display:flex;align-items:center;font-size:14px;transition:box-shadow .3s,border-color .3s}
+.dm-f i{font-style:normal;color:#9aa6b4}
+.dm-btn{height:38px;border-radius:6px;background:var(--blue);color:#fff;font-weight:700;font-size:14px;display:grid;place-items:center;opacity:.4;transition:opacity .3s,transform .2s}
+.dm-ok{margin-top:8px;background:#e6f6ec;border:1px solid #b7e2c8;color:#146c3a;border-radius:6px;font-weight:700;font-size:13px;padding:7px 10px;opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.dm-tap{position:absolute;width:26px;height:26px;border-radius:50%;background:rgba(36,71,214,.28);border:2px solid var(--blue);left:0;top:0;opacity:0;transition:transform .6s ease,opacity .3s;pointer-events:none}
+.dm[data-s="1"] .f1,.dm[data-s="2"] .f2,.dm[data-s="3"] .f3{box-shadow:0 0 0 3px #9db4ff;border-color:var(--blue)}
+.dm-f b{display:none}.dm-f i{display:inline}
+.dm[data-s="2"] .f1 b,.dm[data-s="3"] .f1 b,.dm[data-s="4"] .f1 b,.dm[data-s="3"] .f2 b,.dm[data-s="4"] .f2 b,.dm[data-s="4"] .f3 b{display:inline}
+.dm[data-s="2"] .f1 i,.dm[data-s="3"] .f1 i,.dm[data-s="4"] .f1 i,.dm[data-s="3"] .f2 i,.dm[data-s="4"] .f2 i,.dm[data-s="4"] .f3 i{display:none}
+.dm[data-s="3"] .dm-btn,.dm[data-s="4"] .dm-btn{opacity:1}
+.dm[data-s="4"] .dm-btn{transform:scale(.96)}
+.dm[data-s="4"] .dm-ok{opacity:1;transform:none}
+.dm[data-s="1"] .dm-tap{opacity:1;transform:translate(200px,18px)}
+.dm[data-s="2"] .dm-tap{opacity:1;transform:translate(200px,64px)}
+.dm[data-s="3"] .dm-tap{opacity:1;transform:translate(200px,110px)}
+.dm[data-s="4"] .dm-tap{opacity:1;transform:translate(120px,150px)}
+.dm-cap{background:#fff4cc;border-top:1px solid var(--ink);padding:8px 12px;font-size:13px;font-weight:700;min-height:38px}
+.dm-ctl{display:flex;gap:8px;justify-content:center;align-items:center;margin-bottom:8px}
+.dm-ctl button{color:var(--ink);font:inherit;font-size:13px;font-weight:700;border:1px solid var(--ink);background:#fff;border-radius:8px;padding:8px 14px;min-height:44px;cursor:pointer}
+.steps li{cursor:pointer;transition:background .25s,box-shadow .25s}
+.steps li.on{background:#e8eeff;box-shadow:0 0 0 2px var(--blue)}
+.steps li:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.dm *{transition:none!important}}
 
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="slate"><h1>ลงเบอร์โทร</h1><p>FDM23067 · สำหรับคนที่ลงตำแหน่งแล้ว ไม่ต้องลงใหม่</p></div>
-  <div class="card howto"><b>วิธีลงเบอร์โทร</b><div class="dm" aria-label="ตัวอย่างวิธีลงเบอร์โทรแบบเคลื่อนไหว"><div class="dm-bar"><span>ลงเบอร์โทร</span><span>FDM23067</span></div><div class="dm-cap"><span class="c1">① เลือกชื่อของตัวเอง</span><span class="c2">② พิมพ์เบอร์โทร 10 หลัก</span><span class="c3">③ กดบันทึก เห็นแถบเขียว = สำเร็จ</span></div><div class="dm-scr"><div class="dm-lab dm-ln">ชื่อของคุณ</div><div class="dm-f n"><span class="dm-ph dm-n1">— เลือกชื่อ —</span><span class="dm-n2">ชื่อ นามสกุล</span></div><div class="dm-lab dm-lp">เบอร์โทร</div><div class="dm-f p"><span class="dm-ph dm-p1">เช่น 0891234567</span><span class="dm-type">0891234567</span></div><div class="dm-btn">บันทึกเบอร์โทร</div><div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div><div class="dm-hand">👆</div></div></div><ol><li>เลือกชื่อของตัวเอง + ใส่รหัสแก้ไข 4 ตัว (ได้ตอนลงตำแหน่ง)</li><li>มีเบอร์ขึ้นให้ → ถูกกด "ยืนยัน" / ผิดกด "แก้เบอร์" · ไม่มี → พิมพ์เบอร์ 10 หลัก</li><li>กด "บันทึกเบอร์โทร" เห็นแถบเขียวคือสำเร็จ</li></ol><span>ไม่เห็นชื่อ = ยังไม่ได้ลงตำแหน่ง ให้กลับไปลงตำแหน่งก่อน · กรอกผิดแก้ได้ ต้องใช้รหัสแก้ไขของตัวเอง · ลืมรหัสถามแอดมิน</span></div>
+  <div class="card howto"><b>วิธีลงเบอร์โทร</b>
+    <div class="dm" id="dm" data-s="1" aria-hidden="true">
+      <div class="dm-bar">ลงเบอร์โทร</div>
+      <div class="dm-scr">
+        <div class="dm-f f1"><i>เลือกชื่อของคุณ</i><b>ชื่อ นามสกุล</b></div>
+        <div class="dm-f f2"><i>รหัสแก้ไข 4 ตัว</i><b>A7K2</b></div>
+        <div class="dm-f f3"><i>เบอร์โทร</i><b>0891234567</b></div>
+        <div class="dm-btn">บันทึกเบอร์โทร</div>
+        <div class="dm-ok">บันทึกเบอร์โทรแล้ว ขอบคุณครับ</div>
+        <div class="dm-tap"></div>
+      </div>
+      <div class="dm-cap" id="dmCap"></div>
+    </div>
+    <ol class="steps" id="dmSteps">
+      <li><div><strong>เลือกชื่อของคุณ</strong><span>ในช่อง "ชื่อของคุณ" เลือกชื่อตัวเองจากรายการ</span></div></li>
+      <li><div><strong>ใส่รหัสแก้ไข 4 ตัว</strong><span>รหัสได้ตอนลงตำแหน่ง ถ้าเครื่องนี้เคยลงตำแหน่งไว้ ระบบจะใส่ให้เอง</span></div></li>
+      <li><div><strong>พิมพ์เบอร์ 10 หลัก แล้วกดบันทึก</strong><span>มีเบอร์อยู่แล้ว กด "✓ ถูกต้อง ยืนยัน" หรือ "✏️ ไม่ถูก แก้เบอร์"<br>ยังไม่มีเบอร์ ให้พิมพ์เบอร์ 10 หลัก แล้วกด "บันทึกเบอร์โทร"</span></div></li>
+      <li><div><strong>เช็กผล</strong><span>ขึ้นว่า "บันทึกเบอร์โทรแล้ว ขอบคุณครับ" ก็สำเร็จ แก้ทีหลังได้ที่ปุ่ม "✏️ แก้" ในรายชื่อด้านล่าง</span></div></li>
+    </ol>
+    <span>ไม่เห็นชื่อตัวเอง = ยังไม่ได้ลงตำแหน่ง ให้ไปลงตำแหน่งก่อน · กรอกผิดแก้ได้ ต้องใช้รหัสของตัวเอง · ลืมรหัสถามแอดมิน</span>
+  </div>
   <div class="card">
     <div class="progress"><b id="done">0</b>/<span id="total">0</span> คนลงเบอร์แล้ว</div>
     <div class="field"><label for="who">ชื่อของคุณ</label><select id="who"><option value="">กำลังโหลด...</option></select></div>
@@ -95,6 +105,26 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </div>
   <a class="back" href="positions.html">← กลับไปหน้าลงตำแหน่ง</a> <a class="back" href="./" style="margin-left:14px">หน้าหลัก</a>
 </div>
+<script>
+/* เดโมสอนลงเบอร์: เล่นเองวน 4 ขั้น (ขั้นละ 2.8 วิ), หยุด/เล่นใหม่ได้, แตะขั้นเพื่อดูซ้ำ */
+(function(){
+  var dm=document.getElementById('dm'),cap=document.getElementById('dmCap'),
+      lis=[].slice.call(document.querySelectorAll('#dmSteps li')),
+      play=document.createElement('i'),re=play;
+  var caps=['เลือกชื่อของคุณจากรายการ','ใส่รหัสแก้ไข 4 ตัว','พิมพ์เบอร์ 10 หลัก แล้วกดบันทึก','ขึ้นแถบเขียว = เสร็จแล้ว'];
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var n=1,timer=null,playing=!reduce;
+  function show(i){n=i;dm.dataset.s=i;cap.textContent=i+'/4 '+caps[i-1];
+    lis.forEach(function(l,k){l.classList.toggle('on',k===i-1)})}
+  function tick(){show(n%4+1)}
+  function start(){stop();timer=setInterval(tick,2800);playing=true;play.textContent='⏸ หยุด';play.setAttribute('aria-pressed','true')}
+  function stop(){clearInterval(timer);timer=null;playing=false;play.textContent='▶ เล่น';play.setAttribute('aria-pressed','false')}
+  lis.forEach(function(l,k){l.tabIndex=0;l.onclick=function(){stop();show(k+1)};
+    l.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();stop();show(k+1)}}});
+  show(1);
+  if(reduce)stop();else start();
+})();
+</script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
 import { getFirestore, doc, collection, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
