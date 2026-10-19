@@ -47,6 +47,7 @@ h1 b{font-weight:700}
 .u .pill{flex:none;display:inline-flex;align-items:center;gap:6px;padding:2px 11px;border-radius:99px;background:#ffc43c;color:#1b1200;font-size:13px;font-weight:700}
 .u .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#1b1200;animation:pulse 1.4s ease-in-out infinite}
 .u .t{font-size:17px;font-weight:600;line-height:1.35}
+.u .t small{display:block;font-size:14px;font-weight:400;opacity:.85}
 .u svg{flex:none;margin-left:auto;width:22px;height:22px;fill:none;stroke:#ffc43c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .u:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .u:active{background:rgba(255,196,60,.3)}
@@ -99,18 +100,18 @@ footer a{color:#fff}
 <main>
   <div class="top"><span>FDM23067</span><a href="https://discord.gg/tY44Uad7bN" target="_blank" rel="noopener">Discord</a></div>
 
-  <!-- เรื่องด่วน: แก้ข้อความหรือเพิ่มบรรทัดตรงนี้ได้เลย ลบทั้งก้อนถ้าไม่มีเรื่องด่วน -->
+  <!-- ประกาศ: แก้ข้อความตรงนี้ได้เลย ลบทั้งก้อนถ้าไม่มีประกาศ -->
   <div class="urgent" role="status">
-    <a class="u" href="phone.html"><span class="pill">ด่วน</span><span class="t">ใครยังไม่ลงเบอร์ ลงภายในวันศุกร์นี้นะ</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6l-6 6"/></svg></a>
+    <a class="u" href="screenplay.html"><span class="pill">ประกาศ</span><span class="t">ถ่ายทำวันที่ 21/10/69<small>Master Scene · บทของเราเอง</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6l-6 6"/></svg></a>
   </div>
 
   <h1>หนังสั้น 1 ซีน<br><b>2 นาที</b></h1>
 
   <nav class="cards" aria-label="เมนูหลัก">
-    <a class="c" href="phone.html"><span class="ic" style="--g:linear-gradient(135deg,#e8662b,#f5a04a)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2"/></svg></span><span><strong>ลงเบอร์โทร</strong><small>กดยืนยันเบอร์ของคุณ</small></span><span class="st" id="stPhone"></span></a>
-    <a class="c s2" href="positions.html"><span class="ic" style="--g:linear-gradient(135deg,#17a58f,#2fd1b0)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg></span><span><strong>ลงตำแหน่ง</strong><small>ใครกดก่อนได้ก่อน</small></span><span class="st" id="stPos"></span></a>
-    <a class="c s3" href="voteTheme.html"><span class="ic" style="--g:linear-gradient(135deg,#e8a21f,#ffd24a)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.615 20h-2.615a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8"/><path d="M14 19l2 2l4 -4"/><path d="M9 8h4"/><path d="M9 12h2"/></svg></span><span><strong>โหวตธีม</strong><small>เลือกธีมของหนัง</small></span></a>
+    <a class="c" href="positions.html"><span class="ic" style="--g:linear-gradient(135deg,#17a58f,#2fd1b0)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85"/></svg></span><span><strong>ลงตำแหน่ง</strong><small>ใครกดก่อนได้ก่อน</small></span><span class="st" id="stPos"></span></a>
+    <a class="c s2" href="voteTheme.html"><span class="ic" style="--g:linear-gradient(135deg,#e8a21f,#ffd24a)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.615 20h-2.615a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8"/><path d="M14 19l2 2l4 -4"/><path d="M9 8h4"/><path d="M9 12h2"/></svg></span><span><strong>โหวตธีม</strong><small>เลือกธีมของหนัง</small></span></a>
     <a class="c s3" href="screenplay.html"><span class="ic" style="--g:linear-gradient(135deg,#c2415a,#ef6f7e)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 13h6"/><path d="M9 17h6"/></svg></span><span><strong>อ่านบทหนัง</strong><small>เหรียญเงิน</small></span></a>
+    <a class="c s3" href="lighting.html"><span class="ic" style="--g:linear-gradient(135deg,#e8a21f,#ffc43c)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0 -3.5 10.9c.6.5 1 1.2 1 2.1h5c0 -.9.4 -1.6 1 -2.1a6 6 0 0 0 -3.5 -10.9z"/></svg></span><span><strong>Lighting Diagram</strong><small>แผนผังไฟ</small></span><span class="st">รอทีมไฟ</span></a>
     <a class="c s4" href="questions.html"><span class="ic" style="--g:linear-gradient(135deg,#6a5cff,#a07bff)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M12 17v.01"/><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4"/></svg></span><span><strong>ถามอาจารย์</strong><small>ฝากคำถามไว้</small></span></a>
   </nav>
 
@@ -128,8 +129,6 @@ try{
   onSnapshot(collection(db,'fdm23067','settings','entries'),snap=>{
     const es=snap.docs.map(d=>d.data()).filter(e=>!e.removed);
     const me=mine&&es.find(e=>e.studentId===mine.studentId);
-    const n=es.filter(e=>e.phone).length;
-    $('stPhone').textContent=(me&&me.phone)?'คุณลงแล้ว':'ลงแล้ว '+n+'/'+es.length;
     $('stPos').textContent=me?'คุณลงแล้ว':'ลงแล้ว '+es.length;
   });
 }catch(e){}

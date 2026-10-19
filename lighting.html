@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lighting Diagram · FDM23067</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#f4efe8;--muted:rgba(244,239,232,.62);--edge:rgba(255,255,255,.16);--amber:#ffc43c;--paper:rgba(16,10,28,.55)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#050407;color:var(--ink);font-family:'Anuphan',system-ui,sans-serif;font-weight:300;line-height:1.7;min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+body::after{content:"";position:fixed;left:50%;top:-38vh;width:max(900px,110vw);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(150,60,40,.38),rgba(60,20,50,.18) 45%,transparent 68%)}
+.wrap{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:18px 18px 56px}
+.top{display:flex;justify-content:space-between;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted)}
+.top a{color:var(--ink);text-decoration:none;font-family:'Anuphan',sans-serif;font-size:15px;min-height:44px;display:inline-flex;align-items:center}
+.top a:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+h1{margin:34px 0 6px;font-weight:700;font-size:clamp(38px,10vw,60px);line-height:1.15}
+.sub{margin:0;color:var(--muted);font-size:16px}
+.wait{margin-top:26px;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:rgba(40,24,0,.62);border:1.5px solid var(--amber);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.wait .pill{flex:none;display:inline-flex;align-items:center;gap:6px;padding:2px 11px;border-radius:99px;background:var(--amber);color:#1b1200;font-size:13px;font-weight:700}
+.wait .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#1b1200;animation:pulse 1.4s ease-in-out infinite}
+.wait span.t{font-size:17px;font-weight:600;line-height:1.35}
+@keyframes pulse{50%{opacity:.25}}
+/* กรอบว่างรอใส่ไดอะแกรม */
+.slot{margin-top:22px;aspect-ratio:16/10;border:1.5px dashed var(--edge);border-radius:18px;display:grid;place-items:center;text-align:center;padding:18px;color:var(--muted);background:var(--paper)}
+.slot svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:6px}
+.slot p{margin:0;font-size:15px}
+.info{margin-top:22px;font-size:15px;color:var(--muted)}
+.info b{color:var(--ink);font-weight:500}
+@media(prefers-reduced-motion:reduce){.wait .pill::before{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="./">← หน้าหลัก</a><span>FDM23067</span></div>
+
+  <h1>Lighting Diagram</h1>
+  <p class="sub">แผนผังไฟสำหรับถ่าย Master Scene วันที่ 21/10/69</p>
+
+  <!-- สถานะ: เปลี่ยนข้อความหรือลบกล่องนี้ได้เมื่อทีมไฟส่งไดอะแกรมมาแล้ว -->
+  <div class="wait" role="status"><span class="pill">รอ</span><span class="t">กำลังรอทีมไฟส่งมา</span></div>
+
+  <!-- ใส่ไดอะแกรมแทนกรอบนี้ เช่น <img src="lighting.png" alt="แผนผังไฟ"> -->
+  <div class="slot"><div>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0 -3.5 10.9c.6.5 1 1.2 1 2.1h5c0 -.9.4 -1.6 1 -2.1a6 6 0 0 0 -3.5 -10.9z"/></svg>
+    <p>ยังไม่มีไดอะแกรม<br>ทีมไฟส่งมาแล้วจะขึ้นตรงนี้</p>
+  </div></div>
+
+  <p class="info"><b>ฉากที่ถ่าย:</b> ห้องทำงาน เวลาเช้ามืด (INT. ห้องทำงาน – DAWN) ดูบทได้ที่ <a href="screenplay.html" style="color:var(--ink)">อ่านบทหนัง</a></p>
+</div>
+</body>
+</html>
